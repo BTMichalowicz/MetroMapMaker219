@@ -1,0 +1,1 @@
+This is my final project for Stony Brook University's CSE 219, taken in Fall 2017. The Metro Map Maker application's purpose is to give users the ability to create metro map systems and toy with already created maps. It wiil be heavily worked on between November and December 2017, with minor edits after main completion.
