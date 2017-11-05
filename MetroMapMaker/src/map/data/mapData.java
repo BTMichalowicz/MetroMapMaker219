@@ -116,9 +116,7 @@ public class mapData  implements AppDataComponent{
         transact = new jTPS();
     }
 
-    
-    
-    
+
     public Color getBackgroundColor() {
         return backgroundColor;
     }
@@ -181,33 +179,7 @@ public class mapData  implements AppDataComponent{
     
     
 
-   
 
-    public void moveSelectedShapeToBack() {
-        if (selectedNode != null) {
-            items.remove(selectedNode);
-            if (items.isEmpty()) {
-                items.add(selectedNode);
-            } else {
-                ArrayList<Node> temp = new ArrayList<>();
-                temp.add(selectedNode);
-                for (Node node : items) {
-                    temp.add(node);
-                }
-                items.clear();
-                for (Node node : temp) {
-                    items.add(node);
-                }
-            }
-        }
-    }
-
-    public void moveSelectedShapeToFront() {
-        if (selectedNode != null) {
-           items.remove(selectedNode);
-            items.add(selectedNode);
-        }
-    }
 
     /**
      * This function clears out the HTML tree and reloads it with the minimal

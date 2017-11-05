@@ -10,8 +10,8 @@ package map;
  */
 public enum mapLanguageProperty {
     
-    UNDO_ICON,
-    REDO_ICON,
+ UNDO_ICON,
+   REDO_ICON,
     UNDO_TOOLTIP,
     REDO_TOOLTIP,
 
@@ -30,9 +30,12 @@ public enum mapLanguageProperty {
     ADD_STATION_TOOLTIP,
     REMOVE_STATION_TOOLTIP,
     SNAP_TOOLTIP,
-    ROTATE_MAP_TOOLTIP,
-    ROTATE_MAP_ICON,
+    ROTATE_LABEL_TOOLTIP,
+    ROTATE_LABEL_ICON,
     STATION_THICKNESS,
+    ABOUT_ICON,
+    ADD_LABEL_TOOLTIP,
+    MOVE_LABEL,
     
     
     FROM_TO_ICON,
@@ -54,12 +57,7 @@ public enum mapLanguageProperty {
     ZOOM_OUT_TOOLTIP,
     INCREASE_TOOLTIP,
     DECREASE_TOOLTIP,
-    
-    
-    
-    
-       
-    
+
     
     
     

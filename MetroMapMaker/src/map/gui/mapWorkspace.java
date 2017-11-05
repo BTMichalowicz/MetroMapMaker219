@@ -1,17 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package map.gui;
 
 import djf.AppTemplate;
 import djf.components.AppDataComponent;
 import djf.components.AppWorkspaceComponent;
+import static djf.settings.AppPropertyType.ABOUT_ICON;
+import static djf.settings.AppPropertyType.ABOUT_TOOLTIP;
 import djf.ui.AppGUI;
 import static djf.ui.AppGUI.CLASS_FILE_BUTTON;
 import djf.ui.AppMessageDialogSingleton;
 import djf.ui.AppYesNoCancelDialogSingleton;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -21,9 +20,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.text.Text;
-import jdk.internal.org.objectweb.asm.Label;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 import static map.css.mapStyle.CLASS_BUTTON;
@@ -32,6 +31,38 @@ import static map.css.mapStyle.CLASS_EDIT_TOOLBAR;
 import static map.css.mapStyle.CLASS_EDIT_TOOLBAR_ROW;
 import static map.css.mapStyle.CLASS_RENDER_CANVAS;
 import map.data.mapData;
+import map.data.mapState;
+import map.mapLanguageProperty;
+import static map.mapLanguageProperty.ADD_ELEM;
+import static map.mapLanguageProperty.ADD_IMG_TOOLTIP;
+import static map.mapLanguageProperty.ADD_LABEL_TOOLTIP;
+import static map.mapLanguageProperty.ADD_LINE_TOOLTIP;
+import static map.mapLanguageProperty.ADD_STATION_TOOLTIP;
+import static map.mapLanguageProperty.BACK_IMG_TOOLTIP;
+import static map.mapLanguageProperty.DECREASE_ICON;
+import static map.mapLanguageProperty.DECREASE_TOOLTIP;
+import static map.mapLanguageProperty.FROM_TO_ICON;
+import static map.mapLanguageProperty.FROM_TO_TOOLTIP;
+import static map.mapLanguageProperty.INCREASE_ICON;
+import static map.mapLanguageProperty.INCREASE_TOOLTIP;
+import static map.mapLanguageProperty.LINE_DETAILS_TOOLTIP;
+import static map.mapLanguageProperty.MOVE_LABEL;
+import static map.mapLanguageProperty.REDO_ICON;
+import static map.mapLanguageProperty.REDO_TOOLTIP;
+import static map.mapLanguageProperty.REMOVE_ELEM;
+import static map.mapLanguageProperty.REMOVE_ELEM_TOOLTIP;
+import static map.mapLanguageProperty.REMOVE_FROM_TOOLTIP;
+import static map.mapLanguageProperty.REMOVE_LINE_TOOLTIP;
+import static map.mapLanguageProperty.REMOVE_STATION_TOOLTIP;
+import static map.mapLanguageProperty.ROTATE_LABEL_ICON;
+import static map.mapLanguageProperty.ROTATE_LABEL_TOOLTIP;
+import static map.mapLanguageProperty.SNAP_TOOLTIP;
+import static map.mapLanguageProperty.UNDO_ICON;
+import static map.mapLanguageProperty.UNDO_TOOLTIP;
+import static map.mapLanguageProperty.ZOOM_IN_ICON;
+import static map.mapLanguageProperty.ZOOM_IN_TOOLTIP;
+import static map.mapLanguageProperty.ZOOM_OUT_ICON;
+import static map.mapLanguageProperty.ZOOM_OUT_TOOLTIP;
 
 /**
  *
@@ -83,31 +114,37 @@ public class mapWorkspace extends AppWorkspaceComponent {
     //Sliders for the size or thickness of each line and station
     Slider lineThickness;
     Slider statThickness;
-    
+
     //COLOR PICKERS
-    
-    ColorPicker fillColorPicker, outlineColorPicker, backgroundColorPicker;
-
-    public ColorPicker getFillColorPicker() {
-        return fillColorPicker;
-    }
-
-    public ColorPicker getOutlineColorPicker() {
-        return outlineColorPicker;
-    }
-
-    public ColorPicker getBackgroundColorPicker() {
-        return backgroundColorPicker;
-    }
-    
-    
-
+    // ColorPicker fillColorPicker, outlineColorPicker, backgroundColorPicker;
+//    public ColorPicker getFillColorPicker() {
+//        return fillColorPicker;
+//    }
+//
+//    public ColorPicker getOutlineColorPicker() {
+//        return outlineColorPicker;
+//    }
+//
+//    public ColorPicker getBackgroundColorPicker() {
+//        return backgroundColorPicker;
+//    }
     public ComboBox getLines() {
         return lines;
     }
 
     public void setLines(ComboBox lines) {
         this.lines = lines;
+    }
+
+    public void setLines(ObservableList stuff) {
+        this.lines = new ComboBox(stuff);
+
+    }
+
+    public void setStations(ObservableList stations) {
+        this.fromStat = new ComboBox(stations);
+        this.toStat = new ComboBox(stations);
+
     }
 
     public ComboBox getStations() {
@@ -177,7 +214,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         initLayout();
 
         // HOOK UP THE CONTROLLERS
-        //initControllers();
+        //initControllers(); //TODO: GET THIS DONE TIMELY!!
         // AND INIT THE STYLE FOR THE WORKSPACE
         initStyle();
     }
@@ -189,14 +226,31 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
     @Override
     public void reloadWorkspace(AppDataComponent dataComponent) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        dataManager  = (mapData) dataComponent;
+        
+        if(dataManager.isInState(mapState.STARTING_LINE)){
+            addLabel.setDisable(false);
+            removeElement.setDisable(false);
+            addImage.setDisable(false);
+            addLine.setDisable(true);
+            imgBackground.setDisable(true);
+            addToLine.setDisable(true);
+            removeFromLine.setDisable(true);
+            addStat.setDisable(false);
+            removeStat.setDisable(true);
+            details.setDisable(true);
+            fromToPop.setDisable(true);
+            
+        }else if(dataManager.isInState(mapState.STARTING_IMAGE)){
+            
+        }
     }
 
     private void initLayout() {
         editToolbar = new VBox();
-        redo = gui.initChildButton(gui.getFileToolbar(), "Redo", "Redo a given action", true);
-        undo = gui.initChildButton(gui.getFileToolbar(), "Undo", "Undo a given action", true);
-        about = gui.initChildButton(gui.getFileToolbar(), "About", "About the developer", false);
+        redo = gui.initChildButton(gui.getFileToolbar(), REDO_ICON.toString(), REDO_TOOLTIP.toString(), true);
+        undo = gui.initChildButton(gui.getFileToolbar(), UNDO_ICON.toString(), UNDO_TOOLTIP.toString(), true);
+        about = gui.initChildButton(gui.getFileToolbar(), ABOUT_ICON.toString(), ABOUT_TOOLTIP.toString(), false);
 
         redo.getStyleClass().add(CLASS_FILE_BUTTON);
         undo.getStyleClass().add(CLASS_FILE_BUTTON);
@@ -209,24 +263,24 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         lines = new ComboBox();
         metroLine = new Text("Metro Lines");
-        lineColor = new Ellipse(3, 3);
+        lineColor = new Ellipse(50, 50);
+        lineColor.setFill(Paint.valueOf("0xFFFFFF"));
+        lineColor.setAccessibleText(lineColor.getFill().toString());
 
         lines1.getChildren().addAll(metroLine, lines, lineColor);
 
         //HBOX 2: Line Editor Part 2
         lines2 = new HBox();
 
-        /*
-         
-         TODO: Replace these with gui.initChildButton(...) later!!!
-         */
-        addLine = new Button();
-        removeLine = new Button();
-        addToLine = new Button();
-        removeFromLine = new Button();
-        details = new Button();
+        
+        addLine = gui.initChildButton(lines2, ADD_ELEM.toString(), ADD_LINE_TOOLTIP.toString(), false);
+        removeLine = gui.initChildButton(lines2, REMOVE_ELEM.toString(), REMOVE_LINE_TOOLTIP.toString(), false);
+        addToLine = gui.initChildButton(lines2, " ", mapLanguageProperty.ADD_TO_TOOLTIP.toString(), false);
+        addToLine.setText("Add Station to Line");
+        removeFromLine = gui.initChildButton(lines2, " ", REMOVE_FROM_TOOLTIP.toString(), true);
+        removeFromLine.setText("Remove Station from Line");
 
-        lines2.getChildren().addAll(addLine, removeLine, addToLine, removeFromLine);
+        details = gui.initChildButton(lines2, mapLanguageProperty.LINE_DETAILS.toString(), LINE_DETAILS_TOOLTIP.toString(), workspaceActivated);
 
         //HBOX 3: Line Editor Part 3
         lineSlider = new HBox();
@@ -242,21 +296,25 @@ public class mapWorkspace extends AppWorkspaceComponent {
         stat1 = new HBox();
 
         metroStation = new Text();
-        stationColor = new Ellipse(3, 3);
+
+        stationColor = new Ellipse(50, 50);
+        stationColor.setFill(Paint.valueOf("0xFFFFFF"));
+        stationColor.setAccessibleText(lineColor.getFill().toString());
+
         stations = new ComboBox();
+        stations.setPromptText("Metro Stations");
 
         stat1.getChildren().addAll(metroStation, stations, stationColor);
 
         /// VBOX 2, PART 2, BUTTONS
         //TODO: REPLACE WITH GUI.INITcHILDBUTTON()
         stat2 = new HBox();
-        addStat = new Button();
-        removeStat = new Button();
-        snapToGrid = new Button();
-        moveLabel = new Button();
-        rotate = new Button();
-
-        stat2.getChildren().addAll(addStat, removeStat, snapToGrid, moveLabel, rotate);
+        addStat = gui.initChildButton(stat2, ADD_ELEM.toString(), ADD_STATION_TOOLTIP.toString(), true);
+        removeStat = gui.initChildButton(stat2, REMOVE_ELEM.toString(), REMOVE_STATION_TOOLTIP.toString(), true);
+        snapToGrid = gui.initChildButton(stat2, " ", SNAP_TOOLTIP.toString(), false);
+        snapToGrid.setText("Snap");
+        moveLabel = gui.initChildButton(stat2, " ", MOVE_LABEL.toString(), true);
+        rotate = gui.initChildButton(stat2, ROTATE_LABEL_ICON.toString(), ROTATE_LABEL_TOOLTIP.toString(), true);
 
         // PART 3: SLIDER AGAIN
         statSlider = new HBox();
@@ -269,12 +327,14 @@ public class mapWorkspace extends AppWorkspaceComponent {
         /// VBOX 3: DESTINATION FROM-TO
         fromTo = new VBox();
         fromStat = new ComboBox();
+        fromStat.setPromptText("Choose a starting station");
         toStat = new ComboBox();
+        toStat.setPromptText("Choose an ending destination");
 
         fromToDest = new HBox();
 
         //TODO: REPLACE WITH GUI.INITCHILDBUTTON()...
-        fromToPop = new Button();
+        fromToPop = gui.initChildButton(fromTo, FROM_TO_ICON.toString(), FROM_TO_TOOLTIP.toString(), false);
 
         fromTo.getChildren().addAll(fromStat, toStat);
 
@@ -283,21 +343,28 @@ public class mapWorkspace extends AppWorkspaceComponent {
         /// VBOX 4; DECORUM... SWEET SWEET DECORUM
         decor1 = new VBox();
         decorTop = new HBox();
+        decorTop.setSpacing(decorTop.getWidth() / 2);
         decor = new Text();
-        backColor = new Ellipse(3, 3);
+
+        backColor = new Ellipse(50, 50);
+        backColor.setFill(Paint.valueOf("0xFFFFFF"));
+        backColor.setAccessibleText(lineColor.getFill().toString());
 
         decorTop.getChildren().addAll(decor, backColor);
 
         /// Part 2
         decorBot = new HBox();
 
-        imgBackground = new Button();
-        addImage = new Button();
-        addLabel = new Button();
-        removeElement = new Button();
+        imgBackground = gui.initChildButton(decorBot, " ", BACK_IMG_TOOLTIP.toString(), false);
+        imgBackground.setText("Add a background image");
+        addImage = gui.initChildButton(decorBot, " ", ADD_IMG_TOOLTIP.toString(), false);
+        addImage.setText("Add an image overlay");
+        addLabel = gui.initChildButton(decorBot, " ", ADD_LABEL_TOOLTIP.toString(), false);
+        addLabel.setText("Add A Label");
+        removeElement = gui.initChildButton(decorBot, " ", REMOVE_ELEM_TOOLTIP.toString(), true);
+        removeElement.setText("Remove an element");
 
-        decorBot.getChildren().addAll(imgBackground, addImage, addLabel, removeElement);
-
+        //decorBot.getChildren().addAll(imgBackground, addImage, addLabel, removeElement);
         //VBOX 5: FONT
         font1 = new VBox();
 
@@ -305,17 +372,29 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         font = new Text();
 
-        fontColor = new Ellipse();
+        fontColor = new Ellipse(50, 50);
+        fontColor.setFill(Paint.valueOf("0x000000"));
+        fontColor.setAccessibleText(lineColor.getFill().toString());
+        fontTop.setSpacing(fontTop.getWidth() / 2);
         fontTop.getChildren().addAll(font, fontColor);
 
         fontBot = new HBox();
         // PART 2;:
         bold = new CheckBox();
+        Text boldText = new Text("Bold your text ->");
         italicize = new CheckBox();
-        fontSizes = new ComboBox();
-        fontFamilies = new ComboBox();
+        Text iText = new Text("Italicize ->");
 
-        fontBot.getChildren().addAll(bold, italicize, fontSizes, fontFamilies);
+        ObservableList<Integer> sizes = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 20, 21, 22, 23, 48, 72, 96);
+        fontSizes = new ComboBox(sizes);
+        fontSizes.setPromptText("Choose a font size");
+
+        ObservableList<String> families = FXCollections.observableArrayList("Sans Serif", "Comic Sans MS", "Times New Roman", "Arial", "Courier", "Cambria");
+        fontFamilies = new ComboBox(families);
+        fontSizes.setPromptText("Choose a font family");
+
+        fontBot.getChildren().addAll(boldText, bold, iText, italicize, fontSizes, fontFamilies);
+        fontBot.setSpacing(1.5);
 
         font1.getChildren().addAll(fontTop, fontBot);
 
@@ -332,12 +411,12 @@ public class mapWorkspace extends AppWorkspaceComponent {
         navBot = new HBox();
 
         //TODO: TAKE CARE OF GUI.INITCHILDBUTTON
-        zoomIn = new Button();
-        zoomOut = new Button();
-        increaseMapSize = new Button();
-        decreaseMapSize = new Button();
+        zoomIn = gui.initChildButton(navBot, ZOOM_IN_ICON.toString(), ZOOM_IN_TOOLTIP.toString(), false);
+        zoomOut = gui.initChildButton(navBot, ZOOM_OUT_ICON.toString(), ZOOM_OUT_TOOLTIP.toString(), false);
+        increaseMapSize = gui.initChildButton(navBot, INCREASE_ICON.toString(), INCREASE_TOOLTIP.toString(), false);
+        decreaseMapSize = gui.initChildButton(navBot, DECREASE_ICON.toString(), DECREASE_TOOLTIP.toString(), false);
 
-        navBot.getChildren().addAll(zoomIn, zoomOut, increaseMapSize, decreaseMapSize);
+        
 
         nav1.getChildren().addAll(navTop, navBot);
 
@@ -356,41 +435,32 @@ public class mapWorkspace extends AppWorkspaceComponent {
         workspace = new BorderPane();
         ((BorderPane) workspace).setLeft(editToolbar);
         ((BorderPane) workspace).setCenter(canvas);
-        
-        
-        
-        
     }
-    
-    
-    private void initStyle(){
+
+    private void initStyle() {
         // NOTE THAT EACH CLASS SHOULD CORRESPOND TO
         // A STYLE CLASS SPECIFIED IN THIS APPLICATION'S
         // CSS FILE
         canvas.getStyleClass().add(CLASS_RENDER_CANVAS);
 
         // COLOR PICKER STYLE
-        fillColorPicker.getStyleClass().add(CLASS_BUTTON);
-        outlineColorPicker.getStyleClass().add(CLASS_BUTTON);
-        backgroundColorPicker.getStyleClass().add(CLASS_BUTTON);
-
+//        fillColorPicker.getStyleClass().add(CLASS_BUTTON);
+        // outlineColorPicker.getStyleClass().add(CLASS_BUTTON);
+        //backgroundColorPicker.getStyleClass().add(CLASS_BUTTON);
         editToolbar.getStyleClass().add(CLASS_EDIT_TOOLBAR);
         addLinesMain.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         addStationsMain.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         fromTo.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         fromToDest.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
-       // backgroundColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
+        // backgroundColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
 
         decor1.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         //fillColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
         font1.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         //outlineColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
         nav1.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
-       // outlineThicknessLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
-        
+        // outlineThicknessLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
 
     }
-
-    
 
 }

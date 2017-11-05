@@ -26,7 +26,7 @@
         <property name="EXPORT_ICON"        value="Export.png"></property>
         <property name="EXIT_ICON"          value="Exit.png"></property> 
         <property name="ADD_ELEM"           value="Plus.png"></property>
-        <property name="REMOVE_ELEM"        value="Minue.png"></property>
+        <property name="REMOVE_ELEM"        value="Minus.png"></property>
         <property name="ABOUT_ICON"         value="About.png"></property>
         <property name="UNDO_ICON"          value="Undo.png"></property>
         <property name="REDO_ICON"          value="Redo.png"></property>
@@ -38,34 +38,44 @@
         <property name="INCRASE_ICON"    value="IncreaseMap.png"></property>
         <property name="DECREASE_ICON"   value="DecreaseMap.png"></property>
         
-        
-        
         <!-- TOOLTIPS FOR BUTTONS -->
+
+   
+
+        <property name="EXIT_TOOLTIP"		value="Exit the Application"></property>
+        <property name="CUT_TOOLTIP"		value="Cut a selected item or text"></property>
+        <property name="COPY_TOOLTIP"		value="Copy a selected item or text"></property>
+        <property name="PASTE_TOOLTIP"		value="Paste a selected item or text"></property>
+        <property name="ABOUT_TOOLTIP"          value="About the developer(s)"></property>
+        <property name="LANG_TOOLTIP"           value="Choose between two languages"></property>
+        <property name="UNDO_TOOLTIP"           value="Undo the last action"></property>
+        <property name="REDO_TOOLTIP"           value="Redo the last action"></property>
+        
         <property name="NEW_TOOLTIP"		value="Create a New Map"></property>
         <property name="LOAD_TOOLTIP"		value="Load an Existing Map"></property>
         <property name="SAVE_AS_TOOLTIP"        value="Save as Map"></property>
         <property name="EXPORT_TOOLTIP"         value="Export Map"></property>
         <property name="SAVE_TOOLTIP"		value="Save this Map"></property>
         <property name="EXIT_TOOLTIP"		value="Exit the Application"></property>
-        <property name="ABOUT_TOOLTIP"          value="About the developer(s)"></property>
-        <property name="UNDO_TOOLTIP"           value="Undo the last action"></property>
-        <property name="REDO_TOOLTIP"           value="Redo the last action"></property>
+       
         <property name="ADD_LINE_TOOLTIP"       value="Add a new metro line"></property>
         <property name="REMOVE_LINE_TOOLTIP"    value="Remove a metro line"></property>
         <property name="ADD_TO_TOOLTIP"         value="Add a station to a line"></property>
         <property name="REMOVE_FROM_TOOLTIP"    value="Remove a station from a line"></property>
         <property name="LINE_DETAILS_TOOLTIP"   value="List the stations on this line"></property>
         <property name="LINE_THICKNESS"         value="Increase or decrease the border thickness of the line"></property>
-        
         <property name="ADD_STATION_TOOLTIP"    value="Add a station on the map"></property>
         <property name="REMOVE_STATION_TOOLTIP" value="Remove a station from the map"></property>
         <property name="SNAP_TOOLTIP"           value="Snap all the elements to a grid"></property>
         <property name="ROTATE_LABEL_TOOLTIP"   value="Rotate a label some value of degrees"></property>
         <property name="STATION_THICKNESS"      value="Increase the thickness of a station border"></property>
+        
         <property name="FROM_TO_TOOLTIP"        value="Explains how to go from the first selected station to the second selected station"></property>
         <property name="BACK_IMG_TOOLTIP"       value="Add a background Image"></property>
         <property name="ADD_IMG_TOOLTIP"        value="Add an image overlay somewhere on the map"></property>
-        <property name="ADD_LABEL_TOOLTIP"      value="Add a label somewhere on the 
+        <property name="ADD_LABEL_TOOLTIP"      value="Add a label somewhere on the line"></property>
+        <property name="MOVE_LABEL"             value="Move a label around on the canvas"></property>
+        
         <property name="REMOVE_ELEM_TOOLTIP"    value="Remove any element from the map"></property>
         <property name="BOLD_TOOLTIP"           value="Bold your given text"></property>
         <property name="ITALICS_TOOLTIP"        value="Italicize your given text"></property>
@@ -73,9 +83,6 @@
         <property name="ZOOM_OUT_TOOLTIP"       value="Zoom out of the map"></property>
         <property name="INCREASE_TOOLTIP"       value="Increase the map's size"></property>
         <property name="DECREASE_TOOLTIP"       value="Decrease the map's size"></property>
-        
-        
-        
         
         
         <!-- ERROR MESSAGES -->
@@ -97,7 +104,6 @@
         <property name="LOAD_COMPLETED_MESSAGE"		value="File Loading Completed and ready for editing"></property>
         <property name="LOAD_COMPLETED_TITLE"		value="Loading Completed"></property>
         <property name="SAVE_COMPLETED_MESSAGE"		value="File Saving Completed"></property>
-       
         <property name="SAVE_COMPLETED_TITLE"		value="Saving Completed"></property>
         <property name="SAVE_UNSAVED_WORK_MESSAGE"	value="Would you like to save your unsaved work first?"></property>
         <property name="SAVE_UNSAVED_WORK_TITLE"	value="Save unsaved work?"></property>
@@ -110,18 +116,25 @@
         <property name="LOAD_WORK_TITLE"		value="Select work file to load"></property>
         <property name="LOAD_IMAGE_TITLE"               value="Select an image to load"></property>
         <property name="LOAD_TEXT_TITLE"                value="Add some text to the work"></property>
-        <property name="WORK_FILE_EXT"			value="map"></property>
-        <property name="WORK_FILE_EXT_DESC"		value="MetroMapMaker Files"></property>
+        <property name="WORK_FILE_EXT"			value="pm"></property>
+        <property name="WORK_FILE_EXT_DESC"		value="goLogoLo Files"></property>
 
-        <!-- PROGRAM ICON FILES -->
 
-        
         
         <!-- TOOLTIPS FOR BUTTONS -->
-
+        <!--	<property name="SELECTION_TOOL_TOOLTIP"	    value="Use Shape Selection Tool"></property>
+        <property name="REMOVE_ELEMENT_TOOLTIP"	    value="Remove Element"></property>
+        <property name="RECTANGLE_TOOLTIP"	    value="Draw Rectangle"></property>
+        <property name="ELLIPSE_TOOLTIP"	    value="Draw Ellipse"></property>
+        <property name="MOVE_TO_BACK_TOOLTIP"	    value="Move Shape to Back"></property>
+        <property name="MOVE_TO_FRONT_TOOLTIP"	    value="Move Shape to Front"></property>-->
+        <property name="BACKGROUND_TOOLTIP"	    value="Select Background Color"></property>
+        <property name="FILL_TOOLTIP"		    value="Select Fill Color"></property>
+        <property name="OUTLINE_TOOLTIP"	    value="Select Outline Color"></property>
+        <!--	<property name="SNAPSHOT_TOOLTIP"	    value="Take Snapshot"></property>-->
 	
         <!-- MESSAGES -->
-	
+        <property name="REMOVE_ELEMENT_MESSAGE"	    value="Are you sure you wish to remove that element?"></property>
 		
         <!-- ERROR MESSAGES AND TITLES FOR THEIR DIALOGS -->
         <property name="ATTRIBUTE_UPDATE_ERROR_MESSAGE"	    value="WARNING: An error occured updating the element's attribute."></property>
@@ -136,9 +149,11 @@
         <property name="FILL"                         value="Fill Color"></property>
         <property name="OUTLINE_COLOR"                      value="Outline Color"></property>
         <property name="OUTLINE_THICKNESS"                  value="Outline Thickness"></property>
- 
+        <property name="TEXT_BUTTON"                        value="Add some text"></property>
+        <property name="IMAGE_BUTTON"                       value="Add an Image"></property>  
                         
                                         
     </property_list>
-  
+    <property_options_list>
+    </property_options_list>
 </properties>

@@ -142,9 +142,7 @@ public class PropertiesManager
         // NOW LOAD ALL THE PROPERTIES
         Node propertyListNode = xmlUtil.getNodeWithName(doc, PROPERTY_LIST_ELEMENT);
         ArrayList<Node> propNodes = xmlUtil.getChildNodesWithName(propertyListNode, PROPERTY_ELEMENT);
-        for(Node n : propNodes)
-        {
-            NamedNodeMap attributes = n.getAttributes();
+        propNodes.stream().map((n) -> n.getAttributes()).forEachOrdered((attributes) -> {
             for (int i = 0; i < attributes.getLength(); i++)
             {
                 Node att = attributes.getNamedItem(NAME_ATT);
@@ -152,26 +150,23 @@ public class PropertiesManager
                 String attValue = attributes.getNamedItem(VALUE_ATT).getTextContent();
                 properties.put(attName, attValue);
             }
-        }
+        });
         
         // AND THE PROPERTIES FROM OPTION LISTS
         Node propertyOptionsListNode = xmlUtil.getNodeWithName(doc, PROPERTY_OPTIONS_LIST_ELEMENT);
         if (propertyOptionsListNode != null)
         {
             ArrayList<Node> propertyOptionsNodes = xmlUtil.getChildNodesWithName(propertyOptionsListNode, PROPERTY_OPTIONS_ELEMENT);
-            for (Node n : propertyOptionsNodes)
-            {
+            propertyOptionsNodes.forEach((n) -> {
                 NamedNodeMap attributes = n.getAttributes();
                 String name = attributes.getNamedItem(NAME_ATT).getNodeValue();
                 ArrayList<String> options = new ArrayList<>();
                 propertyOptionsLists.put(name, options);
                 ArrayList<Node> optionsNodes = xmlUtil.getChildNodesWithName(n, OPTION_ELEMENT);
-                for (Node oNode : optionsNodes)
-                {
-                    String option = oNode.getTextContent();
+                optionsNodes.stream().map((oNode) -> oNode.getTextContent()).forEachOrdered((option) -> {
                     options.add(option);
-                }
-            }
+                });
+            });
         }
     }
 }
