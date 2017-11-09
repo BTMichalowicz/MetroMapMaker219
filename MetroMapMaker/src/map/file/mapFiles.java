@@ -14,6 +14,8 @@ import java.io.IOException;
  * @author Ben Michalowicz
  */
 public class mapFiles implements AppFileComponent{
+    
+    
 
     @Override
     public void saveData(AppDataComponent data, String filePath) throws IOException {
@@ -30,9 +32,11 @@ public class mapFiles implements AppFileComponent{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    
+    // THIS METHOD WILL NOT BE USED FOR THE DURATION OF THIS PROJECT
     @Override
     public void importData(AppDataComponent data, String filePath) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

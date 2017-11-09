@@ -1,6 +1,5 @@
 package djf.ui;
 
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
@@ -9,7 +8,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import properties_manager.PropertiesManager;
 import djf.controller.AppFileController;
@@ -20,14 +18,15 @@ import static djf.settings.AppStartupConstants.PATH_IMAGES;
 import java.net.URL;
 
 /**
- * This class provides the basic user interface for this application,
- * including all the file controls, but not including the workspace,
- * which would be customly provided for each app.
- * 
+ * This class provides the basic user interface for this application, including
+ * all the file controls, but not including the workspace, which would be
+ * customly provided for each app.
+ *
  * @author Richard McKenna
  * @version 1.0
  */
 public class AppGUI {
+
     // THIS HANDLES INTERACTIONS WITH FILE-RELATED CONTROLS
     protected AppFileController fileController;
 
@@ -41,10 +40,10 @@ public class AppGUI {
     // APPLICATION AppGUI. NOTE THAT THE WORKSPACE WILL GO
     // IN THE CENTER REGION OF THE appPane
     protected BorderPane appPane;
-    
+
     // THIS IS THE TOP PANE WHERE WE CAN PUT TOOLBAR
     protected FlowPane topToolbarPane;
-    
+
     // THIS IS THE FILE TOOLBAR AND ITS CONTROLS
     protected FlowPane fileToolbar;
 
@@ -53,130 +52,157 @@ public class AppGUI {
     protected Button loadButton;
     protected Button saveButton;
     protected Button exitButton;
-    
-    // THIS DIALOG IS USED FOR GIVING FEEDBACK TO THE USER
-    protected AppYesNoCancelDialogSingleton yesNoCancelDialog;
-    
-    // THIS TITLE WILL GO IN THE TITLE BAR
-    protected String appTitle;
-    
-    /**
-     * This constructor initializes the file toolbar for use.
-     * 
-     * @param initPrimaryStage The window for this application.
-     * 
-     * @param initAppTitle The title of this application, which
-     * will appear in the window bar.
-     * 
-     * @param app The app within this gui is used.
-     */
-    public AppGUI(  Stage initPrimaryStage, 
-		    String initAppTitle, 
-		    AppTemplate app){
-	// SAVE THESE FOR LATER
-	primaryStage = initPrimaryStage;
-	appTitle = initAppTitle;
-	       
-        // INIT THE TOOLBAR
-        initTopToolbar(app);
-        		
-        // AND FINALLY START UP THE WINDOW (WITHOUT THE WORKSPACE)
-        initWindow();
-        
-        // INIT THE STYLESHEET AND THE STYLE FOR THE FILE TOOLBAR
-        initStylesheet(app);
-        initFileToolbarStyle();        
+    protected Button saveAs;
+
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
+    public void setSaveButton(Button saveButton) {
+        this.saveButton = saveButton;
     }
     
+
+    // THIS DIALOG IS USED FOR GIVING FEEDBACK TO THE USER
+    protected AppYesNoCancelDialogSingleton yesNoCancelDialog;
+
+    // THIS TITLE WILL GO IN THE TITLE BAR
+    protected String appTitle;
+
+    /**
+     * This constructor initializes the file toolbar for use.
+     *
+     * @param initPrimaryStage The window for this application.
+     *
+     * @param initAppTitle The title of this application, which will appear in
+     * the window bar.
+     *
+     * @param app The app within this gui is used.
+     */
+    public AppGUI(Stage initPrimaryStage,
+            String initAppTitle,
+            AppTemplate app) {
+        // SAVE THESE FOR LATER
+        primaryStage = initPrimaryStage;
+        appTitle = initAppTitle;
+
+        // INIT THE TOOLBAR
+        initTopToolbar(app);
+
+        // AND FINALLY START UP THE WINDOW (WITHOUT THE WORKSPACE)
+        initWindow();
+
+        // INIT THE STYLESHEET AND THE STYLE FOR THE FILE TOOLBAR
+        initStylesheet(app);
+        initFileToolbarStyle();
+    }
+
     /**
      * Accessor method for getting the file toolbar controller.
+     * @return the given instance of the fileController
      */
-    public AppFileController getFileController() { return fileController; }
-    
+    public AppFileController getFileController() {
+        return fileController;
+    }
+
     /**
-     * Accessor method for getting the application pane, within which all
-     * user interface controls are ultimately placed.
-     * 
+     * Accessor method for getting the application pane, within which all user
+     * interface controls are ultimately placed.
+     *
      * @return This application GUI's app pane.
      */
-    public BorderPane getAppPane() { return appPane; }
-    
+    public BorderPane getAppPane() {
+        return appPane;
+    }
+
     /**
      * Accessor method for getting the toolbar pane in the top, within which
      * other toolbars are placed.
-     * 
+     *
      * @return This application GUI's app pane.
-     */    
+     */
     public FlowPane getTopToolbarPane() {
         return topToolbarPane;
     }
-    
+
     /**
-     * Accessor method for getting the file toolbar pane, within which all
-     * file controls are ultimately placed.
-     * 
+     * Accessor method for getting the file toolbar pane, within which all file
+     * controls are ultimately placed.
+     *
      * @return This application GUI's app pane.
-     */    
+     */
     public FlowPane getFileToolbar() {
         return fileToolbar;
     }
-    
-    /**
-     * Accessor method for getting this application's primary stage's,
-     * scene.
-     * 
-     * @return This application's window's scene.
-     */
-    public Scene getPrimaryScene() { return primaryScene; }
-    
-    /**
-     * Accessor method for getting this application's window,
-     * which is the primary stage within which the full GUI will be placed.
-     * 
-     * @return This application's primary stage (i.e. window).
-     */    
-    public Stage getWindow() { return primaryStage; }
 
     /**
-     * This method is used to activate/deactivate toolbar buttons when
-     * they can and cannot be used so as to provide foolproof design.
-     * 
+     * Accessor method for getting this application's primary stage's, scene.
+     *
+     * @return This application's window's scene.
+     */
+    public Scene getPrimaryScene() {
+        return primaryScene;
+    }
+
+    /**
+     * Accessor method for getting this application's window, which is the
+     * primary stage within which the full GUI will be placed.
+     *
+     * @return This application's primary stage (i.e. window).
+     */
+    public Stage getWindow() {
+        return primaryStage;
+    }
+
+    /**
+     * This method is used to activate/deactivate toolbar buttons when they can
+     * and cannot be used so as to provide foolproof design.
+     *
      * @param saved Describes whether the loaded Page has been saved or not.
      */
     public void updateToolbarControls(boolean saved) {
         // THIS TOGGLES WITH WHETHER THE CURRENT COURSE
         // HAS BEEN SAVED OR NOT
         saveButton.setDisable(saved);
+        saveAs.setDisable(saved);
 
         // ALL THE OTHER BUTTONS ARE ALWAYS ENABLED
         // ONCE EDITING THAT FIRST COURSE BEGINS
-	newButton.setDisable(false);
+        newButton.setDisable(false);
         loadButton.setDisable(false);
-	exitButton.setDisable(false);
+        exitButton.setDisable(false);
 
         // NOTE THAT THE NEW, LOAD, AND EXIT BUTTONS
         // ARE NEVER DISABLED SO WE NEVER HAVE TO TOUCH THEM
     }
 
-    /****************************************************************************/
+    /**
+     * *************************************************************************
+     */
     /* BELOW ARE ALL THE PRIVATE HELPER METHODS WE USE FOR INITIALIZING OUR AppGUI */
-    /****************************************************************************/
-    
+    /**
+     * *************************************************************************
+     */
     /**
      * This function initializes all the buttons in the toolbar at the top of
      * the application window. These are related to file management.
      */
     private void initTopToolbar(AppTemplate app) {
         fileToolbar = new FlowPane();
+        
 
         // HERE ARE OUR FILE TOOLBAR BUTTONS, NOTE THAT SOME WILL
         // START AS ENABLED (false), WHILE OTHERS DISABLED (true)
-        newButton = initChildButton(fileToolbar,	NEW_ICON.toString(),	    NEW_TOOLTIP.toString(),	false);
-        loadButton = initChildButton(fileToolbar,	LOAD_ICON.toString(),	    LOAD_TOOLTIP.toString(),	false);
-        saveButton = initChildButton(fileToolbar,	SAVE_ICON.toString(),	    SAVE_TOOLTIP.toString(),	true);
-        exitButton = initChildButton(fileToolbar,	EXIT_ICON.toString(),	    EXIT_TOOLTIP.toString(),	false);
+        newButton = initChildButton(fileToolbar, NEW_ICON.toString(), NEW_TOOLTIP.toString(), false);
+        loadButton = initChildButton(fileToolbar, LOAD_ICON.toString(), LOAD_TOOLTIP.toString(), false);
+        saveButton = initChildButton(fileToolbar, SAVE_ICON.toString(), SAVE_TOOLTIP.toString(), true);
+        exitButton = initChildButton(fileToolbar, EXIT_ICON.toString(), EXIT_TOOLTIP.toString(), false);
+        saveAs = initChildButton(fileToolbar, SAVE_AS_ICON.toString(), SAVE_AS_TOOLTIP.toString(), true);
+        
 
-	// AND NOW SETUP THEIR EVENT HANDLERS
+        
+
+        // AND NOW SETUP THEIR EVENT HANDLERS
         fileController = new AppFileController(app);
         newButton.setOnAction(e -> {
             fileController.handleNewRequest();
@@ -189,8 +215,15 @@ public class AppGUI {
         });
         exitButton.setOnAction(e -> {
             fileController.handleExitRequest();
-        });	
+        });
+
+        saveAs.setOnAction(e -> {
+            fileController.handleSaveAsRequest();
+        });
         
+        
+        
+
         // NOW PUT THE FILE TOOLBAR IN THE TOP TOOLBAR, WHICH COULD
         // ALSO STORE OTHER TOOLBARS
         topToolbarPane = new FlowPane();
@@ -201,8 +234,8 @@ public class AppGUI {
     // THERE EXCEPT THE WORKSPACE, WHICH WILL BE ADDED THE FIRST
     // TIME A NEW Page IS CREATED OR LOADED
     private void initWindow() {
-	PropertiesManager props = PropertiesManager.getPropertiesManager();
-        
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+
         // SET THE WINDOW TITLE
         primaryStage.setTitle(appTitle);
 
@@ -229,83 +262,84 @@ public class AppGUI {
         // NOW TIE THE SCENE TO THE WINDOW
         primaryStage.setScene(primaryScene);
     }
-    
+
     /**
-     * This is a public helper method for initializing a simple button with
-     * an icon and tooltip and placing it into a toolbar.
-     * 
+     * This is a public helper method for initializing a simple button with an
+     * icon and tooltip and placing it into a toolbar.
+     *
      * @param toolbar Toolbar pane into which to place this button.
-     * 
+     *
      * @param icon Icon image file name for the button.
-     * 
+     *
      * @param tooltip Tooltip to appear when the user mouses over the button.
-     * 
-     * @param disabled true if the button is to start off disabled, false otherwise.
-     * 
-     * @return A constructed, fully initialized button placed into its appropriate
-     * pane container.
+     *
+     * @param disabled true if the button is to start off disabled, false
+     * otherwise.
+     *
+     * @return A constructed, fully initialized button placed into its
+     * appropriate pane container.
      */
     public Button initChildButton(Pane toolbar, String icon, String tooltip, boolean disabled) {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
-	
-	// LOAD THE ICON FROM THE PROVIDED FILE
+
+        // LOAD THE ICON FROM THE PROVIDED FILE
         String imagePath = FILE_PROTOCOL + PATH_IMAGES + props.getProperty(icon);
         Image buttonImage = new Image(imagePath);
-	
-	// NOW MAKE THE BUTTON
+
+        // NOW MAKE THE BUTTON
         Button button = new Button();
         button.setDisable(disabled);
         button.setGraphic(new ImageView(buttonImage));
         Tooltip buttonTooltip = new Tooltip(props.getProperty(tooltip));
         button.setTooltip(buttonTooltip);
-	
-	// PUT THE BUTTON IN THE TOOLBAR
+
+        // PUT THE BUTTON IN THE TOOLBAR
         toolbar.getChildren().add(button);
-	
-	// AND RETURN THE COMPLETED BUTTON
+
+        // AND RETURN THE COMPLETED BUTTON
         return button;
     }
-    
-   /**
-     *  Note that this is the default style class for the top file toolbar
-     * and that style characteristics for this type of component should be 
-     * put inside app_properties.xml.
+
+    /**
+     * Note that this is the default style class for the top file toolbar and
+     * that style characteristics for this type of component should be put
+     * inside app_properties.xml.
      */
     public static final String CLASS_BORDERED_PANE = "bordered_pane";
 
-   /**
-     *  Note that this is the default style class for the file buttons in
-     * the top file toolbar and that style characteristics for this type
-     * of component should be put inside app_properties.xml.
+    /**
+     * Note that this is the default style class for the file buttons in the top
+     * file toolbar and that style characteristics for this type of component
+     * should be put inside app_properties.xml.
      */
     public static final String CLASS_FILE_BUTTON = "file_button";
-    
+
     /**
-     * This function sets up the stylesheet to be used for specifying all
-     * style for this application. Note that it does not attach CSS style
-     * classes to controls, that must be done separately.
+     * This function sets up the stylesheet to be used for specifying all style
+     * for this application. Note that it does not attach CSS style classes to
+     * controls, that must be done separately.
      */
     private void initStylesheet(AppTemplate app) {
-	// SELECT THE STYLESHEET
-	PropertiesManager props = PropertiesManager.getPropertiesManager();
-	String stylesheet = props.getProperty(APP_PATH_CSS);
-	stylesheet += props.getProperty(APP_CSS);
+        // SELECT THE STYLESHEET
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String stylesheet = props.getProperty(APP_PATH_CSS);
+        stylesheet += props.getProperty(APP_CSS);
         Class appClass = app.getClass();
-	URL stylesheetURL = appClass.getResource(stylesheet);
-	String stylesheetPath = stylesheetURL.toExternalForm();
-	primaryScene.getStylesheets().add(stylesheetPath);	
+        URL stylesheetURL = appClass.getResource(stylesheet);
+        String stylesheetPath = stylesheetURL.toExternalForm();
+        primaryScene.getStylesheets().add(stylesheetPath);
     }
-    
+
     /**
-     * This function specifies the CSS style classes for the controls managed
-     * by this framework.
+     * This function specifies the CSS style classes for the controls managed by
+     * this framework.
      */
     private void initFileToolbarStyle() {
-	topToolbarPane.getStyleClass().add(CLASS_BORDERED_PANE);
+        topToolbarPane.getStyleClass().add(CLASS_BORDERED_PANE);
         fileToolbar.getStyleClass().add(CLASS_BORDERED_PANE);
-	newButton.getStyleClass().add(CLASS_FILE_BUTTON);
-	loadButton.getStyleClass().add(CLASS_FILE_BUTTON);
-	saveButton.getStyleClass().add(CLASS_FILE_BUTTON);
-	exitButton.getStyleClass().add(CLASS_FILE_BUTTON);
+        newButton.getStyleClass().add(CLASS_FILE_BUTTON);
+        loadButton.getStyleClass().add(CLASS_FILE_BUTTON);
+        saveButton.getStyleClass().add(CLASS_FILE_BUTTON);
+        exitButton.getStyleClass().add(CLASS_FILE_BUTTON);
     }
 }

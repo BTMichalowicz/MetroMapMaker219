@@ -17,8 +17,10 @@ public enum mapState {
     DRAGGING_NOTHING,
     SIZING_NOTHING,
     STARTING_TEXT,
-    STARTING_IMAGE,
-    SIZING_ITEM
+    
+    STARTING_OVERLAY,
+    SIZING_ITEM,
+    ROTATING_LABEL
     
     
     

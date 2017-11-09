@@ -9,7 +9,7 @@
 <properties>
     <property_list>
         <property name="APP_TITLE"	    value="Metro Map Maker"></property>
-        <property name="APP_LOGO"	    value="M3.png"></property>
+        <property name="APP_LOGO"	    value="M3Logo.png"></property>
         <property name="APP_PATH_CSS"	    value="css/"></property>
         <property name="APP_CSS"	    value="map_style.css"></property>
 
@@ -35,7 +35,7 @@
         <property name="FROM_TO_ICON"       value="FromTo.png"></property>
         <property name="ZOOM_IN_ICON"       value="ZoomIn.png"></property>
         <property name="ZOOM_OUT_ICON"      value="ZoomOut.png"></property>
-        <property name="INCRASE_ICON"    value="IncreaseMap.png"></property>
+        <property name="INCREASE_ICON"    value="IncreaseMap.png"></property>
         <property name="DECREASE_ICON"   value="DecreaseMap.png"></property>
         
         <!-- TOOLTIPS FOR BUTTONS -->
@@ -116,8 +116,8 @@
         <property name="LOAD_WORK_TITLE"		value="Select work file to load"></property>
         <property name="LOAD_IMAGE_TITLE"               value="Select an image to load"></property>
         <property name="LOAD_TEXT_TITLE"                value="Add some text to the work"></property>
-        <property name="WORK_FILE_EXT"			value="pm"></property>
-        <property name="WORK_FILE_EXT_DESC"		value="goLogoLo Files"></property>
+        <property name="WORK_FILE_EXT"			value="m3"></property>
+        <property name="WORK_FILE_EXT_DESC"		value="MetroMapMaker Files"></property>
 
 
         
