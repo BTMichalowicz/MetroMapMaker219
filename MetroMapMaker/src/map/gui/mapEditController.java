@@ -107,7 +107,7 @@ public class mapEditController {
 //            /*
 //            Once the fule has been exported as some sort of PNG image, then we go to exporting the data
 //            */
-//            fileControl.exportData(dataManager, FILE_PROTOCOL);
+//            fileControl.exportData(dataManager, PATH_WORKSSSSSS);
 //            
 //
 //        } catch (IOException ioe) {
@@ -116,8 +116,9 @@ public class mapEditController {
 
             Alert a = new Alert(AlertType.INFORMATION);
             a.setHeaderText(null);
-            a.setContentText("Export Map");
-            a.setTitle("Export is Completed");
+            a.setTitle("Export Map");
+            a.setHeaderText(null);
+            a.setContentText("Export is Completed");
             a.showAndWait();
       
     }

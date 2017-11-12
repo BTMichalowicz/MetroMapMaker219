@@ -7,14 +7,11 @@ import javafx.stage.Stage;
 import properties_manager.PropertiesManager;
 import static djf.settings.AppPropertyType.*;
 import static djf.settings.AppStartupConstants.*;
-import java.io.IOException;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import java.util.Optional;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TextInputDialog;
 import properties_manager.InvalidXMLFileFormatException;
 
 /**
@@ -60,8 +57,6 @@ public abstract class AppTemplate extends Application {
         return dataComponent;
     }
 
-    
-
     /**
      * Accessor for the file component.
      */
@@ -101,7 +96,7 @@ public abstract class AppTemplate extends Application {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
 
         //SETTING UP THE WELCOME TAG!!
-        AppWelcomeDialogSingleton welcome = AppWelcomeDialogSingleton.getAppWelcomeDialog();
+        AppWelcomeDialogSingleton welcome = AppWelcomeDialogSingleton.getAppWelcomeDialog(this);
         //TODO: SET UP THE WELCOME TAG
         try {
 
@@ -123,18 +118,64 @@ public abstract class AppTemplate extends Application {
 
                 welcome.show();
                 // NOW OPEN UP THE WINDOW
-                
-                welcome.getNewButton().setOnAction(e -> {
 
+                welcome.getNewButton().setOnAction((ActionEvent e) -> {
                     welcome.close();
-                    primaryStage.show();
-                    this.getGUI().getFileController().handleNewRequest();
+                    
+                    TextInputDialog newMap = new TextInputDialog();
+                    newMap.setTitle("Creating a new Map!");
+                    newMap.setHeaderText(null);
+                    newMap.setContentText("Enter your map name here");
+                    
+                    Optional<String> result = newMap.showAndWait();
+                    
+                    
+                        if (result.isPresent()) {
+                            
+                            
+                            boolean isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get()); //TODO: IMPLEMENT!!!!
+                            while(!isDuplicate){
+                                Alert duplicate = new Alert(AlertType.ERROR);
+                                duplicate.setHeaderText(null);
+                                duplicate.setContentText("You have a duplicate name!!!");
+                                duplicate.showAndWait();
+                                result = newMap.showAndWait();
+                                if(result.isPresent()){
+                                    isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get());
+                                    continue;
+                            }else{
+                                    primaryStage.show();
+                                getGUI().getFileController().handleNewWelcomeRequest(result.get());
+                                break;
+                                }
+                            }
+                            
+                                primaryStage.show();
+                                getGUI().getFileController().handleNewWelcomeRequest(result.get());
+                                
+                                
+                                
+                            
+                            
+                        } else {
+                            primaryStage.show();
+                            
+                            
+                        }
+                        
+                    
+                });
 
+                welcome.setOnCloseRequest(e -> {
+                    primaryStage.show();
                 });
 
                 primaryStage.setOnCloseRequest(e -> {
 
                     if (!getGUI().getFileController().isSaved()) {
+                        getGUI().getFileController().handleExitRequest();
+                    } else {
+
                         getGUI().getFileController().handleExitRequest();
                     }
 

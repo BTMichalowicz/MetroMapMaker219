@@ -5,9 +5,9 @@
         <group>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/file/mapFiles.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/data/app_properties_EN.xml</file>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/mapLanguageProperty.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/mapWorkspace.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/mapApp.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/mapEditController.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/mapState.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/mapData.java</file>
         </group>

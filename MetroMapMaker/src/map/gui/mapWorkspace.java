@@ -7,8 +7,6 @@ import static djf.settings.AppPropertyType.ABOUT_ICON;
 import static djf.settings.AppPropertyType.ABOUT_TOOLTIP;
 import static djf.settings.AppPropertyType.EXPORT_ICON;
 import static djf.settings.AppPropertyType.EXPORT_TOOLTIP;
-import static djf.settings.AppPropertyType.SAVE_AS_ICON;
-import static djf.settings.AppPropertyType.SAVE_AS_TOOLTIP;
 import djf.ui.AppGUI;
 import static djf.ui.AppGUI.CLASS_BORDERED_PANE;
 import static djf.ui.AppGUI.CLASS_FILE_BUTTON;
@@ -16,7 +14,6 @@ import djf.ui.AppMessageDialogSingleton;
 import djf.ui.AppYesNoCancelDialogSingleton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -27,14 +24,11 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.text.Text;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 import static map.css.mapStyle.CLASS_BUTTON;
-import static map.css.mapStyle.CLASS_COLOR_CHOOSER_CONTROL;
 import static map.css.mapStyle.CLASS_EDIT_TOOLBAR;
 import static map.css.mapStyle.CLASS_EDIT_TOOLBAR_ROW;
 import static map.css.mapStyle.CLASS_RENDER_CANVAS;
@@ -487,7 +481,11 @@ public class mapWorkspace extends AppWorkspaceComponent {
         font = new Text("Font         ");
 
 
-        fontTop.getChildren().addAll(font, fontColorPicker);
+        
+         ObservableList<Integer> sizes = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 20, 21, 22, 23, 48, 72, 96);
+        fontSizes = new ComboBox(sizes);
+        fontSizes.setPromptText("Choose a font size");
+        fontTop.getChildren().addAll(font, fontColorPicker, fontSizes);
 
         fontBot = new HBox();
         // PART 2;:
@@ -496,15 +494,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
         italicize = new CheckBox();
         Text iText = new Text("Italicize ->");
 
-        ObservableList<Integer> sizes = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 20, 21, 22, 23, 48, 72, 96);
-        fontSizes = new ComboBox(sizes);
-        fontSizes.setPromptText("Choose a font size");
+       
 
         ObservableList<String> families = FXCollections.observableArrayList("Sans Serif", "Comic Sans MS", "Times New Roman", "Arial", "Courier", "Cambria");
         fontFamilies = new ComboBox(families);
         fontFamilies.setPromptText("Choose a font family");
 
-        fontBot.getChildren().addAll(boldText, bold, iText, italicize, fontSizes, fontFamilies);
+        fontBot.getChildren().addAll(boldText, bold, iText, italicize,  fontFamilies);
         fontBot.setSpacing(1.5);
 
         font1.getChildren().addAll(fontTop, fontBot);

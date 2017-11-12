@@ -3,13 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/ui/AppYesNoCancelDialogSingleton.java</file>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/settings/AppPropertyType.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/AppTemplate.java</file>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/ui/AppMessageDialogSingleton.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/ui/AppWelcomeDialogSingleton.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/ui/AppGUI.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/components/AppFileComponent.java</file>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/ui/AppWelcomeDialogSingleton.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/DesktopJavaFramework/src/djf/controller/AppFileController.java</file>
         </group>
     </open-files>

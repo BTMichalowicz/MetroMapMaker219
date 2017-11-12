@@ -19,17 +19,17 @@ public class mapFiles implements AppFileComponent{
 
     @Override
     public void saveData(AppDataComponent data, String filePath) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new IOException("Not supported yet!");
     }
 
     @Override
     public void loadData(AppDataComponent data, String filePath) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new IOException("Not supported yet!");
     }
 
     @Override
     public void exportData(AppDataComponent data, String filePath) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new IOException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     

@@ -26,7 +26,20 @@ import static djf.settings.AppPropertyType.SAVE_ERROR_TITLE;
 import static djf.settings.AppPropertyType.SAVE_UNSAVED_WORK_MESSAGE;
 import static djf.settings.AppPropertyType.SAVE_UNSAVED_WORK_TITLE;
 import static djf.settings.AppPropertyType.SAVE_WORK_TITLE;
+import static djf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static djf.settings.AppStartupConstants.PATH_WORK;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
+import javax.json.JsonWriterFactory;
+import javax.json.stream.JsonGenerator;
 
 /**
  * This class provides the event programmed responses for the file controls that
@@ -42,7 +55,6 @@ public class AppFileController {
 
     // WE WANT TO KEEP TRACK OF WHEN SOMETHING HAS NOT BEEN SAVED
     boolean saved;
-    
 
     // THIS IS THE FILE FOR THE WORK CURRENTLY BEING WORKED ON
     File currentWorkFile;
@@ -75,8 +87,99 @@ public class AppFileController {
     }
 
     /**
+     * This method starts the process of editing new Work by creating a new work
+     * from the welcome box dialog. The majority of this comes from the
+     * handleNewRequest(), and Will save a file as well.
+     *
+     * At this point, all of the checks have been made (duplicate files, whether
+     * any files of that particular extension even EXIST, etc
+     *
+     * @param file The name of the file that is used do be placed
+     */
+    
+    public void handleNewWelcomeRequest(String file) {
+        AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        try {
+            
+            
+            ///NOW SAVE THE FILE AT THE VERY END!!
+                JsonObject newFile = Json.createObjectBuilder()
+                        
+                        .add("FileName", file)
+                        .build();
+                
+                File f = new File(PATH_WORK);
+
+                // AND NOW OUTPUT IT TO A JSON FILE WITH PRETTY PRINTING
+                Map<String, Object> properties = new HashMap<>(1);
+                properties.put(JsonGenerator.PRETTY_PRINTING, true);
+                JsonWriterFactory writerFactory = Json.createWriterFactory(properties);
+                StringWriter sw = new StringWriter();
+                try (JsonWriter jsonWriter = writerFactory.createWriter(sw)) {
+                    jsonWriter.writeObject(newFile);
+                }
+
+                // INIT THE WRITER
+                OutputStream os = new FileOutputStream(PATH_WORK+ f.getName()+ ".m3");
+                JsonWriter jsonFileWriter = Json.createWriter(os);
+                jsonFileWriter.writeObject(newFile);
+                String prettyPrinted = sw.toString();
+                try (PrintWriter pw = new PrintWriter(PATH_WORK+file + ".m3")) {
+                    pw.write(prettyPrinted);
+                }
+            
+            
+            
+            
+            // WE MAY HAVE TO SAVE CURRENT WORK
+            boolean continueToMakeNew = true;
+            if (!saved) {
+                // THE USER CAN OPT OUT HERE WITH A CANCEL
+                continueToMakeNew = promptToSave();
+            }
+
+            // IF THE USER REALLY WANTS TO MAKE A NEW COURSE
+            if (continueToMakeNew) {
+                // RESET THE WORKSPACE
+
+                app.getWorkspaceComponent().resetWorkspace();
+
+                // RESET THE DATA
+                app.getDataComponent().resetData();
+
+                // NOW RELOAD THE WORKSPACE WITH THE RESET DATA
+                app.getWorkspaceComponent().reloadWorkspace(app.getDataComponent());
+
+                // MAKE SURE THE WORKSPACE IS ACTIVATED
+                app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
+
+                // WORK IS NOT SAVED
+                saved = false;
+                currentWorkFile = null;
+
+                // REFRESH THE GUI, WHICH WILL ENABLE AND DISABLE
+                // THE APPROPRIATE CONTROLS
+                app.getGUI().updateToolbarControls(saved);
+
+                
+
+                // TELL THE USER NEW WORK IS UNDERWAY
+                dialog.show(props.getProperty(NEW_COMPLETED_TITLE), props.getProperty(NEW_COMPLETED_MESSAGE));
+            }
+        } catch (IOException ioe) {
+            // SOMETHING WENT WRONG, PROVIDE FEEDBACK
+            dialog.show(props.getProperty(NEW_ERROR_TITLE), props.getProperty(NEW_ERROR_MESSAGE));
+            ioe.printStackTrace();
+
+        }
+
+    }
+
+    /**
      * This method starts the process of editing new Work. If work is already
      * being edited, it will prompt the user to save it first.
+     *
      *
      */
     public void handleNewRequest() {
@@ -93,6 +196,7 @@ public class AppFileController {
             // IF THE USER REALLY WANTS TO MAKE A NEW COURSE
             if (continueToMakeNew) {
                 // RESET THE WORKSPACE
+
                 app.getWorkspaceComponent().resetWorkspace();
 
                 // RESET THE DATA
@@ -118,7 +222,9 @@ public class AppFileController {
         } catch (IOException ioe) {
             // SOMETHING WENT WRONG, PROVIDE FEEDBACK
             dialog.show(props.getProperty(NEW_ERROR_TITLE), props.getProperty(NEW_ERROR_MESSAGE));
+
         }
+
     }
 
     /**
@@ -374,5 +480,24 @@ public class AppFileController {
         }
     }
 
-   
+    public boolean checkDuplicateFileName(String fileName) {
+
+        File f = new File(PATH_WORK);
+
+        File[] directory = f.listFiles((File dir, String name) -> name.endsWith(".m3"));
+
+        if (directory.length == 0) {
+            return true; //If no files match that same name and extension, 
+            //return true to create a new file and save it
+        } else {
+            for (File dirFile : directory) {
+                if (dirFile.getName().split("\\.")[0].equals(fileName.split("\\.")[0] )) {
+                    return false; // There does exist a duplicate
+                }
+            }
+        } //There does not exist a duplicate, so
+        return true;
+
+    }
+
 }

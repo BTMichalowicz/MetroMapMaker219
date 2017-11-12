@@ -16,6 +16,9 @@ import static djf.settings.AppPropertyType.*;
 import static djf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static djf.settings.AppStartupConstants.PATH_IMAGES;
 import java.net.URL;
+import java.util.Optional;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputDialog;
 
 /**
  * This class provides the basic user interface for this application, including
@@ -61,7 +64,6 @@ public class AppGUI {
     public void setSaveButton(Button saveButton) {
         this.saveButton = saveButton;
     }
-    
 
     // THIS DIALOG IS USED FOR GIVING FEEDBACK TO THE USER
     protected AppYesNoCancelDialogSingleton yesNoCancelDialog;
@@ -99,6 +101,7 @@ public class AppGUI {
 
     /**
      * Accessor method for getting the file toolbar controller.
+     *
      * @return the given instance of the fileController
      */
     public AppFileController getFileController() {
@@ -189,7 +192,6 @@ public class AppGUI {
      */
     private void initTopToolbar(AppTemplate app) {
         fileToolbar = new FlowPane();
-        
 
         // HERE ARE OUR FILE TOOLBAR BUTTONS, NOTE THAT SOME WILL
         // START AS ENABLED (false), WHILE OTHERS DISABLED (true)
@@ -198,14 +200,39 @@ public class AppGUI {
         saveButton = initChildButton(fileToolbar, SAVE_ICON.toString(), SAVE_TOOLTIP.toString(), true);
         exitButton = initChildButton(fileToolbar, EXIT_ICON.toString(), EXIT_TOOLTIP.toString(), false);
         saveAs = initChildButton(fileToolbar, SAVE_AS_ICON.toString(), SAVE_AS_TOOLTIP.toString(), true);
-        
-
-        
 
         // AND NOW SETUP THEIR EVENT HANDLERS
         fileController = new AppFileController(app);
         newButton.setOnAction(e -> {
-            fileController.handleNewRequest();
+
+            TextInputDialog newMap = new TextInputDialog();
+            newMap.setTitle("Creating a new Map!");
+            newMap.setHeaderText(null);
+            newMap.setContentText("Enter your map name here");
+
+            Optional<String> result = newMap.showAndWait();
+
+            if (result.isPresent()) {
+
+                boolean isDuplicate = getFileController().checkDuplicateFileName(result.get()); //TODO: IMPLEMENT!!!!
+                while (!isDuplicate) {
+                    Alert duplicate = new Alert(Alert.AlertType.ERROR);
+                    duplicate.setHeaderText(null);
+                    duplicate.setContentText("You have a duplicate name!!!");
+                    duplicate.showAndWait();
+                    result = newMap.showAndWait();
+                    if (result.isPresent()) {
+                        isDuplicate = getFileController().checkDuplicateFileName(result.get());
+                    } else {
+                        break;
+                    }
+                }
+
+                getFileController().handleNewWelcomeRequest(result.get());
+
+            } else {
+
+            }
         });
         loadButton.setOnAction(e -> {
             fileController.handleLoadRequest();
@@ -220,9 +247,6 @@ public class AppGUI {
         saveAs.setOnAction(e -> {
             fileController.handleSaveAsRequest();
         });
-        
-        
-        
 
         // NOW PUT THE FILE TOOLBAR IN THE TOP TOOLBAR, WHICH COULD
         // ALSO STORE OTHER TOOLBARS
@@ -341,5 +365,6 @@ public class AppGUI {
         loadButton.getStyleClass().add(CLASS_FILE_BUTTON);
         saveButton.getStyleClass().add(CLASS_FILE_BUTTON);
         exitButton.getStyleClass().add(CLASS_FILE_BUTTON);
+        saveAs.getStyleClass().add(CLASS_FILE_BUTTON);
     }
 }
