@@ -33,6 +33,9 @@ import java.io.FileWriter;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import javax.json.Json;
@@ -106,7 +109,7 @@ public class AppFileController {
             ///NOW SAVE THE FILE AT THE VERY END!!
                 JsonObject newFile = Json.createObjectBuilder()
                         
-                        .add("FileName", file)
+                        
                         .build();
                 
                 File f = new File(PATH_WORK);
@@ -121,13 +124,16 @@ public class AppFileController {
                 }
 
                 // INIT THE WRITER
-                OutputStream os = new FileOutputStream(f.getPath()+ ".m3");
+                OutputStream os = new FileOutputStream(f.getPath()+"\\"+ file+ ".m3");
                 JsonWriter jsonFileWriter = Json.createWriter(os);
                 jsonFileWriter.writeObject(newFile);
                 String prettyPrinted = sw.toString();
-                try (PrintWriter pw = new PrintWriter(PATH_WORK+file + ".m3")) {
+                try (PrintWriter pw = new PrintWriter(f.getPath()+"\\"+ file+ ".m3")) {
                     pw.write(prettyPrinted);
+                    
                 }
+                
+                
             
             
             
