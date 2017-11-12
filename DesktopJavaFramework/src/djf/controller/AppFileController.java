@@ -121,7 +121,7 @@ public class AppFileController {
                 }
 
                 // INIT THE WRITER
-                OutputStream os = new FileOutputStream(PATH_WORK+ f.getName()+ ".m3");
+                OutputStream os = new FileOutputStream(f.getPath()+ ".m3");
                 JsonWriter jsonFileWriter = Json.createWriter(os);
                 jsonFileWriter.writeObject(newFile);
                 String prettyPrinted = sw.toString();
