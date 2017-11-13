@@ -113,6 +113,11 @@ public class AppFileController {
                         .build();
                 
                 File f = new File(PATH_WORK);
+                
+                
+                //TODO:: PROPERLY IMPLEWMENT FILE OPENING AND STUFF
+//                File f2 = new File(PATH_WORK + file);
+//                boolean b = f2.mkdir();
 
                 // AND NOW OUTPUT IT TO A JSON FILE WITH PRETTY PRINTING
                 Map<String, Object> properties = new HashMap<>(1);

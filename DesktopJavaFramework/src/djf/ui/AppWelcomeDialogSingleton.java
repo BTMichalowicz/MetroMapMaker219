@@ -271,7 +271,7 @@ public class AppWelcomeDialogSingleton extends Stage {
     private void sortFiles(ArrayList<File> recentWorks) {
         for (int idx = 0; idx < recentWorks.size() - 1; idx++) {
             for (int j = 0; j < recentWorks.size() - idx - 1; idx++) {
-                if (recentWorks.get(j).lastModified() < recentWorks.get(j + 1).lastModified()) {
+                if (recentWorks.get(j).lastModified() > recentWorks.get(j + 1).lastModified()) {
                     File temp = recentWorks.get(j);
                     recentWorks.set(j, recentWorks.get(j + 1));
                     recentWorks.set(j + 1, temp);

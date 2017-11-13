@@ -451,10 +451,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
         fromToDest.getChildren().addAll(fromTo, fromToPop);
 
         /// VBOX 4; DECORUM... SWEET SWEET DECORUM
-        decor1 = new VBox();
-        decorTop = new HBox();
-        decorTop.setSpacing(decorTop.getWidth() / 2);
-        decor = new Text();
+        decor1 = new VBox(25);
+        decorTop = new HBox(35);
+        //decorTop.setSpacing(decorTop.getWidth() / 2);
+        decor = new Text("Decor");
 
         
 
@@ -473,6 +473,9 @@ public class mapWorkspace extends AppWorkspaceComponent {
         removeElement.setText("Remove an element");
 
         //decorBot.getChildren().addAll(imgBackground, addImage, addLabel, removeElement);
+        
+        decor1.getChildren().addAll(decorTop, decorBot);
+        
         //VBOX 5: FONT
         font1 = new VBox();
 
@@ -525,7 +528,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         nav1.getChildren().addAll(navTop, navBot);
 
-        editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest,
+        editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest,decor1,
                 font1, nav1);
 
         canvas = new Pane();
@@ -561,6 +564,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         // backgroundColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
 
         decor1.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
+        
         //fillColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
         font1.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         //outlineColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);

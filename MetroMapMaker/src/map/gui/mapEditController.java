@@ -65,7 +65,8 @@ public class mapEditController {
         s = "Welcome to Metro Map Maker!\n\nThrough this application, you will be able to view maps of real-life metro stations and create your own custom maps!\n"
                 + "This application was designed and developed by Benjamin Michalowicz, a student in the Computer Science Department at "
                 + "Stony Brook University from October to December, 2017 using the Java programming language."
-                + "\n\nEnjoy!";
+                + "\n\nEnjoy!\n\n"
+                + "\u00a9 Benjamin Michalowicz, 2017";
 
         DialogPane d = aboutAlert.getDialogPane();
 
