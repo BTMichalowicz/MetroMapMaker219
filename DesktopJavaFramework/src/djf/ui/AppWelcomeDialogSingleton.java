@@ -104,7 +104,7 @@ public class AppWelcomeDialogSingleton extends Stage {
         
         Label recentFiles = new Label("Recent Files");
 
-        hyperLinkList.getChildren().addAll(recentFiles, file1, file2, file3, file4, file5);
+        hyperLinkList.getChildren().addAll(recentFiles, file5, file4, file3, file2, file1);
         
         
 
@@ -271,10 +271,10 @@ public class AppWelcomeDialogSingleton extends Stage {
     private void sortFiles(ArrayList<File> recentWorks) {
         for (int idx = 0; idx < recentWorks.size() - 1; idx++) {
             for (int j = 0; j < recentWorks.size() - idx - 1; idx++) {
-                if (recentWorks.get(j).lastModified() > recentWorks.get(j + 1).lastModified()) {
-                    File temp = recentWorks.get(j);
-                    recentWorks.set(j, recentWorks.get(j + 1));
-                    recentWorks.set(j + 1, temp);
+                if (recentWorks.get(j).lastModified()<=recentWorks.get(j + 1).lastModified()) {
+                    File temp = recentWorks.get(j+1);
+                    recentWorks.set(j+1, recentWorks.get(j));
+                    recentWorks.set(j, temp);
                 }
             }
         }
@@ -283,12 +283,12 @@ public class AppWelcomeDialogSingleton extends Stage {
     private void renameLinks(ArrayList<File> recentWorks) {
 
         if (recentWorks.size() > 0 && recentWorks.get(0) != null) {
-            file1.setText(recentWorks.get(0).getName());
+            file5.setText(recentWorks.get(0).getName());
         } else {
 
         }
         if (recentWorks.size() > 1 && recentWorks.get(1) != null) {
-            file2.setText(recentWorks.get(1).getName());
+            file4.setText(recentWorks.get(1).getName());
         } else {
 
         }
@@ -298,12 +298,12 @@ public class AppWelcomeDialogSingleton extends Stage {
 
         }
         if (recentWorks.size() > 3 && recentWorks.get(3) != null) {
-            file4.setText(recentWorks.get(3).getName());
+            file2.setText(recentWorks.get(3).getName());
         } else {
 
         }
         if (recentWorks.size() > 4 && recentWorks.get(4) != null) {
-            file5.setText(recentWorks.get(4).getName());
+            file1.setText(recentWorks.get(4).getName());
         } else {
 
         }

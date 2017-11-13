@@ -99,50 +99,42 @@ public class AppFileController {
      *
      * @param file The name of the file that is used do be placed
      */
-    
     public void handleNewWelcomeRequest(String file) {
         AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         try {
-            
-            
+
             ///NOW SAVE THE FILE AT THE VERY END!!
-                JsonObject newFile = Json.createObjectBuilder()
-                        
-                        
-                        .build();
-                
-                File f = new File(PATH_WORK);
-                
-                
-                //TODO:: PROPERLY IMPLEWMENT FILE OPENING AND STUFF
+            JsonObject newFile = Json.createObjectBuilder()
+                    .build();
+
+            File f = new File(PATH_WORK);
+
+            //TODO:: PROPERLY IMPLEWMENT FILE OPENING AND STUFF
 //                File f2 = new File(PATH_WORK + file);
 //                boolean b = f2.mkdir();
+            File f2 = new File(PATH_WORK + file);
+            boolean b = f2.mkdir();
 
-                // AND NOW OUTPUT IT TO A JSON FILE WITH PRETTY PRINTING
-                Map<String, Object> properties = new HashMap<>(1);
-                properties.put(JsonGenerator.PRETTY_PRINTING, true);
-                JsonWriterFactory writerFactory = Json.createWriterFactory(properties);
-                StringWriter sw = new StringWriter();
-                try (JsonWriter jsonWriter = writerFactory.createWriter(sw)) {
-                    jsonWriter.writeObject(newFile);
-                }
+            // AND NOW OUTPUT IT TO A JSON FILE WITH PRETTY PRINTING
+            Map<String, Object> properties = new HashMap<>(1);
+            properties.put(JsonGenerator.PRETTY_PRINTING, true);
+            JsonWriterFactory writerFactory = Json.createWriterFactory(properties);
+            StringWriter sw = new StringWriter();
+            try (JsonWriter jsonWriter = writerFactory.createWriter(sw)) {
+                jsonWriter.writeObject(newFile);
+            }
 
-                // INIT THE WRITER
-                OutputStream os = new FileOutputStream(f.getPath()+"\\"+ file+ ".m3");
-                JsonWriter jsonFileWriter = Json.createWriter(os);
-                jsonFileWriter.writeObject(newFile);
-                String prettyPrinted = sw.toString();
-                try (PrintWriter pw = new PrintWriter(f.getPath()+"\\"+ file+ ".m3")) {
-                    pw.write(prettyPrinted);
-                    
-                }
-                
-                
-            
-            
-            
-            
+            // INIT THE WRITER
+            OutputStream os = new FileOutputStream(f2.getPath() + "\\" + file + ".m3");
+            JsonWriter jsonFileWriter = Json.createWriter(os);
+            jsonFileWriter.writeObject(newFile);
+            String prettyPrinted = sw.toString();
+            try (PrintWriter pw = new PrintWriter(f2.getPath() + "\\" + file + ".m3")) {
+                pw.write(prettyPrinted);
+
+            }
+
             // WE MAY HAVE TO SAVE CURRENT WORK
             boolean continueToMakeNew = true;
             if (!saved) {
@@ -172,8 +164,6 @@ public class AppFileController {
                 // REFRESH THE GUI, WHICH WILL ENABLE AND DISABLE
                 // THE APPROPRIATE CONTROLS
                 app.getGUI().updateToolbarControls(saved);
-
-                
 
                 // TELL THE USER NEW WORK IS UNDERWAY
                 dialog.show(props.getProperty(NEW_COMPLETED_TITLE), props.getProperty(NEW_COMPLETED_MESSAGE));
@@ -502,7 +492,7 @@ public class AppFileController {
             //return true to create a new file and save it
         } else {
             for (File dirFile : directory) {
-                if (dirFile.getName().split("\\.")[0].equals(fileName.split("\\.")[0] )) {
+                if (dirFile.getName().split("\\.")[0].equals(fileName.split("\\.")[0])) {
                     return false; // There does exist a duplicate
                 }
             }

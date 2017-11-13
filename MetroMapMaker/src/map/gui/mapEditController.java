@@ -3,7 +3,9 @@ package map.gui;
 import djf.AppTemplate;
 
 import static djf.settings.AppStartupConstants.FILE_PROTOCOL;
+import static djf.settings.AppStartupConstants.PATH_EXPORTS;
 import static djf.settings.AppStartupConstants.PATH_IMAGES;
+import static djf.settings.AppStartupConstants.PATH_WORK;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,26 +96,26 @@ public class mapEditController {
 
         Optional<String> result = fileName.showAndWait();
 
-//        int i = 1; //for use in writing
-//        File file = null;
+        int i = 1; //for use in writing
+        File file = null;
         
         
         
 
-//        //Writing the file
-//        try {
-//            if (result.isPresent())
-//                makeImage(file, i, result, image); //method to take a snapshot of the canvas
-//            
-//            /*
-//            Once the fule has been exported as some sort of PNG image, then we go to exporting the data
-//            */
-//            fileControl.exportData(dataManager, PATH_WORKSSSSSS);
-//            
-//
-//        } catch (IOException ioe) {
-//           ioe.printStackTrace();
-//        }
+        //Writing the file
+        try {
+            if (result.isPresent())
+                makeImage(file, i, result, image); //method to take a snapshot of the canvas
+            
+            /*
+            Once the fule has been exported as some sort of PNG image, then we go to exporting the data
+            */
+            //fileControl.exportData(dataManager, PATH_EXPORTS);
+            
+
+        } catch (IOException ioe) {
+           ioe.printStackTrace();
+        }
 
             Alert a = new Alert(AlertType.INFORMATION);
             a.setHeaderText(null);
@@ -138,11 +140,11 @@ public class mapEditController {
                         i++;
                         file = new File(result.get() + "(" + i + ").png");
                     }
-                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file); //Only save the file
+                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file)); //Only save the file
                                                                                        //After the loop has finished
 
                 } else {
-                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file));
                 }
             }
             
