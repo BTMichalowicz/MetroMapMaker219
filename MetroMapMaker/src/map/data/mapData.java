@@ -29,7 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
-import map.gui.mapWorkspace;
+import map.gui.MapWorkspace;
 
 /**
  *
@@ -140,7 +140,7 @@ public class mapData  implements AppDataComponent{
     
     public void setBackgroundColor(Color initBackgroundColor) {
         backgroundColor = initBackgroundColor;
-        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
         Pane canvas = workspace.getCanvas();
         BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
         Background background = new Background(fill);
@@ -197,7 +197,7 @@ public class mapData  implements AppDataComponent{
         currentOutlineColor = Color.web(BLACK_HEX);
 
         items.clear();
-        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().clear();
+        ((MapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().clear();
     }
 
     public void selectSizedShape() {
@@ -224,8 +224,8 @@ public class mapData  implements AppDataComponent{
         items.add(shapeToAdd);
     }
 
-    public void removeShape(Node shapeToRemove) {
-        items.remove(shapeToRemove);
+    public void removeShape(Node nodeToRemove) {
+        items.remove(nodeToRemove);
     }
 
     public mapState getState() {
@@ -250,6 +250,18 @@ public class mapData  implements AppDataComponent{
 
     public void setSelectedShape(Node initSelectedShape) {
         selectedNode = initSelectedShape;
+    }
+    
+    public void removeSelectedItem(){
+        if (selectedNode!= null) {
+
+            
+            selectedNode = null;
+
+       
+            //TODO: WORK ON TRANSACTIONS
+
+        }
     }
 
     

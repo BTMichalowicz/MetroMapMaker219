@@ -5,7 +5,7 @@ import djf.AppTemplate;
 import static javafx.application.Application.launch;
 import map.data.mapData;
 import map.file.mapFiles;
-import map.gui.mapWorkspace;
+import map.gui.MapWorkspace;
 
 /**This is the base class for the entire application of Metro Map Maker.
  * 
@@ -32,7 +32,7 @@ public class mapApp extends AppTemplate{
         
         fileComponent = new mapFiles();
         dataComponent = new mapData(this);
-        workspaceComponent = new mapWorkspace(this);
+        workspaceComponent = new MapWorkspace(this);
     }
 
     

@@ -14,17 +14,29 @@ import djf.ui.AppMessageDialogSingleton;
 import djf.ui.AppYesNoCancelDialogSingleton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
@@ -32,6 +44,9 @@ import static map.css.mapStyle.CLASS_BUTTON;
 import static map.css.mapStyle.CLASS_EDIT_TOOLBAR;
 import static map.css.mapStyle.CLASS_EDIT_TOOLBAR_ROW;
 import static map.css.mapStyle.CLASS_RENDER_CANVAS;
+import map.data.DraggableLine;
+import map.data.DraggableStation;
+import map.data.DraggableText;
 import map.data.mapData;
 import map.data.mapState;
 import map.mapLanguageProperty;
@@ -71,7 +86,7 @@ import static map.mapLanguageProperty.ZOOM_OUT_TOOLTIP;
  * @author Ben Michalowicz
  * @version 1.0
  */
-public class mapWorkspace extends AppWorkspaceComponent {
+public class MapWorkspace extends AppWorkspaceComponent {
 
     AppTemplate app; //The main app that will be used
 
@@ -97,7 +112,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addImage, addLabel, removeElement,
             zoomIn,
             zoomOut, increaseMapSize, decreaseMapSize,
-            addToLine, removeFromLine, export;
+            addToLine, removeFromLine, export, editLine;
 
     //CheckBoxes for bolding and italicizing
     CheckBox bold, italicize;
@@ -105,7 +120,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
     CheckBox showGrid; //Checkboxes for showing the grid
 
     //Combo
-    ComboBox lines, stations, fromStat, toStat, fontSizes, fontFamilies;
+    ComboBox<DraggableLine> lines;
+
+    ComboBox<DraggableStation> stations, fromStat, toStat;
+
+    ComboBox<Integer> fontSizes;
+
+    ComboBox<String> fontFamilies;
 
     //LABELS TO DEFINE EACH SECTION OF THE H-BOX
     Text metroLine, metroStation, decor, font, navigation;
@@ -118,9 +139,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
     Slider statThickness;
 
     //COLOR PICKERS
-    ColorPicker  lineColorPicker, stationColorPicker, backgroundColorPicker, fontColorPicker;
-
-    
+    ColorPicker lineColorPicker, stationColorPicker, backgroundColorPicker, fontColorPicker;
 
     public ColorPicker getOutlineColorPicker() {
         return lineColorPicker;
@@ -134,26 +153,26 @@ public class mapWorkspace extends AppWorkspaceComponent {
         return lines;
     }
 
-    public void setLines(ComboBox lines) {
+    public void setLines(ComboBox<DraggableLine> lines) {
         this.lines = lines;
     }
 
-    public void setLines(ObservableList stuff) {
-        this.lines = new ComboBox(stuff);
+    public void setLines(ObservableList<DraggableLine> stuff) {
+        this.lines = new ComboBox<>(stuff);
 
     }
 
-    public void setStations(ObservableList stations) {
-        this.fromStat = new ComboBox(stations);
-        this.toStat = new ComboBox(stations);
+    public void setStations(ObservableList<DraggableStation> stations) {
+        this.fromStat = new ComboBox<>(stations);
+        this.toStat = new ComboBox<>(stations);
 
     }
 
-    public ComboBox getStations() {
+    public ComboBox<DraggableStation> getStations() {
         return stations;
     }
 
-    public void setStations(ComboBox stations) {
+    public void setStations(ComboBox<DraggableStation> stations) {
         this.stations = stations;
     }
 
@@ -161,7 +180,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         return fromStat;
     }
 
-    public void setFromStat(ComboBox fromStat) {
+    public void setFromStat(ComboBox<DraggableStation> fromStat) {
         this.fromStat = fromStat;
     }
 
@@ -169,7 +188,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         return toStat;
     }
 
-    public void setToStat(ComboBox toStat) {
+    public void setToStat(ComboBox<DraggableStation> toStat) {
         this.toStat = toStat;
     }
 
@@ -178,6 +197,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
     }
 
     //THE MAIN CANVAS FOR THE APPLICATION
+    ScrollPane outerCanvas;
     Pane canvas;
 
     Text debugText;
@@ -190,12 +210,12 @@ public class mapWorkspace extends AppWorkspaceComponent {
         this.debugText = debugText;
     }
 
-    public Pane getCanvas() {
-        return canvas;
+    public ScrollPane getOuterCanvas() {
+        return outerCanvas;
     }
     mapData dataManager;
 
-    mapEditController mapEditController;
+    MapEditController mapEditController;
     CanvasController canvasController;
 
     AppMessageDialogSingleton messageDialog;
@@ -204,7 +224,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
     jTPS transact;
     jTPS_Transaction transaction;
 
-    public mapWorkspace(AppTemplate app) {
+    public MapWorkspace(AppTemplate app) {
         this.app = app;
 
         dataManager = (mapData) app.getDataComponent();
@@ -213,7 +233,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         gui = app.getGUI();
 
         backgroundColorPicker = new ColorPicker();
-       
+
         lineColorPicker = new ColorPicker();
         fontColorPicker = new ColorPicker();
         stationColorPicker = new ColorPicker();
@@ -236,11 +256,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
     public void reloadWorkspace(AppDataComponent dataComponent) {
         dataManager = (mapData) dataComponent;
 
+        Node data = dataManager.getSelectedShape();
+
         if (dataManager.isInState(mapState.STARTING_LINE)) {
             addLine.setDisable(true);
             removeLine.setDisable(false);
-            addToLine.setDisable(false);
-            removeFromLine.setDisable(false);
+            addToLine.setDisable(data != null && data instanceof DraggableLine);
+            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -257,8 +279,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
         } else if (dataManager.isInState(mapState.STARTING_OVERLAY)) {
             addLine.setDisable(false);
             removeLine.setDisable(false);
-            addToLine.setDisable(false);
-            removeFromLine.setDisable(false);
+            addToLine.setDisable(data != null && data instanceof DraggableLine);
+            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -274,8 +296,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
         } else if (dataManager.isInState(mapState.STARTING_TEXT)) {
             addLine.setDisable(false);
             removeLine.setDisable(false);
-            addToLine.setDisable(false);
-            removeFromLine.setDisable(false);
+            addToLine.setDisable(data != null && data instanceof DraggableLine);
+            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -291,8 +313,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
         } else if (dataManager.isInState(mapState.STARTING_STATION)) {
             addLine.setDisable(false);
             removeLine.setDisable(false);
-            addToLine.setDisable(true);
-            removeFromLine.setDisable(true);
+            addToLine.setDisable(data != null && data instanceof DraggableLine);
+            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(true);
             removeStat.setDisable(true);
@@ -311,8 +333,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
             boolean notSelected = dataManager.getSelectedShape() == null;
             addLine.setDisable(false);
             removeLine.setDisable(false);
-            addToLine.setDisable(false);
-            removeFromLine.setDisable(true);
+            addToLine.setDisable(data != null && data instanceof DraggableLine);
+            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -345,8 +367,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         }
 
-        
-
     }
 
     private void initLayout() {
@@ -376,10 +396,15 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         lines1 = new HBox();
 
-        lines = new ComboBox();
+        lines = new ComboBox<>();
         metroLine = new Text("Metro Lines");
 
-        lines1.getChildren().addAll(metroLine, lines, lineColorPicker);
+        lines1.getChildren().addAll(metroLine, lines);
+        editLine = gui.initChildButton(lines1, " ", " ", false);
+
+        editLine.setBackground(new Background(new BackgroundFill(lines.getSelectionModel().getSelectedItem().getFill(), null, null)));
+        editLine.setText(lines.getSelectionModel().getSelectedItem().getFill().toString());
+        editLine.setTooltip(new Tooltip("Edit the given line"));
 
         //HBOX 2: Line Editor Part 2
         lines2 = new HBox();
@@ -407,8 +432,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
         stat1 = new HBox();
 
         metroStation = new Text();
-
-        
 
         stations = new ComboBox();
         stations.setPromptText("Metro Stations");
@@ -456,8 +479,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
         //decorTop.setSpacing(decorTop.getWidth() / 2);
         decor = new Text("Decor");
 
-        
-
         decorTop.getChildren().addAll(decor, backgroundColorPicker);
 
         /// Part 2
@@ -473,9 +494,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
         removeElement.setText("Remove an element");
 
         //decorBot.getChildren().addAll(imgBackground, addImage, addLabel, removeElement);
-        
         decor1.getChildren().addAll(decorTop, decorBot);
-        
+
         //VBOX 5: FONT
         font1 = new VBox();
 
@@ -483,9 +503,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         font = new Text("Font         ");
 
-
-        
-         ObservableList<Integer> sizes = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 20, 21, 22, 23, 48, 72, 96);
+        ObservableList<Integer> sizes = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 20, 21, 22, 23, 48, 72, 96);
         fontSizes = new ComboBox(sizes);
         fontSizes.setPromptText("Choose a font size");
         fontTop.getChildren().addAll(font, fontColorPicker, fontSizes);
@@ -497,13 +515,11 @@ public class mapWorkspace extends AppWorkspaceComponent {
         italicize = new CheckBox();
         Text iText = new Text("Italicize ->");
 
-       
-
         ObservableList<String> families = FXCollections.observableArrayList("Sans Serif", "Comic Sans MS", "Times New Roman", "Arial", "Courier", "Cambria");
         fontFamilies = new ComboBox(families);
         fontFamilies.setPromptText("Choose a font family");
 
-        fontBot.getChildren().addAll(boldText, bold, iText, italicize,  fontFamilies);
+        fontBot.getChildren().addAll(boldText, bold, iText, italicize, fontFamilies);
         fontBot.setSpacing(1.5);
 
         font1.getChildren().addAll(fontTop, fontBot);
@@ -528,10 +544,12 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         nav1.getChildren().addAll(navTop, navBot);
 
-        editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest,decor1,
+        editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest, decor1,
                 font1, nav1);
 
+        outerCanvas = new ScrollPane();
         canvas = new Pane();
+        outerCanvas.getChildrenUnmodifiable().add(canvas);
         debugText = new Text();
         canvas.getChildren().add(debugText);
         debugText.setX(100);
@@ -541,8 +559,9 @@ public class mapWorkspace extends AppWorkspaceComponent {
         dataManager.setList(canvas.getChildren());
 
         workspace = new BorderPane();
+
         ((BorderPane) workspace).setLeft(editToolbar);
-        ((BorderPane) workspace).setCenter(canvas);
+        ((BorderPane) workspace).setCenter(outerCanvas);
     }
 
     private void initStyle() {
@@ -552,10 +571,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
         canvas.getStyleClass().add(CLASS_RENDER_CANVAS);
 
         // COLOR PICKER STYLE
-           lineColorPicker.getStyleClass().add(CLASS_BUTTON);
+        lineColorPicker.getStyleClass().add(CLASS_BUTTON);
         stationColorPicker.getStyleClass().add(CLASS_BUTTON);
-       backgroundColorPicker.getStyleClass().add(CLASS_BUTTON);
-       fontColorPicker.getStyleClass().add(CLASS_BUTTON);
+        backgroundColorPicker.getStyleClass().add(CLASS_BUTTON);
+        fontColorPicker.getStyleClass().add(CLASS_BUTTON);
         editToolbar.getStyleClass().add(CLASS_EDIT_TOOLBAR);
         addLinesMain.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         addStationsMain.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
@@ -564,7 +583,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         // backgroundColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
 
         decor1.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
-        
+
         //fillColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
         font1.getStyleClass().add(CLASS_EDIT_TOOLBAR_ROW);
         //outlineColorLabel.getStyleClass().add(CLASS_COLOR_CHOOSER_CONTROL);
@@ -573,9 +592,14 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
     }
 
+    boolean isBold, isItalic;
+
     private void initControllers() {
 
-        mapEditController = new mapEditController(app);
+        isBold = false;
+        isItalic = false;
+
+        mapEditController = new MapEditController(app);
         about.setOnAction(e -> {
             mapEditController.processAboutRequest();
         });
@@ -583,6 +607,213 @@ public class mapWorkspace extends AppWorkspaceComponent {
         export.setOnAction((e -> {
             mapEditController.processExportRequest();
         }));
+
+        removeElement.setOnAction(e -> {
+            mapEditController.processRemoveElement();
+
+        });
+
+        removeLine.setOnAction(e -> {
+            if (dataManager.getSelectedShape() instanceof DraggableLine) {
+                mapEditController.processRemoveLine((DraggableLine) dataManager.getSelectedShape());
+            }
+
+        });
+
+        removeStat.setOnAction(e -> {
+            if (dataManager.getSelectedShape() instanceof DraggableStation) {
+                mapEditController.processRemoveStat((DraggableStation) dataManager.getSelectedShape());
+            }
+
+        });
+
+        addImage.setOnAction(e -> {
+            mapEditController.processImageOverlay();
+
+        });
+
+        imgBackground.setOnAction(e -> {
+            mapEditController.processAddBackgroundImage();
+
+        });
+
+        //TODO: Focus on later
+//        editLine.setOnAction(e -> {
+//            mapEditController.processEditLine();
+//
+//        });
+
+        addLabel.setOnAction(e -> {
+            mapEditController.processAddLabel();
+        });
+
+        addLine.setOnAction(e -> {
+            mapEditController.processAddLine();
+
+        });
+
+        addStat.setOnAction(e -> {
+            mapEditController.processAddStation();
+        });
+
+        addToLine.setOnAction(e -> {
+
+            mapEditController.processAddStatToLine(); //TODO: Include some sort of identifier for this
+
+        });
+
+        removeFromLine.setOnAction(e -> {
+            mapEditController.processRemoveStatFromLine(); //TODO: Look Up
+
+        });
+        
+             canvas.setOnMouseClicked(e -> {
+            canvasController.processCanvasMousPressed((int) e.getX(), (int) e.getY());
+        });
+
+        canvas.setOnMouseReleased(e -> {
+            canvasController.processCanvasMouseRelease((int) e.getX(), (int) e.getY());
+        });
+        canvas.setOnMouseDragged(e -> {
+            canvasController.processCanvasMouseDragged((int) e.getX(), (int) e.getY());
+        });
+
+//        details.setOnAction(e -> {
+//
+//            if (lines.getSelectionModel().getSelectedItem() instanceof DraggableLine) {
+//                mapEditController.listStationsOnLine((DraggableLine) lines.getSelectionModel().getSelectedItem());
+//            }
+//        });
+//
+//        rotate.setOnAction(e -> {
+//            mapEditController.rotateText();
+//        });
+//
+//        lineThickness.valueProperty().addListener(e -> {
+//            mapEditController.processSelectOutlineThickness();
+//        });
+//
+//        statThickness.valueProperty().addListener(e -> {
+//            mapEditController.processStationThickness();
+//        });
+//
+//        fromToPop.setOnAction(e -> {
+//            mapEditController.processDirections(); //Create a Singleton for this perhaps?
+//
+//        });
+//        snapToGrid.setOnAction(e -> {
+//            mapEditController.processSnapToGrid();
+//
+//        });
+//
+//        showGrid.setOnAction(e -> {
+//            mapEditController.showGrid();
+//        });
+//
+//        zoomIn.setOnAction(e -> canvasController.zoomIn());
+//
+//        zoomOut.setOnAction(e -> canvasController.zoomOut());
+//
+//        increaseMapSize.setOnAction(e -> {
+//            canvasController.increaseMapSize();
+//
+//        });
+//
+//        decreaseMapSize.setOnAction(e -> {
+//            canvasController.decreaseMapSize();
+//        });
+
+        fontFamilies.setOnAction(e -> {
+            Node node = dataManager.getSelectedShape();
+
+            if (node != null & node instanceof DraggableText) {
+
+                String prevFontChoice = ((DraggableText) node).getFont().getFamily();
+                String s = fontFamilies.getSelectionModel().getSelectedItem();
+
+                if (s != null) {
+
+                    ((DraggableText) node).setFont(Font.font(s, isBold ? FontWeight.BOLD : FontWeight.NORMAL, isItalic ? FontPosture.ITALIC : FontPosture.REGULAR, ((DraggableText) node).getFont().getSize()));
+                    String curFontChoice = ((DraggableText) node).getFont().getFamily();
+
+                }
+
+            }
+
+        });
+
+        fontSizes.setOnAction(e -> {
+            Node node = dataManager.getSelectedShape();
+
+            if (node != null & node instanceof DraggableText) {
+                double prevFont = ((DraggableText) node).getFont().getSize();
+
+                Integer i = fontSizes.getSelectionModel().getSelectedItem();
+
+                ((DraggableText) node).setFont(Font.font(((DraggableText) node).getFont().getFamily(), isBold ? FontWeight.BOLD : FontWeight.NORMAL, isItalic ? FontPosture.ITALIC : FontPosture.REGULAR, i));
+
+                double curFont = ((DraggableText) node).getFont().getSize();
+
+            }
+
+        });
+
+   
+
+        //EventHandler<ActionEvent> for Bolding and Italicizing
+        //Also several Fonts to go with it
+        Font fontBold = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.BOLD, FontPosture.REGULAR, fontSizes.getSelectionModel().getSelectedItem());
+        Font fontItalic = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.NORMAL, FontPosture.ITALIC, fontSizes.getSelectionModel().getSelectedItem());
+        Font fontNormal = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.NORMAL, FontPosture.REGULAR, fontSizes.getSelectionModel().getSelectedItem());
+        Font fontBoldItalic = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.BOLD, FontPosture.ITALIC, fontSizes.getSelectionModel().getSelectedItem());
+
+        EventHandler<ActionEvent> fontHandler = e -> {
+
+            Node node = dataManager.getSelectedShape();
+
+            if (node != null && node instanceof DraggableText) {
+                DraggableText text = (DraggableText) node;
+                if (bold.isSelected() && italicize.isSelected()) {
+                    isBold = true;
+                    isItalic = true;
+                    text.setFont(fontBoldItalic); // Both check boxes checked
+                } else if (bold.isSelected()) {
+                    isBold = true;
+                    isItalic = false;
+                    text.setFont(fontBold); // The Bold check box checked
+                } else if (italicize.isSelected()) {
+                    isBold = false;
+                    isItalic = true;
+                    text.setFont(fontItalic); // The Italic check box checked
+                } else {
+                    isItalic = false;
+                    isBold = false;
+                    text.setFont(fontNormal); // Both check boxes unchecked
+                }
+            }
+        };
+
+        bold.setOnAction(fontHandler);
+        italicize.setOnAction(fontHandler);
+    }
+
+// HELPER METHOD
+    public void loadSelectedShapeSettings(Node shape) {
+        if (shape != null) {
+
+            //Color fillColor = (Color) ((Shape) shape).getFill();
+            Color strokeColor = (Color) ((Shape) shape).getStroke();
+            //double lineThickness = ((Shape) shape).getStrokeWidth();
+
+            // fillColorPicker.setValue(fillColor);
+            lineColorPicker.setValue(strokeColor);
+            // outlineThicknessSlider.setValue(lineThickness);
+
+        }
+    }
+
+    public Pane getCanvas() {
+        return canvas;
     }
 
 }
