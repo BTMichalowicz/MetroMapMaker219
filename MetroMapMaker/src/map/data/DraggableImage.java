@@ -20,7 +20,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
-import map.gui.MapWorkspace;
+import map.gui.mapWorkspace;
 import properties_manager.PropertiesManager;
 
 /**
@@ -55,7 +55,7 @@ public class DraggableImage extends Rectangle implements Draggable{
     
     private Image getNewImage(){
         PropertiesManager props = PropertiesManager.getPropertiesManager();
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         Scene sc = app.getGUI().getPrimaryScene();
         // AND NOW ASK THE USER FOR THE FILE TO OPEN
         FileChooser fc = new FileChooser();

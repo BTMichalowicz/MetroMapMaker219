@@ -5,7 +5,6 @@ import djf.AppTemplate;
 import static djf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static djf.settings.AppStartupConstants.PATH_EXPORTS;
 import static djf.settings.AppStartupConstants.PATH_IMAGES;
-import static djf.settings.AppStartupConstants.PATH_WORK;
 import djf.ui.AppMessageDialogSingleton;
 
 import java.io.File;
@@ -45,12 +44,12 @@ import properties_manager.PropertiesManager;
  *
  * @author Ben Michalowicz
  */
-public class MapEditController {
+public class mapEditController {
 
     public AppTemplate app;
     public mapData dataManager;
 
-    public MapEditController(AppTemplate app) {
+    public mapEditController(AppTemplate app) {
         this.app = app;
         this.dataManager = (mapData) app.getDataComponent();
     }
@@ -64,7 +63,7 @@ public class MapEditController {
         dataManager.setState(mapState.SELECTING);
 
         // ENABLE/DISABLE THE PROPER BUTTONS
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
     }
 
@@ -95,10 +94,10 @@ public class MapEditController {
     }
 
     void processExportRequest() {
-        
+
         dataManager = (mapData) app.getDataComponent();
-      mapFiles fileControl = (mapFiles) app.getFileComponent();
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapFiles fileControl = (mapFiles) app.getFileComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         Pane canvas = workspace.getCanvas();
         WritableImage image = canvas.snapshot(new SnapshotParameters(), null);
 
@@ -111,56 +110,50 @@ public class MapEditController {
 
         int i = 1; //for use in writing
         File file = null;
-        
-        
-        
 
         //Writing the file
         try {
-            if (result.isPresent())
+            if (result.isPresent()) {
                 makeImage(file, i, result, image); //method to take a snapshot of the canvas
-            
+            }
             /*
             Once the fule has been exported as some sort of PNG image, then we go to exporting the data
-            */
+             */
             //fileControl.exportData(dataManager, PATH_EXPORTS);
-            
 
         } catch (IOException ioe) {
-           ioe.printStackTrace();
         }
 
-            Alert a = new Alert(AlertType.INFORMATION);
-            a.setHeaderText(null);
-            a.setTitle("Export Map");
-            a.setHeaderText(null);
-            a.setContentText("Export is Completed");
-            a.showAndWait();
-      
+        Alert a = new Alert(AlertType.INFORMATION);
+        a.setHeaderText(null);
+        a.setTitle("Export Map");
+        a.setHeaderText(null);
+        a.setContentText("Export is Completed");
+        a.showAndWait();
+
     }
-    
-    
-    private void makeImage(File file, int i, Optional<String> result, WritableImage image) throws IOException{
+
+    private void makeImage(File file, int i, Optional<String> result, WritableImage image) throws IOException {
         if (result.isPresent()) {
-                file = new File(PATH_EXPORTS + result.get() + ".png");
+            file = new File(PATH_EXPORTS + result.get() + ".png");
 
-                if (file.exists()) {
-                    // If the file exists already, then just save it with a given number after it
+            if (file.exists()) {
+                // If the file exists already, then just save it with a given number after it
 
+                file = new File(result.get() + "(" + i + ").png");
+                //If the file exists with the given number, keep going until the file (x(number).png) no longer exists
+                while (file.exists()) {
+                    i++;
                     file = new File(result.get() + "(" + i + ").png");
-                    //If the file exists with the given number, keep going until the file (x(number).png) no longer exists
-                    while (file.exists()) {
-                        i++;
-                        file = new File(result.get() + "(" + i + ").png");
-                    }
-                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file)); //Only save the file
-                                                                                       //After the loop has finished
-
-                } else {
-                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file));
                 }
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file)); //Only save the file
+                //After the loop has finished
+
+            } else {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file));
             }
-            
+        }
+
     }
 
     /**
@@ -168,35 +161,35 @@ public class MapEditController {
      */
     public void processRemoveElement() {
         dataManager.removeSelectedItem();
-        
+
         // ENABLE/DISABLE THE PROPER BUTTONS
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
         app.getGUI().updateToolbarControls(false);
     }
-    
-    
+
     /**
-     * This method removes a line as well as all of its stations. 
+     * This method removes a line as well as all of its stations.
+     *
      * @param selectedLine The selected Draggable Line in question
      */
-
     public void processRemoveLine(DraggableLine selectedLine) {
         selectedLine.getStations().forEach((d) -> {
             selectedLine.getStations().remove(d);
-        }); 
-        
+        });
+
         processRemoveElement();
     }
 
-    
     /**
-     * This method will remove any given station that is not directly associated with a line.
+     * This method will remove any given station that is not directly associated
+     * with a line.
+     *
      * @param draggableStation The draggable station in question.
      */
     public void processRemoveStat(DraggableStation draggableStation) {
-        ((MapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(draggableStation);
-            draggableStation = null;
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(draggableStation);
+        // draggableStation = null; // Remove the reference
     }
 
     public void processImageOverlay() {
@@ -208,17 +201,16 @@ public class MapEditController {
         dataManager.setState(mapState.STARTING_OVERLAY);
 
         // ENABLE/DISABLE THE PROPER BUTTONS
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
     }
 
-    
     /**
      * For adding a background image in lieu of colors
      */
     public void processAddBackgroundImage() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         Scene sc = app.getGUI().getPrimaryScene();
         // AND NOW ASK THE USER FOR THE FILE TO OPEN
         FileChooser fc = new FileChooser();
@@ -228,28 +220,26 @@ public class MapEditController {
         fc.setTitle(props.getProperty("Load an Image"));
 
         File selectedFile = fc.showOpenDialog(null);
-        
-        ((mapData)app.getDataComponent()).setState(mapState.STARTING_BCKGROUND);
-        
-        try{
-        URL fileU = selectedFile.toURI().toURL();
 
-        Image image = new Image(fileU.toExternalForm());
-        
-        ((MapWorkspace) app.getWorkspaceComponent()).getCanvas().setBackground(new Background(new BackgroundFill(new ImagePattern(image), null, null)));
+        ((mapData) app.getDataComponent()).setState(mapState.STARTING_BCKGROUND);
 
-        
-        }catch(MalformedURLException muee){
-            
-            AppMessageDialogSingleton.getSingleton().show("Loading image error","There was an error loading the image as follows" + Arrays.toString(muee.getStackTrace()));
-            return;
+        try {
+            URL fileU = selectedFile.toURI().toURL();
+
+            Image image = new Image(fileU.toExternalForm());
+
+            ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().setBackground(new Background(new BackgroundFill(new ImagePattern(image), null, null)));
+
+        } catch (MalformedURLException muee) {
+
+            AppMessageDialogSingleton.getSingleton().show("Loading image error", "There was an error loading the image as follows" + Arrays.toString(muee.getStackTrace()));
+
         }
 
-    
     }
 
     public void processAddLabel() {
-         // CHANGE THE CURSOR
+        // CHANGE THE CURSOR
         Scene scene = app.getGUI().getPrimaryScene();
         scene.setCursor(Cursor.CROSSHAIR);
 
@@ -257,13 +247,13 @@ public class MapEditController {
         dataManager.setState(mapState.STARTING_TEXT);
 
         // ENABLE/DISABLE THE PROPER BUTTONS
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
-        
+
     }
 
     void processAddLine() {
-         // CHANGE THE CURSOR
+        // CHANGE THE CURSOR
         Scene scene = app.getGUI().getPrimaryScene();
         scene.setCursor(Cursor.CROSSHAIR);
 
@@ -271,12 +261,12 @@ public class MapEditController {
         dataManager.setState(mapState.STARTING_LINE);
 
         // ENABLE/DISABLE THE PROPER BUTTONS
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
     }
 
     void processAddStation() {
-         // CHANGE THE CURSOR
+        // CHANGE THE CURSOR
         Scene scene = app.getGUI().getPrimaryScene();
         scene.setCursor(Cursor.CROSSHAIR);
 
@@ -284,8 +274,30 @@ public class MapEditController {
         dataManager.setState(mapState.STARTING_STATION);
 
         // ENABLE/DISABLE THE PROPER BUTTONS
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
+    }
+
+    public void processAddStatToLine(Node draggableLine) {
+
+        TextInputDialog statName = new TextInputDialog();
+        statName.setTitle("Make a station Name!");
+        statName.setHeaderText(null);
+        statName.setContentText("Add a name for your station!");
+
+        Optional<String> result = statName.showAndWait();
+
+        while (!result.isPresent()) {
+            Alert duplicate = new Alert(AlertType.ERROR);
+            duplicate.setHeaderText(null);
+            duplicate.setContentText("You need a name for the file!!");
+            duplicate.showAndWait();
+            result = statName.showAndWait();
+
+        }
+
+        DraggableStation newStation = new DraggableStation(app, result.get());
+
     }
 
 }

@@ -82,7 +82,7 @@ public class EditLineSingleton extends Stage {
             if (metroLines.getSelectionModel().getSelectedItem() != null) {
                 DraggableLine drag = metroLines.getSelectionModel().getSelectedItem();
                 
-                ((MapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().stream().filter((s) -> (s instanceof DraggableLine)).map((s) -> (DraggableLine) s).filter((that) -> (drag.getName().equals(that.getName()))).forEachOrdered((that) -> {
+                ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().stream().filter((s) -> (s instanceof DraggableLine)).map((s) -> (DraggableLine) s).filter((that) -> (drag.getName().equals(that.getName()))).forEachOrdered((that) -> {
                     that.setFill(lineColor.getValue());
                 });
                 

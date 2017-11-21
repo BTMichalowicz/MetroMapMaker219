@@ -18,39 +18,33 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 
-
-
 import djf.components.AppDataComponent;
 import djf.AppTemplate;
-
 
 import java.io.IOException;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
-import map.gui.MapWorkspace;
+import map.gui.mapWorkspace;
 
 /**
  *
  * @author Ben Michalowicz
  */
-public class mapData  implements AppDataComponent{
-    
-        // FIRST THE THINGS THAT HAVE TO BE SAVED TO FILES
+public class mapData implements AppDataComponent {
 
+    // FIRST THE THINGS THAT HAVE TO BE SAVED TO FILES
     // THESE ARE THE SHAPES TO DRAW
     ObservableList<Node> items;
-    
-    
-    
-     public ObservableList<Node> getShapeList() {
+
+    public ObservableList<Node> getShapeList() {
         return items;
     }
-     
-     public void setList(ObservableList<Node> list){
-         this.items = list;
-     }
+
+    public void setList(ObservableList<Node> list) {
+        this.items = list;
+    }
 
     // THE BACKGROUND COLOR
     Color backgroundColor;
@@ -58,8 +52,6 @@ public class mapData  implements AppDataComponent{
     // AND NOW THE EDITING DATA
     // THIS IS THE SHAPE CURRENTLY BEING SIZED BUT NOT YET ADDED
     Node newNode;
-
-   
 
     // FOR FILL AND OUTLINE
     Color currentFillColor;
@@ -74,22 +66,19 @@ public class mapData  implements AppDataComponent{
 
     // USE THIS WHEN THE SHAPE IS SELECTED
     Effect highlightedEffect;
-    
+
     //AppTemplate app;
-    
-    
     Node selectedNode;
-    
-     public static final String WHITE_HEX = "#FFFFFF";
+
+    public static final String WHITE_HEX = "#FFFFFF";
     public static final String BLACK_HEX = "#000000";
     public static final String YELLOW_HEX = "#EEEE00";
     public static final Paint DEFAULT_BACKGROUND_COLOR = Paint.valueOf(WHITE_HEX);
     public static final Paint HIGHLIGHTED_COLOR = Paint.valueOf(YELLOW_HEX);
     public static final int HIGHLIGHTED_STROKE_THICKNESS = 2;
-    
-    
+
     jTPS transact;
-    
+
     public mapData(AppTemplate initApp) {
         // KEEP THE APP FOR LATER
         app = initApp;
@@ -116,7 +105,6 @@ public class mapData  implements AppDataComponent{
         transact = new jTPS();
     }
 
-
     public Color getBackgroundColor() {
         return backgroundColor;
     }
@@ -136,11 +124,10 @@ public class mapData  implements AppDataComponent{
     public void setItems(ObservableList<Node> initItems) {
         items = initItems;
     }
-    
-    
+
     public void setBackgroundColor(Color initBackgroundColor) {
         backgroundColor = initBackgroundColor;
-        MapWorkspace workspace = (MapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         Pane canvas = workspace.getCanvas();
         BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
         Background background = new Background(fill);
@@ -176,10 +163,45 @@ public class mapData  implements AppDataComponent{
             }
         }
     }
-    
-    
 
+    public Node selectTopShape(int x, int y) {
+        Node shape = getTopShape(x, y);
+        if (shape == selectedNode) {
+            return shape;
+        }
 
+        if (selectedNode != null) {
+            unhighlightShape(selectedNode);
+        }
+        if (shape != null) {
+            highlightShape(shape);
+            mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+            workspace.loadSelectedShapeSettings(shape);
+        }
+        selectedNode = shape;
+        if (shape != null) {
+
+            if (shape instanceof DraggableText) {
+
+                ((DraggableText) shape).start(x, y);
+
+            } else {
+                ((Draggable) shape).start(x, y);
+            }
+
+        }
+        return shape;
+    }
+
+    public Node getTopShape(int x, int y) {
+        for (int i = items.size() - 1; i >= 0; i--) {
+            Node shape = items.get(i);
+            if (shape.contains(x, y)) {
+                return shape;
+            }
+        }
+        return null;
+    }
 
     /**
      * This function clears out the HTML tree and reloads it with the minimal
@@ -197,7 +219,7 @@ public class mapData  implements AppDataComponent{
         currentOutlineColor = Color.web(BLACK_HEX);
 
         items.clear();
-        ((MapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().clear();
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().clear();
     }
 
     public void selectSizedShape() {
@@ -219,8 +241,8 @@ public class mapData  implements AppDataComponent{
     public void highlightShape(Node shape) {
         shape.setEffect(highlightedEffect);
     }
-    
-      public void addShape(Node shapeToAdd) {
+
+    public void addShape(Node shapeToAdd) {
         items.add(shapeToAdd);
     }
 
@@ -239,8 +261,8 @@ public class mapData  implements AppDataComponent{
     public boolean isInState(mapState testState) {
         return state == testState;
     }
-    
-        public Node getNewShape() {
+
+    public Node getNewShape() {
         return newNode;
     }
 
@@ -251,18 +273,14 @@ public class mapData  implements AppDataComponent{
     public void setSelectedShape(Node initSelectedShape) {
         selectedNode = initSelectedShape;
     }
-    
-    public void removeSelectedItem(){
-        if (selectedNode!= null) {
 
-            
+    public void removeSelectedItem() {
+        if (selectedNode != null) {
+
             selectedNode = null;
 
-       
             //TODO: WORK ON TRANSACTIONS
-
         }
     }
 
-    
 }

@@ -97,7 +97,7 @@ public abstract class AppTemplate extends Application {
 
         //SETTING UP THE WELCOME TAG!!
         AppWelcomeDialogSingleton welcome = AppWelcomeDialogSingleton.getAppWelcomeDialog(this);
-        //TODO: SET UP THE WELCOME TAG
+        
         try {
 
             // LOAD APP PROPERTIES, BOTH THE BASIC UI STUFF FOR THE FRAMEWORK

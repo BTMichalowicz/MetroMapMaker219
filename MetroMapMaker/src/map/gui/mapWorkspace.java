@@ -86,7 +86,7 @@ import static map.mapLanguageProperty.ZOOM_OUT_TOOLTIP;
  * @author Ben Michalowicz
  * @version 1.0
  */
-public class MapWorkspace extends AppWorkspaceComponent {
+public class mapWorkspace extends AppWorkspaceComponent {
 
     AppTemplate app; //The main app that will be used
 
@@ -215,7 +215,7 @@ public class MapWorkspace extends AppWorkspaceComponent {
     }
     mapData dataManager;
 
-    MapEditController mapEditController;
+    mapEditController mapEditController;
     CanvasController canvasController;
 
     AppMessageDialogSingleton messageDialog;
@@ -224,7 +224,7 @@ public class MapWorkspace extends AppWorkspaceComponent {
     jTPS transact;
     jTPS_Transaction transaction;
 
-    public MapWorkspace(AppTemplate app) {
+    public mapWorkspace(AppTemplate app) {
         this.app = app;
 
         dataManager = (mapData) app.getDataComponent();
@@ -260,7 +260,7 @@ public class MapWorkspace extends AppWorkspaceComponent {
 
         if (dataManager.isInState(mapState.STARTING_LINE)) {
             addLine.setDisable(true);
-            removeLine.setDisable(false);
+            removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
             removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
@@ -278,12 +278,12 @@ public class MapWorkspace extends AppWorkspaceComponent {
 
         } else if (dataManager.isInState(mapState.STARTING_OVERLAY)) {
             addLine.setDisable(false);
-            removeLine.setDisable(false);
+            removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
             removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(false);
-            removeStat.setDisable(false);
+            removeStat.setDisable(data != null && data instanceof DraggableStation);
             snapToGrid.setDisable(false);
             moveLabel.setDisable(false);
             rotate.setDisable(false);
@@ -295,12 +295,12 @@ public class MapWorkspace extends AppWorkspaceComponent {
 
         } else if (dataManager.isInState(mapState.STARTING_TEXT)) {
             addLine.setDisable(false);
-            removeLine.setDisable(false);
+            removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
             removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(false);
-            removeStat.setDisable(false);
+            removeStat.setDisable(data != null && data instanceof DraggableStation);
             snapToGrid.setDisable(false);
             moveLabel.setDisable(false);
             rotate.setDisable(false);
@@ -312,12 +312,12 @@ public class MapWorkspace extends AppWorkspaceComponent {
 
         } else if (dataManager.isInState(mapState.STARTING_STATION)) {
             addLine.setDisable(false);
-            removeLine.setDisable(false);
+            removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
             removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(true);
-            removeStat.setDisable(true);
+            removeStat.setDisable(data != null && data instanceof DraggableStation);
             snapToGrid.setDisable(false);
             moveLabel.setDisable(false);
             rotate.setDisable(false);
@@ -332,12 +332,12 @@ public class MapWorkspace extends AppWorkspaceComponent {
 
             boolean notSelected = dataManager.getSelectedShape() == null;
             addLine.setDisable(false);
-            removeLine.setDisable(false);
+            removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
             removeFromLine.setDisable(data != null && data instanceof DraggableLine);
             details.setDisable(false);
             addStat.setDisable(false);
-            removeStat.setDisable(false);
+            removeStat.setDisable(data != null && data instanceof DraggableStation);
             snapToGrid.setDisable(false);
             moveLabel.setDisable(false);
             rotate.setDisable(false);
@@ -351,9 +351,9 @@ public class MapWorkspace extends AppWorkspaceComponent {
 
             addLine.setDisable(false);
             removeLine.setDisable(false);
-            addToLine.setDisable(false);
-            removeFromLine.setDisable(false);
-            details.setDisable(false);
+            addToLine.setDisable(data != null && data instanceof DraggableLine);
+            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
+            details.setDisable(data != null && data instanceof DraggableStation);
             addStat.setDisable(true);
             removeStat.setDisable(true);
             snapToGrid.setDisable(false);
@@ -599,7 +599,7 @@ public class MapWorkspace extends AppWorkspaceComponent {
         isBold = false;
         isItalic = false;
 
-        mapEditController = new MapEditController(app);
+        mapEditController = new mapEditController(app);
         about.setOnAction(e -> {
             mapEditController.processAboutRequest();
         });
@@ -657,13 +657,13 @@ public class MapWorkspace extends AppWorkspaceComponent {
         });
 
         addToLine.setOnAction(e -> {
-
-            mapEditController.processAddStatToLine(); //TODO: Include some sort of identifier for this
+          
+            mapEditController.processAddStatToLine(dataManager.getSelectedShape()); //TODO: Include some sort of identifier for this
 
         });
 
         removeFromLine.setOnAction(e -> {
-            mapEditController.processRemoveStatFromLine(); //TODO: Look Up
+            mapEditController.processRemoveStatFromLine(dataManager.getSelectedShape()); //TODO: Look Up
 
         });
         

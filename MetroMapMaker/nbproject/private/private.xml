@@ -5,10 +5,11 @@
         <group>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/DraggableLine.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/DraggableImage.java</file>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/MapEditController.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/mapWorkspace.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/DraggableStation.java</file>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/MapWorkspace.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/CanvasController.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/EditLineSingleton.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/mapEditController.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/mapState.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/mapData.java</file>
         </group>
