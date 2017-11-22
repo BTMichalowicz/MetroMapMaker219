@@ -53,14 +53,14 @@ public class AppWelcomeDialogSingleton extends Stage {
 
     Label l;
 
-    List<String> recentFiles = new ArrayList<>();
+    ArrayList<File> recentWorks = new ArrayList<>();
 
-    public List<String> getRecentFiles() {
-        return recentFiles;
+    public ArrayList<File> getRecentFiles() {
+        return recentWorks;
     }
 
-    public void setRecentFiles(List<String> recentFiles) {
-        this.recentFiles = recentFiles;
+    public void setRecentFiles(ArrayList<File> recentFiles) {
+        this.recentWorks = recentFiles;
     }
 
     //Because it's a singleton
@@ -103,9 +103,9 @@ public class AppWelcomeDialogSingleton extends Stage {
         file5 = new Hyperlink("");
         
         Label recentFiles = new Label("Recent Files");
+        
 
         hyperLinkList.getChildren().addAll(recentFiles, file5, file4, file3, file2, file1);
-        
         
 
         welcomePane.setLeft(hyperLinkList);
@@ -255,12 +255,12 @@ public class AppWelcomeDialogSingleton extends Stage {
         //TODO: LOAD THIS SHIT
         // Read from the work folder,
         //get all the files, sort them by time last modified
-        ArrayList<File> recentWorks = new ArrayList<>();
-
-        File directory = new File(PATH_WORK);
-
-        recentWorks.addAll(Arrays.asList(directory.listFiles()));
-
+        
+        
+        recentWorks = getWorkDir(new File(PATH_WORK), new ArrayList<File>()); //Attempt to get all files recursively
+        
+        
+        
         //SORT THE FILES BASED ON RECENT WORKS: BubbleSort
         sortFiles(recentWorks);
 
@@ -308,5 +308,19 @@ public class AppWelcomeDialogSingleton extends Stage {
 
         }
     }
+    
+    private ArrayList<File> getWorkDir(File f, ArrayList<File> helper){
+        File[] all = f.listFiles();
+        
+        for(File file: all){
+            if(file.isFile()){
+                helper.add(file);
+            }else if (file.isDirectory()){
+                getWorkDir(file, helper);
+            }
+        }
+        return helper;
+    }
+    
 
 }

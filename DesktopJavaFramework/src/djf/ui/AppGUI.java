@@ -214,7 +214,7 @@ public class AppGUI {
 
             if (result.isPresent()) {
 
-                boolean isDuplicate = getFileController().checkDuplicateFileName(result.get()); //TODO: IMPLEMENT!!!!
+                boolean isDuplicate = getFileController().checkDuplicateFileName(result.get(), AppWelcomeDialogSingleton.getAppWelcomeDialog(app).getRecentFiles()); //TODO: IMPLEMENT!!!!
                 while (!isDuplicate) {
                     Alert duplicate = new Alert(Alert.AlertType.ERROR);
                     duplicate.setHeaderText(null);
@@ -222,7 +222,7 @@ public class AppGUI {
                     duplicate.showAndWait();
                     result = newMap.showAndWait();
                     if (result.isPresent()) {
-                        isDuplicate = getFileController().checkDuplicateFileName(result.get());
+                        isDuplicate = getFileController().checkDuplicateFileName(result.get(), AppWelcomeDialogSingleton.getAppWelcomeDialog(app).getRecentFiles());
                     } else {
                         break;
                     }

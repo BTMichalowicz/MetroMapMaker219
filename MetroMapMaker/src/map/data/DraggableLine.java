@@ -1,14 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package map.data;
 
 import djf.AppTemplate;
 import java.util.ArrayList;
-import javafx.scene.shape.Line;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.shape.Polyline;
+import javafx.scene.text.Text;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 
@@ -23,6 +21,8 @@ public class DraggableLine extends Polyline implements Draggable {
     double startX, endX, startY, endY;
 
     ArrayList<DraggableStation> stations;
+    
+    Text lineName1, lineName2;
 
     jTPS transactl;
     jTPS_Transaction t;
@@ -39,6 +39,8 @@ public class DraggableLine extends Polyline implements Draggable {
         stations = new ArrayList<>();
 
         this.name = name;
+        this.lineName1 = new Text(name);
+        this.lineName2 = new Text(name);
 
     }
 
@@ -64,6 +66,22 @@ public class DraggableLine extends Polyline implements Draggable {
         stations.add(s);
 
         getPoints().add((int) s.getCenterX(), s.getCenterY());
+        
+        if(s.getCenterX() == getPoints().get(0) && s.getCenterY() == getPoints().get(1)){
+            
+            //Bind
+            
+            DoubleProperty x1 = new SimpleDoubleProperty(getPoints().get(0));
+            DoubleProperty y1 = new SimpleDoubleProperty(getPoints().get(1));
+            x1.bind(s.centerXProperty());
+            y1.bind(s.centerYProperty());
+            
+        }else if(getPoints().size()>3 && s.getCenterX() == getPoints().get(getPoints().size()-1) && s.getCenterY() == getPoints().get(getPoints().size()-2)){
+            DoubleProperty x1 = new SimpleDoubleProperty(getPoints().size()-2);
+            DoubleProperty y1 = new SimpleDoubleProperty(getPoints().size()-1);
+            x1.bind(s.centerXProperty());
+            y1.bind(s.centerYProperty());
+        }
     }
 
     public DraggableStation removeStation(DraggableStation s) {
@@ -86,6 +104,14 @@ public class DraggableLine extends Polyline implements Draggable {
         endY = y + 30;
 
         getPoints().addAll(startX, startY, endX, endY);
+        
+        
+        
+        
+        lineName1.setX(startX-10);
+        lineName1.setY(startY);
+        
+        lineName2.setX(endX + 10);
 
     }
 

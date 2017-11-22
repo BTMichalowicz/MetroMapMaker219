@@ -32,6 +32,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
@@ -197,7 +198,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
     }
 
     //THE MAIN CANVAS FOR THE APPLICATION
-    ScrollPane outerCanvas;
+   
+    
     Pane canvas;
 
     Text debugText;
@@ -210,9 +212,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         this.debugText = debugText;
     }
 
-    public ScrollPane getOuterCanvas() {
-        return outerCanvas;
-    }
+ 
     mapData dataManager;
 
     mapEditController mapEditController;
@@ -231,6 +231,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         // KEEP THE GUI FOR LATER
         gui = app.getGUI();
+        
+        canvasController = new CanvasController(app);
 
         backgroundColorPicker = new ColorPicker();
 
@@ -262,10 +264,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(true);
             removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
-            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
+            removeFromLine.setDisable(data != null && data instanceof DraggableStation);
             details.setDisable(false);
             addStat.setDisable(false);
-            removeStat.setDisable(false);
+            removeStat.setDisable(data != null && data instanceof DraggableStation);
             snapToGrid.setDisable(false);
             moveLabel.setDisable(false);
             rotate.setDisable(false);
@@ -280,7 +282,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
-            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
+             removeFromLine.setDisable(data != null && data instanceof DraggableStation);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(data != null && data instanceof DraggableStation);
@@ -297,7 +299,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
-            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
+             removeFromLine.setDisable(data != null && data instanceof DraggableStation);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(data != null && data instanceof DraggableStation);
@@ -314,7 +316,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
-            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
+             removeFromLine.setDisable(data != null && data instanceof DraggableStation);
             details.setDisable(false);
             addStat.setDisable(true);
             removeStat.setDisable(data != null && data instanceof DraggableStation);
@@ -334,7 +336,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(data != null && data instanceof DraggableLine);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
-            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
+             removeFromLine.setDisable(data != null && data instanceof DraggableStation);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(data != null && data instanceof DraggableStation);
@@ -352,10 +354,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(false);
             addToLine.setDisable(data != null && data instanceof DraggableLine);
-            removeFromLine.setDisable(data != null && data instanceof DraggableLine);
-            details.setDisable(data != null && data instanceof DraggableStation);
+             removeFromLine.setDisable(data != null && data instanceof DraggableStation);
+            details.setDisable(data != null && data instanceof DraggableLine);
             addStat.setDisable(true);
-            removeStat.setDisable(true);
+            removeStat.setDisable(data != null && data instanceof DraggableStation);
             snapToGrid.setDisable(false);
             moveLabel.setDisable(false);
             rotate.setDisable(true);
@@ -402,8 +404,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
         lines1.getChildren().addAll(metroLine, lines);
         editLine = gui.initChildButton(lines1, " ", " ", false);
 
-        editLine.setBackground(new Background(new BackgroundFill(lines.getSelectionModel().getSelectedItem().getFill(), null, null)));
-        editLine.setText(lines.getSelectionModel().getSelectedItem().getFill().toString());
+        
+        
         editLine.setTooltip(new Tooltip("Edit the given line"));
 
         //HBOX 2: Line Editor Part 2
@@ -547,9 +549,9 @@ public class mapWorkspace extends AppWorkspaceComponent {
         editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest, decor1,
                 font1, nav1);
 
-        outerCanvas = new ScrollPane();
+        
         canvas = new Pane();
-        outerCanvas.getChildrenUnmodifiable().add(canvas);
+        
         debugText = new Text();
         canvas.getChildren().add(debugText);
         debugText.setX(100);
@@ -561,7 +563,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         workspace = new BorderPane();
 
         ((BorderPane) workspace).setLeft(editToolbar);
-        ((BorderPane) workspace).setCenter(outerCanvas);
+        ((BorderPane) workspace).setCenter(canvas);
     }
 
     private void initStyle() {
@@ -658,12 +660,12 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         addToLine.setOnAction(e -> {
           
-            mapEditController.processAddStatToLine(dataManager.getSelectedShape()); //TODO: Include some sort of identifier for this
+            mapEditController.processAddStatToLine((DraggableLine)dataManager.getSelectedShape()); //TODO: Include some sort of identifier for this
 
         });
 
         removeFromLine.setOnAction(e -> {
-            mapEditController.processRemoveStatFromLine(dataManager.getSelectedShape()); //TODO: Look Up
+            mapEditController.processRemoveStatFromLine((DraggableStation)dataManager.getSelectedShape()); //TODO: Look Up
 
         });
         
@@ -762,12 +764,17 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         //EventHandler<ActionEvent> for Bolding and Italicizing
         //Also several Fonts to go with it
-        Font fontBold = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.BOLD, FontPosture.REGULAR, fontSizes.getSelectionModel().getSelectedItem());
+        
+        
+        
+        EventHandler<ActionEvent> fontHandler = e -> {
+            
+            
+            Font fontBold = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.BOLD, FontPosture.REGULAR, fontSizes.getSelectionModel().getSelectedItem());
         Font fontItalic = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.NORMAL, FontPosture.ITALIC, fontSizes.getSelectionModel().getSelectedItem());
         Font fontNormal = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.NORMAL, FontPosture.REGULAR, fontSizes.getSelectionModel().getSelectedItem());
         Font fontBoldItalic = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.BOLD, FontPosture.ITALIC, fontSizes.getSelectionModel().getSelectedItem());
 
-        EventHandler<ActionEvent> fontHandler = e -> {
 
             Node node = dataManager.getSelectedShape();
 
@@ -795,6 +802,38 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         bold.setOnAction(fontHandler);
         italicize.setOnAction(fontHandler);
+    }
+
+    public Slider getLineThickness() {
+        return lineThickness;
+    }
+
+    public void setLineThickness(Slider lineThickness) {
+        this.lineThickness = lineThickness;
+    }
+
+    public Slider getStatThickness() {
+        return statThickness;
+    }
+
+    public void setStatThickness(Slider statThickness) {
+        this.statThickness = statThickness;
+    }
+
+    public ColorPicker getFontColorPicker() {
+        return fontColorPicker;
+    }
+
+    public void setFontColorPicker(ColorPicker fontColorPicker) {
+        this.fontColorPicker = fontColorPicker;
+    }
+
+    public mapEditController getMapEditController() {
+        return mapEditController;
+    }
+
+    public void setMapEditController(mapEditController mapEditController) {
+        this.mapEditController = mapEditController;
     }
 
 // HELPER METHOD

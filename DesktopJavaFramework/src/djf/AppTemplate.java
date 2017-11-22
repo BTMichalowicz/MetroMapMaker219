@@ -133,7 +133,7 @@ public abstract class AppTemplate extends Application {
                         if (result.isPresent()) {
                             
                             
-                            boolean isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get()); //TODO: IMPLEMENT!!!!
+                            boolean isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles()); //TODO: IMPLEMENT!!!!
                             while(!isDuplicate){
                                 Alert duplicate = new Alert(AlertType.ERROR);
                                 duplicate.setHeaderText(null);
@@ -141,7 +141,7 @@ public abstract class AppTemplate extends Application {
                                 duplicate.showAndWait();
                                 result = newMap.showAndWait();
                                 if(result.isPresent()){
-                                    isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get());
+                                    isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles());
                                     continue;
                             }else{
                                     primaryStage.show();

@@ -33,7 +33,7 @@ public class AppMessageDialogSingleton extends Stage {
      * for all kinds of messages. Note this is a singleton design
      * pattern so the constructor is private.
      * 
-     * @param owner The owner stage of this modal dialoge.
+     * @param owner The owner stage of this modal dialogue.
      * 
      * @param closeButtonText Text to appear on the close button.
      */

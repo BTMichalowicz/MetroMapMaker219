@@ -36,6 +36,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.json.Json;
@@ -481,24 +482,24 @@ public class AppFileController {
         }
     }
 
-    public boolean checkDuplicateFileName(String fileName) {
+    public boolean checkDuplicateFileName(String fileName, ArrayList<File> recentWorks) {
 
-        File f = new File(PATH_WORK);
-
-        File[] directory = f.listFiles((File dir, String name) -> name.endsWith(".m3"));
-
-        if (directory.length == 0) {
-            return true; //If no files match that same name and extension, 
-            //return true to create a new file and save it
-        } else {
-            for (File dirFile : directory) {
+        if (recentWorks.isEmpty()) {
+            return true;
+        }
+        
+            //If the list of recentworks that is the entire work directory
+         
+            for (File dirFile : recentWorks) {
                 if (dirFile.getName().split("\\.")[0].equals(fileName.split("\\.")[0])) {
                     return false; // There does exist a duplicate
                 }
             }
-        } //There does not exist a duplicate, so
-        return true;
+            //There does not exist a duplicate, so
+            return true;
+
+        }
+        
+       
 
     }
-
-}

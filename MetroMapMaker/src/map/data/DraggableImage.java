@@ -12,9 +12,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
@@ -25,35 +22,32 @@ import properties_manager.PropertiesManager;
 
 /**
  * Image Overlay Object for the project. Please let all of this work
+ *
  * @author Ben Michalowicz
  */
-public class DraggableImage extends Rectangle implements Draggable{
-    
+public class DraggableImage extends Rectangle implements Draggable {
+
     String filePath;
     double startX, startY;
-    
-   
-    
+
     Image img;
     AppTemplate app;
     ImagePattern imgPattern;
-    
-    
-    public DraggableImage(AppTemplate app){
+
+    public DraggableImage(AppTemplate app) {
         this.app = app;
-        
+
         img = getNewImage();
-        
+
         imgPattern = new ImagePattern(img);
-        
+
         setWidth(img.getWidth());
         setHeight(img.getHeight());
         setFill(imgPattern);
-        
-        
+
     }
-    
-    private Image getNewImage(){
+
+    private Image getNewImage() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         Scene sc = app.getGUI().getPrimaryScene();
@@ -65,30 +59,31 @@ public class DraggableImage extends Rectangle implements Draggable{
         fc.setTitle(props.getProperty("Load an Image"));
 
         File selectedFile = fc.showOpenDialog(null);
-        
-        ((mapData)app.getDataComponent()).setState(mapState.DRAGGING);
-        
-        try{
-        URL fileU = selectedFile.toURI().toURL();
 
-        Image image = new Image(fileU.toExternalForm());
+        ((mapData) app.getDataComponent()).setState(mapState.DRAGGING);
         
-        filePath = selectedFile.getPath();
+        if(selectedFile!= null){
 
-        return image;
-        }catch(MalformedURLException muee){
-            
-            AppMessageDialogSingleton.getSingleton().show("Loading image error","There was an error loading the image as follows" + Arrays.toString(muee.getStackTrace()));
+        try {
+            URL fileU = selectedFile.toURI().toURL();
+
+            Image image = new Image(fileU.toExternalForm());
+
+            filePath = selectedFile.getPath();
+
+            return image;
+        } catch (MalformedURLException muee) {
+
+            AppMessageDialogSingleton.getSingleton().show("Loading image error", "There was an error loading the image as follows" + Arrays.toString(muee.getStackTrace()));
+            return null;
+        }
+        }else{
             return null;
         }
 
     }
-    
-    
-    
-    
-    
-     public String getFilePath(){
+
+    public String getFilePath() {
         return filePath;
     }
 
@@ -99,36 +94,36 @@ public class DraggableImage extends Rectangle implements Draggable{
 
     @Override
     public void start(int x, int y) {
-        
+
     }
 
     @Override
     public void drag(int x, int y) {
+        double diffX = x - startX;
+        double diffY = y - startY;
+        double newX = getX() + diffX;
+        double newY = getY() + diffY;
         
-            ObjectProperty<Point2D> mouseAnchor = new SimpleObjectProperty<>();
-        setOnMousePressed( event -> mouseAnchor.set(new Point2D(getX(), getY())));
-       setOnMouseDragged( event -> {
-            double deltaX = getX() - mouseAnchor.get().getX();
-            double deltaY = getX() - mouseAnchor.get().getY();
-            relocate(getLayoutX()+deltaX, getLayoutY()+deltaY);
-            mouseAnchor.set(new Point2D(event.getSceneX(), event.getSceneY()));
-        });
         
+        setX(newX);
+        setY(newY);
+        startX = x;
+        startY = y;
     }
 
     @Override
     public void size(int x, int y) {
-        
+
     }
 
     @Override
     public void setLocationAndSize(double initX, double initY, double initWidth, double initHeight) {
-        
+
     }
 
     @Override
     public String getShapeType() {
         return IMAGE;
     }
-    
+
 }

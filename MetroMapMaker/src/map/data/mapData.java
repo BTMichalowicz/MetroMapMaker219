@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package map.data;
 
-import java.util.ArrayList;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.effect.BlurType;
@@ -20,17 +14,36 @@ import javafx.scene.shape.Shape;
 
 import djf.components.AppDataComponent;
 import djf.AppTemplate;
-
-import java.io.IOException;
+import static djf.settings.AppStartupConstants.PATH_IMAGES;
+import djf.ui.AppMessageDialogSingleton;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+
 import javafx.scene.paint.ImagePattern;
+import javafx.stage.FileChooser;
 import jtps.jTPS;
-import jtps.jTPS_Transaction;
+import map.gui.CanvasController;
+import map.gui.mapEditController;
 import map.gui.mapWorkspace;
+import properties_manager.PropertiesManager;
 
 /**
+ * A class that was created for the purpose of manipulating data and handling
+ * updates to the canvas and whatnot
  *
  * @author Ben Michalowicz
+ * @version 1.0, 2017
  */
 public class mapData implements AppDataComponent {
 
@@ -276,11 +289,141 @@ public class mapData implements AppDataComponent {
 
     public void removeSelectedItem() {
         if (selectedNode != null) {
-
+            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(selectedNode);
             selectedNode = null;
 
-            //TODO: WORK ON TRANSACTIONS
         }
     }
+
+     public String s;
+    
+    public String getS(){
+        return s;
+    }
+    public void startNewBackground() {
+
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        Scene scene = app.getGUI().getPrimaryScene();
+
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
+        fc.setInitialDirectory(new File(PATH_IMAGES));
+
+        File selectedFile = fc.showOpenDialog(null);
+
+        if (selectedFile != null) {
+            try {
+                setState(mapState.STARTING_BCKGROUND);
+
+                workspace.getCanvas().setBackground(new Background(new BackgroundImage(loadImg(selectedFile), 
+                        BackgroundRepeat.SPACE, 
+                        BackgroundRepeat.SPACE, 
+                        BackgroundPosition.CENTER,
+                        BackgroundSize.DEFAULT)));
+                
+                s = selectedFile.getPath();
+
+            } catch (MalformedURLException e) {
+                AppMessageDialogSingleton.getSingleton().show("Background Image Error","You encountered an error loading your background image");
+            }
+        }
+    }
+
+    private Image loadImg(File f) throws MalformedURLException {
+
+        URL fileU = f.toURI().toURL();
+
+        Image image = new Image(fileU.toExternalForm());
+
+        return image;
+    }
+
+    
+  
+    public void startNewImage(int x, int y) {
+        DraggableImage d = new DraggableImage(app);
+        
+        d.start(x, y);
+        
+        newNode = d;
+        
+        
+        initNode();
+        
+        
+    }
+
+    public void startNewText(int x, int y) {
+        DraggableText newText = new DraggableText(app);
+        
+        newText.start(x, y);
+        newNode = newText;
+        
+        initNode();
+    }
+    
+   
+
+    public void startNewStation(int x, int y) {
+        
+        TextInputDialog statName = new TextInputDialog();
+        statName.setTitle("Make a station Name!");
+        statName.setHeaderText(null);
+        statName.setContentText("Add a name for your station!");
+
+        Optional<String> result = statName.showAndWait();
+
+        while (!result.isPresent()) {
+            Alert duplicate = new Alert(Alert.AlertType.ERROR);
+            duplicate.setHeaderText(null);
+            duplicate.setContentText("You need a name for the station!!");
+            duplicate.showAndWait();
+            result = statName.showAndWait();
+
+        }
+
+        DraggableStation newStation = new DraggableStation(app, result.get());
+        newStation.start(x, y);
+        
+        newNode = newStation;
+        
+        initNode();
+        
+    }
+    
+    
+    public void initNode(){
+        if(selectedNode!=null){
+            unhighlightShape(selectedNode);
+            selectedNode = null; //Terminate the reference
+        }
+        
+        // USE THE CURRENT SETTINGS FOR THIS NEW SHAPE
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+
+        if (newNode instanceof Shape) {
+            ((Shape) newNode).setFill(newNode instanceof DraggableImage? new ImagePattern(((DraggableImage)newNode).img) : workspace.getOutlineColorPicker().getValue());
+            ((Shape) newNode).setStroke(workspace.getOutlineColorPicker().getValue());
+            ((Shape) newNode).setStrokeWidth(workspace.getLineThickness().getValue());
+        }
+
+        // GO INTO SHAPE SIZING MODE
+        state = mapState.SIZING_ITEM;
+        state = mapState.SELECTING;
+
+        if (newNode instanceof DraggableText) {
+
+            ((DraggableText) newNode).addText();
+
+        }
+        
+        workspace.getCanvas().getChildren().add(newNode);
+        app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);
+        
+        
+    }
+    
+    
 
 }

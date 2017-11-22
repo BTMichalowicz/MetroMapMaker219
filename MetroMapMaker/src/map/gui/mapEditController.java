@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventType;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -140,17 +141,17 @@ public class mapEditController {
             if (file.exists()) {
                 // If the file exists already, then just save it with a given number after it
 
-                file = new File(result.get() + "(" + i + ").png");
+                file = new File(PATH_EXPORTS + result.get() + "(" + i + ").png");
                 //If the file exists with the given number, keep going until the file (x(number).png) no longer exists
                 while (file.exists()) {
                     i++;
-                    file = new File(result.get() + "(" + i + ").png");
+                    file = new File(PATH_EXPORTS+result.get() + "(" + i + ").png");
                 }
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file)); //Only save the file
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file); //Only save the file
                 //After the loop has finished
 
             } else {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(PATH_EXPORTS + file));
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
             }
         }
 
@@ -228,7 +229,7 @@ public class mapEditController {
 
             Image image = new Image(fileU.toExternalForm());
 
-            ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().setBackground(new Background(new BackgroundFill(new ImagePattern(image), null, null)));
+            workspace.getCanvas().setBackground(new Background(new BackgroundFill(new ImagePattern(image), null, null)));
 
         } catch (MalformedURLException muee) {
 
@@ -252,7 +253,7 @@ public class mapEditController {
 
     }
 
-    void processAddLine() {
+    public void processAddLine() {
         // CHANGE THE CURSOR
         Scene scene = app.getGUI().getPrimaryScene();
         scene.setCursor(Cursor.CROSSHAIR);
@@ -265,7 +266,7 @@ public class mapEditController {
         workspace.reloadWorkspace(dataManager);
     }
 
-    void processAddStation() {
+    public void processAddStation() {
         // CHANGE THE CURSOR
         Scene scene = app.getGUI().getPrimaryScene();
         scene.setCursor(Cursor.CROSSHAIR);
@@ -278,7 +279,7 @@ public class mapEditController {
         workspace.reloadWorkspace(dataManager);
     }
 
-    public void processAddStatToLine(Node draggableLine) {
+    public void processAddStatToLine(DraggableLine draggableLine) {
 
         TextInputDialog statName = new TextInputDialog();
         statName.setTitle("Make a station Name!");
@@ -290,14 +291,59 @@ public class mapEditController {
         while (!result.isPresent()) {
             Alert duplicate = new Alert(AlertType.ERROR);
             duplicate.setHeaderText(null);
-            duplicate.setContentText("You need a name for the file!!");
+            duplicate.setContentText("You need a name for the station!!");
             duplicate.showAndWait();
             result = statName.showAndWait();
 
         }
 
         DraggableStation newStation = new DraggableStation(app, result.get());
+        draggableLine.addStation(newStation);
 
+        double x = draggableLine.getPoints().get(draggableLine.getPoints().size() / 2);
+        double y = draggableLine.getPoints().get(draggableLine.getPoints().size() / 2 + 1);
+
+        dataManager.unhighlightShape(dataManager.getSelectedShape());
+        
+        app.getGUI().updateToolbarControls(false);
+        
+        mapWorkspace workspace= (mapWorkspace)app.getWorkspaceComponent();
+        
+        newStation.setFill(workspace.getOutlineColorPicker().getValue());
+        newStation.setStroke(workspace.getOutlineColorPicker().getValue());
+        newStation.setStrokeWidth(workspace.getStatThickness().getValue());
+        dataManager.setState(mapState.SIZING_ITEM);
+        workspace.getCanvas().getChildren().add(newStation);
+        
+        app.getGUI().updateToolbarControls(false);
+        
+    }
+
+    /**
+     * This method is substantially easier to code than its adding counterpart
+     *
+     * @param removedStation
+     */
+    public void processRemoveStatFromLine(DraggableStation removedStation) {
+        
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        
+        for(Node n: workspace.getCanvas().getChildren()){
+            if(n instanceof DraggableLine){
+                DraggableLine node = (DraggableLine) n;
+                
+                if(node.getStations().contains(removedStation)){
+                    node.getStations().remove(removedStation);
+                    
+                    
+                }
+            }
+        }
+        
+        //Just in case
+        
+        workspace.getCanvas().getChildren().remove(removedStation);
+        removedStation = null;
     }
 
 }
