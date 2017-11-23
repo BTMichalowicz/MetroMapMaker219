@@ -227,7 +227,7 @@ public class AppGUI {
                         break;
                     }
                 }
-
+                app.setLineName(result.get());
                 getFileController().handleNewWelcomeRequest(result.get());
 
             } else {
@@ -252,6 +252,10 @@ public class AppGUI {
         // ALSO STORE OTHER TOOLBARS
         topToolbarPane = new FlowPane();
         topToolbarPane.getChildren().add(fileToolbar);
+    }
+    
+    public Stage getPrimaryStage(){
+        return primaryStage;
     }
 
     // INITIALIZE THE WINDOW (i.e. STAGE) PUTTING ALL THE CONTROLS

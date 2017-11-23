@@ -22,7 +22,7 @@ public class DraggableLine extends Polyline  implements Draggable{
 
     double startX, endX, startY, endY;
 
-    ArrayList<DraggableStation> stations;
+    ArrayList<String> stations;
     
     DraggableText startName, endName;
     
@@ -34,6 +34,12 @@ public class DraggableLine extends Polyline  implements Draggable{
 
     public String getName() {
         return name;
+    }
+    
+    public void setName(String name){
+        this.name = name;
+        this.startName.setText(name);
+        this.endName.setText(name);
     }
 
     public DraggableLine(AppTemplate app, String name) {
@@ -53,11 +59,11 @@ public class DraggableLine extends Polyline  implements Draggable{
 
     }
 
-    public ArrayList<DraggableStation> getStations() {
+    public ArrayList<String> getStations() {
         return stations;
     }
 
-    public void setStations(ArrayList<DraggableStation> stations) {
+    public void setStations(ArrayList<String> stations) {
         this.stations = stations;
     }
 
@@ -69,14 +75,22 @@ public class DraggableLine extends Polyline  implements Draggable{
        
     }
 
-    public void addStation(DraggableStation s) {
-        stations.add(s);
+    public void addStation(DraggableStation s, String statName) {
+        stations.add(statName);
         
         s.setCenterX(getPoints().get(0));
         s.setCenterY(getPoints().get(1));
         
-       
         
+//        for(int i = 2; i< getPoints().size(); i++){
+//            
+//            getPoints().set(i, getPoints().get(i-1));
+//            getPoints().set(i-1, getPoints().get(i-2));
+//            
+//            
+//        }
+//       
+//        
         s.setOnMouseDragged(e -> {
             s.drag((int)e.getX(), (int)e.getY());
             
@@ -91,8 +105,8 @@ public class DraggableLine extends Polyline  implements Draggable{
       
     }
 
-    public DraggableStation removeStation(DraggableStation s) {
-        DraggableStation ret = stations.get(stations.indexOf(s));
+    public String removeStation(String s) {
+        String ret = stations.get(stations.indexOf(s));
 
         stations.remove(s);
         return ret;

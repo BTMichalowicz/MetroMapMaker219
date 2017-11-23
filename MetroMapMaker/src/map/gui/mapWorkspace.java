@@ -785,6 +785,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
 
         addToLine.setOnAction(e -> {
+            
+           
 
             mapEditController.processAddStatToLine((DraggableLine) dataManager.getSelectedShape()); //TODO: Include some sort of identifier for this
 
@@ -793,6 +795,24 @@ public class mapWorkspace extends AppWorkspaceComponent {
         removeFromLine.setOnAction(e -> {
             mapEditController.processRemoveStatFromLine((DraggableStation) dataManager.getSelectedShape()); //TODO: Look Up
 
+        });
+        
+        lines.setOnAction(e->{
+            String name = lines.getSelectionModel().getSelectedItem();
+            
+            if(name!=null){
+                for(Node item: getCanvas().getChildren()){
+                    if(item instanceof DraggableLine){
+                        DraggableLine drag = (DraggableLine) item;
+                        
+                        if(drag.getName().equals(name)){
+                            dataManager.highlightShape(item);
+                        }
+                    }
+                }
+            }
+        
+        
         });
 
         canvas.setOnMouseClicked(e -> {
@@ -889,10 +909,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         //Also several Fonts to go with it
         EventHandler<ActionEvent> fontHandler = e -> {
 
-            Font fontBold = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.BOLD, FontPosture.REGULAR, fontSizes.getSelectionModel().getSelectedItem());
-            Font fontItalic = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.NORMAL, FontPosture.ITALIC, fontSizes.getSelectionModel().getSelectedItem());
-            Font fontNormal = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.NORMAL, FontPosture.REGULAR, fontSizes.getSelectionModel().getSelectedItem());
-            Font fontBoldItalic = Font.font(fontFamilies.getSelectionModel().getSelectedItem(), FontWeight.BOLD, FontPosture.ITALIC, fontSizes.getSelectionModel().getSelectedItem());
+           
 
             Node node = dataManager.getSelectedShape();
 
@@ -901,19 +918,23 @@ public class mapWorkspace extends AppWorkspaceComponent {
                 if (bold.isSelected() && italicize.isSelected()) {
                     isBold = true;
                     isItalic = true;
-                    text.setFont(fontBoldItalic); // Both check boxes checked
+                    
+                   
+                    text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, FontPosture.ITALIC, text.getFont().getSize())); // Both check boxes checked
                 } else if (bold.isSelected()) {
                     isBold = true;
                     isItalic = false;
-                    text.setFont(fontBold); // The Bold check box checked
+                    
+                    text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, FontPosture.REGULAR, text.getFont().getSize()));
                 } else if (italicize.isSelected()) {
                     isBold = false;
                     isItalic = true;
-                    text.setFont(fontItalic); // The Italic check box checked
+       
+                    text.setFont(Font.font(text.getFont().getFamily(), FontWeight.NORMAL, FontPosture.ITALIC, text.getFont().getSize()));
                 } else {
                     isItalic = false;
                     isBold = false;
-                    text.setFont(fontNormal); // Both check boxes unchecked
+                    text.setFont(Font.font(text.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, text.getFont().getSize()));
                 }
             }
         };

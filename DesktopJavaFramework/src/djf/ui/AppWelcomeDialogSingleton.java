@@ -1,4 +1,3 @@
-
 package djf.ui;
 
 import djf.AppTemplate;
@@ -24,8 +23,7 @@ import javafx.scene.layout.BorderPane;
 
 /**
  * This class serves to present a dialog that welcomes the user into the
- * apimport javafx.scene.control.TextInputDialog;
-plication
+ * apimport javafx.scene.control.TextInputDialog; plication
  *
  * @author Ben Michalowicz
  */
@@ -60,10 +58,16 @@ public class AppWelcomeDialogSingleton extends Stage {
 
     //Because it's a singleton
     private AppWelcomeDialogSingleton(AppTemplate app) {
-        this.app = app;
+        
+        if(single == null){
+            this.app = app;
         initLayout();
-        initData(); 
+        initData();
         initControllers();
+        }else{
+            initData();
+        }
+        
 
     } //Empty Constructor for the sake of stuff
 
@@ -96,12 +100,10 @@ public class AppWelcomeDialogSingleton extends Stage {
         file4 = new Hyperlink("");
 
         file5 = new Hyperlink("");
-        
+
         Label recentFiles = new Label("Recent Files");
-        
 
         hyperLinkList.getChildren().addAll(recentFiles, file1, file2, file3, file4, file5);
-        
 
         welcomePane.setLeft(hyperLinkList);
         welcomePane.setCenter(centerStage);
@@ -161,7 +163,22 @@ public class AppWelcomeDialogSingleton extends Stage {
         file1.setOnAction(e -> {
 
             try {
-                app.getFileComponent().loadData(app.getDataComponent(), PATH_WORK+file1.getText());
+                        // RESET THE WORKSPACE
+                app.getWorkspaceComponent().resetWorkspace();
+
+                // RESET THE DATA
+                app.getDataComponent().resetData();
+                app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file1.getText().split("\\.")[0]) + "\\" + file1.getText());
+                
+                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+                app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
+
+                // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
+                
+                app.getGUI().updateToolbarControls(true);
+                
+                close();
+                app.getGUI().getPrimaryStage().show();
             } catch (IOException e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
@@ -175,21 +192,52 @@ public class AppWelcomeDialogSingleton extends Stage {
         file2.setOnAction(e -> {
 
             try {
-                app.getFileComponent().loadData(app.getDataComponent(), PATH_WORK + file2.getText());
+                       // RESET THE WORKSPACE
+                app.getWorkspaceComponent().resetWorkspace();
+
+                // RESET THE DATA
+                app.getDataComponent().resetData();
+                app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file2.getText().split("\\.")[0]) + "\\" + file2.getText());
+                
+                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+                app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
+
+                // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
+                
+                app.getGUI().updateToolbarControls(true);
+                
+                close();
+                app.getGUI().getPrimaryStage().show();
             } catch (IOException e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
                 a.setContentText("This action is not yet supported! Please come back later!");
                 a.setTitle("Not Supported Yet!");
                 a.showAndWait();
+                
 
             }
 
         });
         file3.setOnAction(e -> {
 
-           try {
-                app.getFileComponent().loadData(app.getDataComponent(), PATH_WORK + file3.getText());
+            try {
+                            // RESET THE WORKSPACE
+                app.getWorkspaceComponent().resetWorkspace();
+
+                // RESET THE DATA
+                app.getDataComponent().resetData();
+                app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file3.getText().split("\\.")[0]) + "\\" + file3.getText());
+                
+                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+                app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
+
+                // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
+                
+                app.getGUI().updateToolbarControls(true);
+                
+                close();
+                app.getGUI().getPrimaryStage().show();
             } catch (IOException e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
@@ -202,8 +250,24 @@ public class AppWelcomeDialogSingleton extends Stage {
         });
         file4.setOnAction(e -> {
 
-           try {
-                app.getFileComponent().loadData(app.getDataComponent(), PATH_WORK + file4.getText());
+            try {
+                
+                   // RESET THE WORKSPACE
+                app.getWorkspaceComponent().resetWorkspace();
+
+                // RESET THE DATA
+                app.getDataComponent().resetData();
+                app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file4.getText().split("\\.")[0]) + "\\" + file4.getText());
+                
+                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+                app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
+
+                // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
+                
+                app.getGUI().updateToolbarControls(true);
+                
+                close();
+                app.getGUI().getPrimaryStage().show();
             } catch (IOException e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
@@ -216,8 +280,26 @@ public class AppWelcomeDialogSingleton extends Stage {
         });
         file5.setOnAction(e -> {
 
-             try {
-                app.getFileComponent().loadData(app.getDataComponent(), file5.getText());
+            try {
+                
+                
+                            // RESET THE WORKSPACE
+                app.getWorkspaceComponent().resetWorkspace();
+
+                // RESET THE DATA
+                app.getDataComponent().resetData();
+                app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file5.getText().split("\\.")[0]) + "\\" + file5.getText());
+                
+                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+                app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
+
+                // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
+                
+                app.getGUI().updateToolbarControls(true);
+                
+                close();
+                app.getGUI().getPrimaryStage().show();
+
             } catch (IOException e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
@@ -238,8 +320,7 @@ public class AppWelcomeDialogSingleton extends Stage {
         } else {
             
             return single;
-            
-            
+
         }
     }
 
@@ -248,14 +329,9 @@ public class AppWelcomeDialogSingleton extends Stage {
     }
 
     private void initData() {
-       
-        
-        
+
         recentWorks = getWorkDir(new File(PATH_WORK), new ArrayList<>()); //Attempt to get all files recursively
-        
-        
-        
-        
+
         sortFiles(recentWorks);
 
         renameLinks(recentWorks);
@@ -265,9 +341,9 @@ public class AppWelcomeDialogSingleton extends Stage {
     private void sortFiles(ArrayList<File> recentWorks) {
         for (int idx = 0; idx < recentWorks.size() - 1; idx++) {
             for (int j = 0; j < recentWorks.size() - idx - 1; idx++) {
-                if (recentWorks.get(j).lastModified()<=recentWorks.get(j + 1).lastModified()) {
-                    File temp = recentWorks.get(j+1);
-                    recentWorks.set(j+1, recentWorks.get(j));
+                if (recentWorks.get(j).lastModified() < recentWorks.get(j + 1).lastModified()) {
+                    File temp = recentWorks.get(j + 1);
+                    recentWorks.set(j + 1, recentWorks.get(j));
                     recentWorks.set(j, temp);
                 }
             }
@@ -302,19 +378,18 @@ public class AppWelcomeDialogSingleton extends Stage {
 
         }
     }
-    
-    private ArrayList<File> getWorkDir(File f, ArrayList<File> helper){
+
+    private ArrayList<File> getWorkDir(File f, ArrayList<File> helper) {
         File[] all = f.listFiles();
-        
-        for(File file: all){
-            if(file.isFile()){
+
+        for (File file : all) {
+            if (file.isFile()) {
                 helper.add(file);
-            }else if (file.isDirectory()){
+            } else if (file.isDirectory()) {
                 getWorkDir(file, helper);
             }
         }
         return helper;
     }
-    
 
 }

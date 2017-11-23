@@ -13,8 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -117,6 +115,8 @@ public class mapEditController {
         try {
             if (result.isPresent()) {
                 makeImage(file, i, result, image); //method to take a snapshot of the canvas
+            } else {
+                return;
             }
             /*
             Once the fule has been exported as some sort of PNG image, then we go to exporting the data
@@ -124,6 +124,7 @@ public class mapEditController {
             //fileControl.exportData(dataManager, PATH_EXPORTS);
 
         } catch (IOException ioe) {
+
         }
 
         Alert a = new Alert(AlertType.INFORMATION);
@@ -177,17 +178,26 @@ public class mapEditController {
      * @param selectedLine The selected Draggable Line in question
      */
     public void processRemoveLine(DraggableLine selectedLine) {
+
         selectedLine.getStations().forEach((d) -> {
             selectedLine.getStations().remove(d);
-            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(d);
-            ((mapWorkspace)app.getWorkspaceComponent()).getStations().getItems().remove(d.getName());
-            ((mapWorkspace)app.getWorkspaceComponent()).getFromStat().getItems().remove(d.getName());
-            ((mapWorkspace)app.getWorkspaceComponent()).getToStat().getItems().remove(d.getName());
-            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(d.getStatName());
-            
+            for (Node item : ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren()) {
+                if (item instanceof DraggableStation) {
+                    DraggableStation s = (DraggableStation) item;
+                    if (s.getName().equals(d)) {
+                        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(s);
+                        break;
+                    }
+                }
+            }
+
+            ((mapWorkspace) app.getWorkspaceComponent()).getStations().getItems().remove(d);
+            ((mapWorkspace) app.getWorkspaceComponent()).getFromStat().getItems().remove(d);
+            ((mapWorkspace) app.getWorkspaceComponent()).getToStat().getItems().remove(d);
+
         });
-        
-        ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().removeAll(selectedLine.getEndName(), selectedLine.getStartName());
+
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().removeAll(selectedLine.getEndName(), selectedLine.getStartName());
 
         processRemoveElement();
     }
@@ -311,16 +321,11 @@ public class mapEditController {
         }
 
         DraggableStation newStation = new DraggableStation(app, result.get());
-        draggableLine.addStation(newStation);
+        draggableLine.addStation(newStation, newStation.getName());
         workspace.getStations().getItems().add(newStation.getName());
-         workspace.getFromStat().getItems().add(newStation.getName());
-          workspace.getToStat().getItems().add(newStation.getName());
-        
-       
-         
-          
-          
-        
+        workspace.getFromStat().getItems().add(newStation.getName());
+        workspace.getToStat().getItems().add(newStation.getName());
+
         workspace.getStations().getItems().add(newStation.getName());
 
         dataManager.unhighlightShape(dataManager.getSelectedShape());
@@ -346,20 +351,13 @@ public class mapEditController {
 
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
 
-        for (Node n : workspace.getCanvas().getChildren()) {
-            if (n instanceof DraggableLine) {
-                DraggableLine node = (DraggableLine) n;
-
-                if (node.getStations().contains(removedStation)) {
-                    node.getStations().remove(removedStation);
-
-                }
-            }
-        }
+        workspace.getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).map((n) -> (DraggableLine) n).filter((node) -> (node.getStations().contains(removedStation.getName()))).forEachOrdered((node) -> {
+            node.getStations().remove(removedStation.getName());
+        });
 
         //Just in case
         workspace.getCanvas().getChildren().remove(removedStation);
-        removedStation = null;
+
     }
 
 }

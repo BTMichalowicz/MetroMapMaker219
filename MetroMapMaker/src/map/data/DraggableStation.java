@@ -27,6 +27,11 @@ public class DraggableStation extends Ellipse implements Draggable {
     public String getName() {
         return name;
     }
+    
+    public void setName(String name){
+        this.name = name;
+        this.statName.setText(name);
+    }
 
     public DraggableStation(AppTemplate initApp, String name) {
         setCenterX(0.0);

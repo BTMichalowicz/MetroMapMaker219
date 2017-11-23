@@ -34,26 +34,26 @@ public class EditLineSingleton extends Stage {
 
     Label lineDetails;
 
-    ComboBox<DraggableLine> metroLines;
+    DraggableLine metroLine;
 
     Button ok, cancel;
 
     AppTemplate app;
     VBox container;
 
-    public void setMetroLines(ComboBox<DraggableLine> metroLines) {
-        this.metroLines = metroLines;
+    public void setMetroLine(DraggableLine metroLine) {
+        this.metroLine = metroLine;
     }
 
-    public EditLineSingleton(AppTemplate app, ComboBox<DraggableLine> metroLines) {
+    public EditLineSingleton(AppTemplate app, DraggableLine metroLine) {
         this.app = app;
-        this.metroLines = metroLines;
+        this.metroLine = metroLine;
         initLayout();
         initControllers();
 
     }
 
-    public static EditLineSingleton getEditor(AppTemplate app, ComboBox<DraggableLine> metroLines) {
+    public static EditLineSingleton getEditor(AppTemplate app, DraggableLine metroLines) {
         if (editor == null) {
             editor = new EditLineSingleton(app, metroLines);
         }
@@ -74,28 +74,21 @@ public class EditLineSingleton extends Stage {
         HBox h = new HBox(20);
         h.getChildren().addAll(ok, cancel);
 
-        container.getChildren().addAll(lineDetails, metroLines, lineColor, h);
+        container.getChildren().addAll(lineDetails, metroLine, lineColor, h);
     }
 
     private void initControllers() {
         ok.setOnAction((ActionEvent e) -> {
-            if (metroLines.getSelectionModel().getSelectedItem() != null) {
-                DraggableLine drag = metroLines.getSelectionModel().getSelectedItem();
+             metroLine.setFill(lineColor.getValue());
                 
-                ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().stream().filter((s) -> (s instanceof DraggableLine)).map((s) -> (DraggableLine) s).filter((that) -> (drag.getName().equals(that.getName()))).forEachOrdered((that) -> {
-                    that.setFill(lineColor.getValue());
-                });
-                
-            }
+            
         });
 
         cancel.setOnAction((ActionEvent e) -> {
             close();
         });
 
-        if (metroLines.getSelectionModel().getSelectedItem() != null) {
-            lineColor.setValue(Color.valueOf(metroLines.getSelectionModel().getSelectedItem().getFill().toString()));
-        }
+        
     }
 
 }

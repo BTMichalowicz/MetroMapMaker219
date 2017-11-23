@@ -57,6 +57,13 @@ public class mapData implements AppDataComponent {
     public void setList(ObservableList<Node> list) {
         this.items = list;
     }
+    public AppTemplate getApp(){
+        return app;
+    }
+    
+    String lineName;
+    
+    
 
     // THE BACKGROUND COLOR
     Color backgroundColor;
@@ -89,11 +96,12 @@ public class mapData implements AppDataComponent {
     public static final String YELLOW_HEX = "#EEEE00";
     public static final Paint DEFAULT_BACKGROUND_COLOR = Paint.valueOf(WHITE_HEX);
     public static final Paint HIGHLIGHTED_COLOR = Paint.valueOf(YELLOW_HEX);
-    public static final int HIGHLIGHTED_STROKE_THICKNESS = 2;
+    public static final int HIGHLIGHTED_STROKE_THICKNESS = 1;
 
     jTPS transact;
 
     public mapData(AppTemplate initApp) {
+        
         // KEEP THE APP FOR LATER
         app = initApp;
 
@@ -119,6 +127,10 @@ public class mapData implements AppDataComponent {
 
         transact = new jTPS();
     }
+    
+    public String getLineName(){
+        return app.getLineName();
+    }
 
     public Color getBackgroundColor() {
         return backgroundColor;
@@ -142,11 +154,12 @@ public class mapData implements AppDataComponent {
 
     public void setBackgroundColor(Color initBackgroundColor) {
         backgroundColor = initBackgroundColor;
-        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
-        Pane canvas = workspace.getCanvas();
+        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+        Pane canvas = work.getCanvas();
         BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
         Background background = new Background(fill);
         canvas.setBackground(background);
+         b = work.getCanvas().getBackground();
     }
 
     public void setCurrentFillColor(Color initColor) {
@@ -190,8 +203,8 @@ public class mapData implements AppDataComponent {
         }
         if (shape != null) {
             highlightShape(shape);
-            mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
-            workspace.loadSelectedShapeSettings(shape);
+            mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+            work.loadSelectedShapeSettings(shape);
         }
         selectedNode = shape;
         if (shape != null) {
@@ -312,11 +325,17 @@ public class mapData implements AppDataComponent {
     public String getS() {
         return s;
     }
+    
+    Background b;
+    
+    public Background getB(){
+        return b;
+    }
 
     public void startNewBackground() {
 
         PropertiesManager props = PropertiesManager.getPropertiesManager();
-        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
         Scene scene = app.getGUI().getPrimaryScene();
 
         FileChooser fc = new FileChooser();
@@ -329,13 +348,15 @@ public class mapData implements AppDataComponent {
             try {
                 setState(mapState.STARTING_BCKGROUND);
 
-                workspace.getCanvas().setBackground(new Background(new BackgroundImage(loadImg(selectedFile),
+                work.getCanvas().setBackground(new Background(new BackgroundImage(loadImg(selectedFile),
                         BackgroundRepeat.SPACE,
                         BackgroundRepeat.SPACE,
                         BackgroundPosition.CENTER,
                         BackgroundSize.DEFAULT)));
 
                 s = selectedFile.getPath();
+                
+                b = work.getCanvas().getBackground();
 
             } catch (MalformedURLException e) {
                 AppMessageDialogSingleton.getSingleton().show("Background Image Error", "You encountered an error loading your background image");
@@ -354,6 +375,7 @@ public class mapData implements AppDataComponent {
 
     public void startNewImage(int x, int y) {
         DraggableImage d = new DraggableImage(app);
+        d.setImg(d.getNewImage());
 
         d.start(x, y);
 
@@ -412,7 +434,7 @@ public class mapData implements AppDataComponent {
         }
 
         // USE THE CURRENT SETTINGS FOR THIS NEW SHAPE
-        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
 
         
 
@@ -426,7 +448,7 @@ public class mapData implements AppDataComponent {
 
         }
 
-        workspace.getCanvas().getChildren().add(newNode);
+        work.getCanvas().getChildren().add(newNode);
         app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);
 
     }
@@ -441,12 +463,12 @@ public class mapData implements AppDataComponent {
 
         if (addLiner.getResultant().getSource() == addLiner.getBtnCancel()) {
             state = SELECTING;
-            return;
+            
         } else {
 
             DraggableLine newDraggableLine = new DraggableLine(app, addLiner.getName());
             newDraggableLine.setFill(addLiner.getLineColor().getValue());
-            //newDraggableLine.setStroke(newDraggableLine.getFill());
+            newDraggableLine.setStroke(newDraggableLine.getFill());
             newDraggableLine.setStrokeWidth(5);
             
             newDraggableLine.getStartName().setFill(newDraggableLine.getFill());

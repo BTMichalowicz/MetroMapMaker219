@@ -31,23 +31,29 @@ public class DraggableImage extends Rectangle implements Draggable {
     double startX, startY;
 
     Image img;
+
+    public Image getImg() {
+        return img;
+    }
+
+    public void setImg(Image img) {
+        this.img = img;
+    }
     AppTemplate app;
     ImagePattern imgPattern;
 
     public DraggableImage(AppTemplate app) {
         this.app = app;
 
-        img = getNewImage();
+      
 
-        imgPattern = new ImagePattern(img);
+        
 
-        setWidth(img.getWidth());
-        setHeight(img.getHeight());
-        setFill(imgPattern);
+        
 
     }
 
-    private Image getNewImage() {
+    public Image getNewImage() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         Scene sc = app.getGUI().getPrimaryScene();
@@ -70,7 +76,11 @@ public class DraggableImage extends Rectangle implements Draggable {
             Image image = new Image(fileU.toExternalForm());
 
             filePath = selectedFile.getPath();
-
+            imgPattern = new ImagePattern(image);
+            setWidth(image.getWidth());
+        setHeight(image.getHeight());
+        setFill(imgPattern);
+            img = image;
             return image;
         } catch (MalformedURLException muee) {
 
@@ -94,7 +104,8 @@ public class DraggableImage extends Rectangle implements Draggable {
 
     @Override
     public void start(int x, int y) {
-
+           setX(x);
+        setY(y);
     }
 
     @Override
@@ -105,8 +116,8 @@ public class DraggableImage extends Rectangle implements Draggable {
         double newY = getY() + diffY;
         
         
-        setX(newX);
-        setY(newY);
+        setX(x);
+        setY(y);
         startX = x;
         startY = y;
     }

@@ -47,6 +47,16 @@ public abstract class AppTemplate extends Application {
      * components used by the app in the proper order according to the
      * particular app's dependencies.
      */
+    
+    String lineName;
+    
+    public String getLineName(){
+        return lineName;
+    }
+    
+    public void setLineName(String lineName){
+        this.lineName = lineName;
+    }
     public abstract void buildAppComponentsHook();
 
     // COMPONENT ACCESSOR METHODS
@@ -97,7 +107,7 @@ public abstract class AppTemplate extends Application {
 
         //SETTING UP THE WELCOME TAG!!
         AppWelcomeDialogSingleton welcome = AppWelcomeDialogSingleton.getAppWelcomeDialog(this);
-        
+
         try {
 
             // LOAD APP PROPERTIES, BOTH THE BASIC UI STUFF FOR THE FRAMEWORK
@@ -118,56 +128,56 @@ public abstract class AppTemplate extends Application {
 
                 welcome.show();
                 // NOW OPEN UP THE WINDOW
+                
+               
 
                 welcome.getNewButton().setOnAction((ActionEvent e) -> {
                     welcome.close();
-                    
+
                     TextInputDialog newMap = new TextInputDialog();
                     newMap.setTitle("Creating a new Map!");
                     newMap.setHeaderText(null);
                     newMap.setContentText("Enter your map name here");
-                    
+
                     Optional<String> result = newMap.showAndWait();
-                    
-                    
-                        if (result.isPresent()) {
-                            
-                            
-                            boolean isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles()); 
-                            while(!isDuplicate){
-                                Alert duplicate = new Alert(AlertType.ERROR);
-                                duplicate.setHeaderText(null);
-                                duplicate.setContentText("You have a duplicate name!!!");
-                                duplicate.showAndWait();
-                                result = newMap.showAndWait();
-                                if(result.isPresent()){
-                                    isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles());
-                                    continue;
-                            }else{
-                                    primaryStage.show();
-                                getGUI().getFileController().handleNewWelcomeRequest(result.get());
-                                break;
-                                }
-                            }
-                            
+
+                    if (result.isPresent()) {
+
+                        boolean isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles());
+                        while (!isDuplicate) {
+                            Alert duplicate = new Alert(AlertType.ERROR);
+                            duplicate.setHeaderText(null);
+                            duplicate.setContentText("You have a duplicate name!!!");
+                            duplicate.showAndWait();
+                            result = newMap.showAndWait();
+                            if (result.isPresent()) {
+                                isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles());
+                                continue;
+                            } else {
                                 primaryStage.show();
                                 getGUI().getFileController().handleNewWelcomeRequest(result.get());
-                                
-                                
-                                
-                            
-                            
-                        } else {
-                            primaryStage.show();
-                            
-                            
+                                lineName = result.get();
+                                break;
+                            }
                         }
+                        lineName = result.get();
+                        primaryStage.show();
+                        getGUI().getFileController().handleNewWelcomeRequest(result.get());
                         
-                    
+
+                    } else {
+                        primaryStage.show();
+
+                    }
+
                 });
+                
+                
 
                 welcome.setOnCloseRequest(e -> {
-                    primaryStage.show();
+                    
+                    
+                        primaryStage.show();
                 });
 
                 primaryStage.setOnCloseRequest(e -> {
