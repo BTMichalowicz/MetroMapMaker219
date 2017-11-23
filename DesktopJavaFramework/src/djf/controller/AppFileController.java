@@ -26,16 +26,11 @@ import static djf.settings.AppPropertyType.SAVE_ERROR_TITLE;
 import static djf.settings.AppPropertyType.SAVE_UNSAVED_WORK_MESSAGE;
 import static djf.settings.AppPropertyType.SAVE_UNSAVED_WORK_TITLE;
 import static djf.settings.AppPropertyType.SAVE_WORK_TITLE;
-import static djf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static djf.settings.AppStartupConstants.PATH_WORK;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,9 +106,7 @@ public class AppFileController {
 
             File f = new File(PATH_WORK);
 
-            //TODO:: PROPERLY IMPLEWMENT FILE OPENING AND STUFF
-//                File f2 = new File(PATH_WORK + file);
-//                boolean b = f2.mkdir();
+            
             File f2 = new File(PATH_WORK + file);
             boolean b = f2.mkdir();
 

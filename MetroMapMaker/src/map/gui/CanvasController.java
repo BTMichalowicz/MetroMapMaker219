@@ -47,8 +47,8 @@ public class CanvasController {
             dataManager.startNewBackground();
         } else if (dataManager.isInState(mapState.STARTING_STATION)) {
             dataManager.startNewStation(x, y);
-//        } else if (dataManager.isInState(mapState.STARTING_LINE)) {
-//            dataManager.startNewMetroLine(x, y);
+        } else if (dataManager.isInState(mapState.STARTING_LINE)) {
+            dataManager.startNewMetroLine(x, y);
         } else if (dataManager.isInState(mapState.STARTING_OVERLAY)) {
             dataManager.startNewImage(x, y);
         } else if (dataManager.isInState(mapState.STARTING_TEXT)) {

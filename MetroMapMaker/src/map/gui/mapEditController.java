@@ -13,8 +13,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.EventType;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -145,7 +146,7 @@ public class mapEditController {
                 //If the file exists with the given number, keep going until the file (x(number).png) no longer exists
                 while (file.exists()) {
                     i++;
-                    file = new File(PATH_EXPORTS+result.get() + "(" + i + ").png");
+                    file = new File(PATH_EXPORTS + result.get() + "(" + i + ").png");
                 }
                 ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file); //Only save the file
                 //After the loop has finished
@@ -167,6 +168,7 @@ public class mapEditController {
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
         app.getGUI().updateToolbarControls(false);
+
     }
 
     /**
@@ -177,19 +179,29 @@ public class mapEditController {
     public void processRemoveLine(DraggableLine selectedLine) {
         selectedLine.getStations().forEach((d) -> {
             selectedLine.getStations().remove(d);
+            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(d);
+            ((mapWorkspace)app.getWorkspaceComponent()).getStations().getItems().remove(d.getName());
+            ((mapWorkspace)app.getWorkspaceComponent()).getFromStat().getItems().remove(d.getName());
+            ((mapWorkspace)app.getWorkspaceComponent()).getToStat().getItems().remove(d.getName());
+            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(d.getStatName());
+            
         });
+        
+        ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().removeAll(selectedLine.getEndName(), selectedLine.getStartName());
 
         processRemoveElement();
     }
 
     /**
      * This method will remove any given station that is not directly associated
-     * with a line.
+     * with a line, and it should do this with lines as well.
      *
      * @param draggableStation The draggable station in question.
      */
     public void processRemoveStat(DraggableStation draggableStation) {
         ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(draggableStation);
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(draggableStation.getStatName());
+        ((mapWorkspace) app.getWorkspaceComponent()).getStations().getItems().remove(draggableStation.getName());
         // draggableStation = null; // Remove the reference
     }
 
@@ -281,6 +293,7 @@ public class mapEditController {
 
     public void processAddStatToLine(DraggableLine draggableLine) {
 
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         TextInputDialog statName = new TextInputDialog();
         statName.setTitle("Make a station Name!");
         statName.setHeaderText(null);
@@ -299,24 +312,29 @@ public class mapEditController {
 
         DraggableStation newStation = new DraggableStation(app, result.get());
         draggableLine.addStation(newStation);
-
-        double x = draggableLine.getPoints().get(draggableLine.getPoints().size() / 2);
-        double y = draggableLine.getPoints().get(draggableLine.getPoints().size() / 2 + 1);
+        workspace.getStations().getItems().add(newStation.getName());
+         workspace.getFromStat().getItems().add(newStation.getName());
+          workspace.getToStat().getItems().add(newStation.getName());
+        
+       
+         
+          
+          
+        
+        workspace.getStations().getItems().add(newStation.getName());
 
         dataManager.unhighlightShape(dataManager.getSelectedShape());
-        
+
         app.getGUI().updateToolbarControls(false);
-        
-        mapWorkspace workspace= (mapWorkspace)app.getWorkspaceComponent();
-        
+
         newStation.setFill(workspace.getOutlineColorPicker().getValue());
         newStation.setStroke(workspace.getOutlineColorPicker().getValue());
         newStation.setStrokeWidth(workspace.getStatThickness().getValue());
         dataManager.setState(mapState.SIZING_ITEM);
         workspace.getCanvas().getChildren().add(newStation);
-        
+
         app.getGUI().updateToolbarControls(false);
-        
+
     }
 
     /**
@@ -325,23 +343,21 @@ public class mapEditController {
      * @param removedStation
      */
     public void processRemoveStatFromLine(DraggableStation removedStation) {
-        
+
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
-        
-        for(Node n: workspace.getCanvas().getChildren()){
-            if(n instanceof DraggableLine){
+
+        for (Node n : workspace.getCanvas().getChildren()) {
+            if (n instanceof DraggableLine) {
                 DraggableLine node = (DraggableLine) n;
-                
-                if(node.getStations().contains(removedStation)){
+
+                if (node.getStations().contains(removedStation)) {
                     node.getStations().remove(removedStation);
-                    
-                    
+
                 }
             }
         }
-        
+
         //Just in case
-        
         workspace.getCanvas().getChildren().remove(removedStation);
         removedStation = null;
     }

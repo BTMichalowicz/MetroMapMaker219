@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package djf.ui;
 
 import djf.AppTemplate;
@@ -13,8 +9,6 @@ import static djf.ui.AppGUI.CLASS_FILE_BUTTON;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -30,7 +24,8 @@ import javafx.scene.layout.BorderPane;
 
 /**
  * This class serves to present a dialog that welcomes the user into the
- * application
+ * apimport javafx.scene.control.TextInputDialog;
+plication
  *
  * @author Ben Michalowicz
  */
@@ -67,7 +62,7 @@ public class AppWelcomeDialogSingleton extends Stage {
     private AppWelcomeDialogSingleton(AppTemplate app) {
         this.app = app;
         initLayout();
-        initData(); //TODO: For the future
+        initData(); 
         initControllers();
 
     } //Empty Constructor for the sake of stuff
@@ -105,7 +100,7 @@ public class AppWelcomeDialogSingleton extends Stage {
         Label recentFiles = new Label("Recent Files");
         
 
-        hyperLinkList.getChildren().addAll(recentFiles, file5, file4, file3, file2, file1);
+        hyperLinkList.getChildren().addAll(recentFiles, file1, file2, file3, file4, file5);
         
 
         welcomePane.setLeft(hyperLinkList);
@@ -241,7 +236,10 @@ public class AppWelcomeDialogSingleton extends Stage {
             single = new AppWelcomeDialogSingleton(app);
             return single;
         } else {
+            
             return single;
+            
+            
         }
     }
 
@@ -250,18 +248,14 @@ public class AppWelcomeDialogSingleton extends Stage {
     }
 
     private void initData() {
-        //AppMessageDialogSingleton.getSingleton().show("Not supported Yet", "This action isn't supported yet; check back soon!");
-
-        //TODO: LOAD THIS SHIT
-        // Read from the work folder,
-        //get all the files, sort them by time last modified
+       
         
         
-        recentWorks = getWorkDir(new File(PATH_WORK), new ArrayList<File>()); //Attempt to get all files recursively
+        recentWorks = getWorkDir(new File(PATH_WORK), new ArrayList<>()); //Attempt to get all files recursively
         
         
         
-        //SORT THE FILES BASED ON RECENT WORKS: BubbleSort
+        
         sortFiles(recentWorks);
 
         renameLinks(recentWorks);
@@ -283,12 +277,12 @@ public class AppWelcomeDialogSingleton extends Stage {
     private void renameLinks(ArrayList<File> recentWorks) {
 
         if (recentWorks.size() > 0 && recentWorks.get(0) != null) {
-            file5.setText(recentWorks.get(0).getName());
+            file1.setText(recentWorks.get(0).getName());
         } else {
 
         }
         if (recentWorks.size() > 1 && recentWorks.get(1) != null) {
-            file4.setText(recentWorks.get(1).getName());
+            file2.setText(recentWorks.get(1).getName());
         } else {
 
         }
@@ -298,12 +292,12 @@ public class AppWelcomeDialogSingleton extends Stage {
 
         }
         if (recentWorks.size() > 3 && recentWorks.get(3) != null) {
-            file2.setText(recentWorks.get(3).getName());
+            file4.setText(recentWorks.get(3).getName());
         } else {
 
         }
         if (recentWorks.size() > 4 && recentWorks.get(4) != null) {
-            file1.setText(recentWorks.get(4).getName());
+            file5.setText(recentWorks.get(4).getName());
         } else {
 
         }

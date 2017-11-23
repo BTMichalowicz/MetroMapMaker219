@@ -133,7 +133,7 @@ public abstract class AppTemplate extends Application {
                         if (result.isPresent()) {
                             
                             
-                            boolean isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles()); //TODO: IMPLEMENT!!!!
+                            boolean isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles()); 
                             while(!isDuplicate){
                                 Alert duplicate = new Alert(AlertType.ERROR);
                                 duplicate.setHeaderText(null);

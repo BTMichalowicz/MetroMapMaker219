@@ -61,6 +61,12 @@ public class DraggableText extends Text implements Draggable {
         this.app = initApp;
 
     }
+    
+    public DraggableText(AppTemplate initApp, String name){
+        setOpacity(1.0);
+        this.app = initApp;
+        setText(name+ "      ");
+    }
 
     @Override
     public mapState getStartingState() {

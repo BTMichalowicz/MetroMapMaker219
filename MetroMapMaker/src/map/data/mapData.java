@@ -33,8 +33,7 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.FileChooser;
 import jtps.jTPS;
-import map.gui.CanvasController;
-import map.gui.mapEditController;
+import static map.data.mapState.SELECTING;
 import map.gui.mapWorkspace;
 import properties_manager.PropertiesManager;
 
@@ -83,6 +82,8 @@ public class mapData implements AppDataComponent {
     //AppTemplate app;
     Node selectedNode;
 
+    mapWorkspace workspace;
+
     public static final String WHITE_HEX = "#FFFFFF";
     public static final String BLACK_HEX = "#000000";
     public static final String YELLOW_HEX = "#EEEE00";
@@ -99,6 +100,7 @@ public class mapData implements AppDataComponent {
         // NO SHAPE STARTS OUT AS SELECTED
         newNode = null;
         selectedNode = null;
+        workspace = (mapWorkspace) app.getWorkspaceComponent();
 
         // INIT THE COLORS
         currentFillColor = Color.web(WHITE_HEX);
@@ -194,12 +196,12 @@ public class mapData implements AppDataComponent {
         selectedNode = shape;
         if (shape != null) {
 
-            if (shape instanceof DraggableText) {
+            if (shape instanceof Draggable && !(shape instanceof DraggableLine)) {
 
-                ((DraggableText) shape).start(x, y);
+                ((Draggable) shape).start(x, y);
 
             } else {
-                ((Draggable) shape).start(x, y);
+
             }
 
         }
@@ -289,17 +291,28 @@ public class mapData implements AppDataComponent {
 
     public void removeSelectedItem() {
         if (selectedNode != null) {
-            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(selectedNode);
+            ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().removeAll(selectedNode);
+
+            if (selectedNode instanceof DraggableStation) {
+                workspace.getCanvas().getChildren().remove(((DraggableStation) selectedNode).getStatName());
+                workspace.getStations().getItems().remove(((DraggableStation) selectedNode).getName());
+            }else if(selectedNode instanceof DraggableLine){
+                workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getStartName());
+                workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getEndName());
+                workspace.getLines().getItems().remove(((DraggableLine) selectedNode).getName());
+                
+            }
             selectedNode = null;
 
         }
     }
 
-     public String s;
-    
-    public String getS(){
+    public String s;
+
+    public String getS() {
         return s;
     }
+
     public void startNewBackground() {
 
         PropertiesManager props = PropertiesManager.getPropertiesManager();
@@ -316,16 +329,16 @@ public class mapData implements AppDataComponent {
             try {
                 setState(mapState.STARTING_BCKGROUND);
 
-                workspace.getCanvas().setBackground(new Background(new BackgroundImage(loadImg(selectedFile), 
-                        BackgroundRepeat.SPACE, 
-                        BackgroundRepeat.SPACE, 
+                workspace.getCanvas().setBackground(new Background(new BackgroundImage(loadImg(selectedFile),
+                        BackgroundRepeat.SPACE,
+                        BackgroundRepeat.SPACE,
                         BackgroundPosition.CENTER,
                         BackgroundSize.DEFAULT)));
-                
+
                 s = selectedFile.getPath();
 
             } catch (MalformedURLException e) {
-                AppMessageDialogSingleton.getSingleton().show("Background Image Error","You encountered an error loading your background image");
+                AppMessageDialogSingleton.getSingleton().show("Background Image Error", "You encountered an error loading your background image");
             }
         }
     }
@@ -339,34 +352,29 @@ public class mapData implements AppDataComponent {
         return image;
     }
 
-    
-  
     public void startNewImage(int x, int y) {
         DraggableImage d = new DraggableImage(app);
-        
+
         d.start(x, y);
-        
+
         newNode = d;
-        
-        
+
         initNode();
-        
-        
+
     }
 
     public void startNewText(int x, int y) {
         DraggableText newText = new DraggableText(app);
-        
+
         newText.start(x, y);
         newNode = newText;
-        
+
         initNode();
     }
-    
-   
 
     public void startNewStation(int x, int y) {
-        
+
+        workspace = (mapWorkspace) app.getWorkspaceComponent();
         TextInputDialog statName = new TextInputDialog();
         statName.setTitle("Make a station Name!");
         statName.setHeaderText(null);
@@ -384,29 +392,29 @@ public class mapData implements AppDataComponent {
         }
 
         DraggableStation newStation = new DraggableStation(app, result.get());
+
         newStation.start(x, y);
-        
+
+        workspace.getStations().getItems().add(newStation.getName());
+        workspace.getFromStat().getItems().add(newStation.getName());
+        workspace.getToStat().getItems().add(newStation.getName());
+
         newNode = newStation;
-        
+
         initNode();
-        
+
     }
-    
-    
-    public void initNode(){
-        if(selectedNode!=null){
+
+    public void initNode() {
+        if (selectedNode != null) {
             unhighlightShape(selectedNode);
             selectedNode = null; //Terminate the reference
         }
-        
+
         // USE THE CURRENT SETTINGS FOR THIS NEW SHAPE
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
 
-        if (newNode instanceof Shape) {
-            ((Shape) newNode).setFill(newNode instanceof DraggableImage? new ImagePattern(((DraggableImage)newNode).img) : workspace.getOutlineColorPicker().getValue());
-            ((Shape) newNode).setStroke(workspace.getOutlineColorPicker().getValue());
-            ((Shape) newNode).setStrokeWidth(workspace.getLineThickness().getValue());
-        }
+        
 
         // GO INTO SHAPE SIZING MODE
         state = mapState.SIZING_ITEM;
@@ -417,13 +425,40 @@ public class mapData implements AppDataComponent {
             ((DraggableText) newNode).addText();
 
         }
-        
+
         workspace.getCanvas().getChildren().add(newNode);
         app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);
-        
-        
+
     }
-    
-    
+
+    public void startNewMetroLine(int x, int y) {
+
+        workspace = (mapWorkspace) app.getWorkspaceComponent();
+
+        AddLineWindow addLiner = new AddLineWindow(app);
+
+        addLiner.showAndWait();
+
+        if (addLiner.getResultant().getSource() == addLiner.getBtnCancel()) {
+            state = SELECTING;
+            return;
+        } else {
+
+            DraggableLine newDraggableLine = new DraggableLine(app, addLiner.getName());
+            newDraggableLine.setFill(addLiner.getLineColor().getValue());
+            //newDraggableLine.setStroke(newDraggableLine.getFill());
+            newDraggableLine.setStrokeWidth(5);
+            
+            newDraggableLine.getStartName().setFill(newDraggableLine.getFill());
+            newDraggableLine.getEndName().setFill(newDraggableLine.getFill());
+            
+
+            workspace.getLines().getItems().add(addLiner.getName());
+
+            newDraggableLine.start(x, y);
+            newNode = newDraggableLine;
+            initNode();
+        }
+    }
 
 }

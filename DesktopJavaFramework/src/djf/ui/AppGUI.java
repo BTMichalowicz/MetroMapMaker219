@@ -214,7 +214,7 @@ public class AppGUI {
 
             if (result.isPresent()) {
 
-                boolean isDuplicate = getFileController().checkDuplicateFileName(result.get(), AppWelcomeDialogSingleton.getAppWelcomeDialog(app).getRecentFiles()); //TODO: IMPLEMENT!!!!
+                boolean isDuplicate = getFileController().checkDuplicateFileName(result.get(), AppWelcomeDialogSingleton.getAppWelcomeDialog(app).getRecentFiles()); 
                 while (!isDuplicate) {
                     Alert duplicate = new Alert(Alert.AlertType.ERROR);
                     duplicate.setHeaderText(null);

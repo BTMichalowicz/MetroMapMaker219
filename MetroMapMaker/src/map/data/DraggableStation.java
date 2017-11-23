@@ -1,17 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package map.data;
 
 import djf.AppTemplate;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.shape.Ellipse;
-import javafx.scene.text.Text;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
+import map.gui.mapWorkspace;
 
 /**
  *
@@ -25,8 +19,10 @@ public class DraggableStation extends Ellipse implements Draggable {
     AppTemplate app;
 
     String name;
+    
+    DraggableText statName;
 
-    Text statName;
+
 
     public String getName() {
         return name;
@@ -42,10 +38,27 @@ public class DraggableStation extends Ellipse implements Draggable {
         startCenterY = 0.0;
         this.app = initApp;
         this.name = name;
+        this.statName = new DraggableText(initApp,name);
+        
+        statName.yProperty().set(statName.yProperty().get()-20);
+        this.statName.xProperty().bind(centerXProperty());
+        this.statName.yProperty().bind(centerYProperty());
+        ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().add(statName);
+        
+        
 
-        statName = new Text(name);
+        
     }
-
+    
+    public DraggableText getStatName(){
+        return statName;
+            }
+    
+    public void removeClause(){
+        
+            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(this.statName);
+        
+    }
     @Override
     public mapState getStartingState() {
         return mapState.STARTING_STATION;
@@ -55,16 +68,12 @@ public class DraggableStation extends Ellipse implements Draggable {
     public void start(int x, int y) {
         startCenterX = x;
         startCenterY = y;
+        setCenterX(startCenterX);
+        setCenterY(startCenterY);
 
-        statName.setX(x - 9);
-        statName.setY(y - 9);
+
         
-        
-        DoubleProperty x1 = new SimpleDoubleProperty(startCenterX);
-        DoubleProperty y1 = new SimpleDoubleProperty(startCenterY);
-        
-        x1.bind(statName.xProperty());
-         y1.bind(statName.yProperty());
+
         
     }
 
@@ -74,18 +83,20 @@ public class DraggableStation extends Ellipse implements Draggable {
     @Override
     public void drag(int x, int y) {
 
-        double diffX = x - startCenterX;
-        double diffY = y - startCenterY;
-        double newX = getCenterX() + diffX;
-        double newY = getCenterY() + diffY;
-        setCenterX(newX);
-        setCenterY(newY);
+       
+        setCenterX(x);
+        setCenterY(y);
+        centerXProperty().set(x);
+        centerYProperty().set(y);
         startCenterX = x;
         startCenterY = y;
-        statName.setX(x - 9);
-        statName.setY(y - 9);
+        
+
 
     }
+    
+    
+  
 
     @Override
     public void size(int x, int y) {
@@ -95,8 +106,7 @@ public class DraggableStation extends Ellipse implements Draggable {
         double centerY = startCenterY + (height / 2);
         setCenterX(centerX);
         setCenterY(centerY);
-        statName.setX(x - 9);
-        statName.setY(y - 9);
+ 
 
     }
 
