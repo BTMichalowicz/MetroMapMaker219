@@ -121,7 +121,7 @@ public class mapEditController {
             /*
             Once the fule has been exported as some sort of PNG image, then we go to exporting the data
              */
-            //fileControl.exportData(dataManager, PATH_EXPORTS);
+            fileControl.exportData(dataManager, PATH_EXPORTS + result.get() + ".m3");
 
         } catch (IOException ioe) {
 
@@ -186,14 +186,13 @@ public class mapEditController {
                     DraggableStation s = (DraggableStation) item;
                     if (s.getName().equals(d)) {
                         ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(s);
+                        ((mapWorkspace) app.getWorkspaceComponent()).getStations().getItems().remove(d);
+                        ((mapWorkspace) app.getWorkspaceComponent()).getFromStat().getItems().remove(d);
+                        ((mapWorkspace) app.getWorkspaceComponent()).getToStat().getItems().remove(d);
                         break;
                     }
                 }
             }
-
-            ((mapWorkspace) app.getWorkspaceComponent()).getStations().getItems().remove(d);
-            ((mapWorkspace) app.getWorkspaceComponent()).getFromStat().getItems().remove(d);
-            ((mapWorkspace) app.getWorkspaceComponent()).getToStat().getItems().remove(d);
 
         });
 
@@ -353,10 +352,40 @@ public class mapEditController {
 
         workspace.getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).map((n) -> (DraggableLine) n).filter((node) -> (node.getStations().contains(removedStation.getName()))).forEachOrdered((node) -> {
             node.getStations().remove(removedStation.getName());
+
+            workspace.getStations().getItems().remove(removedStation.getName());
+            workspace.getFromStat().getItems().remove(removedStation.getName());
+            workspace.getToStat().getItems().remove(removedStation.getName());
         });
 
         //Just in case
         workspace.getCanvas().getChildren().remove(removedStation);
+
+    }
+
+    public void processEditLine(AppTemplate app, DraggableLine line) {
+
+        EditLineTool editor = new EditLineTool(app, line);
+
+        editor.showAndWait();
+
+        ((mapWorkspace) app.getWorkspaceComponent()).reloadWorkspace(app.getDataComponent());
+    }
+
+    void processLineThickness() {
+        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+
+        dataManager.setCurrentOutlineThickness((int) work.getLineThickness().getValue());
+        app.getGUI().updateToolbarControls(false);
+    }
+
+    void processStatThickness(DraggableStation draggableStation) {
+
+        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+
+        draggableStation.setRadiusX(work.getStatThickness().getValue() / 2);
+        draggableStation.setRadiusY(work.getStatThickness().getValue() / 2);
+        app.getGUI().updateToolbarControls(false);
 
     }
 

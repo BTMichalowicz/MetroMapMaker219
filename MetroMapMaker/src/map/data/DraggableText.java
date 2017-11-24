@@ -108,8 +108,8 @@ public class DraggableText extends Text implements Draggable {
         double newX = getX() + diffX;
         double newY = getY() + diffY;
 
-        setX(newX);
-        setY(newY);
+        setX(x);
+        setY(y);
         startX = x;
         startY = y;
         

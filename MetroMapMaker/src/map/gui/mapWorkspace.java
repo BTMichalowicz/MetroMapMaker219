@@ -391,6 +391,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             imgBackground.setDisable(false);
             addImage.setDisable(false);
             addLabel.setDisable(false);
+            editLine.setDisable(false);
 
             removeElement.setDisable(!(dataManager.getSelectedShape() != null));
 
@@ -410,6 +411,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addImage.setDisable(true);
             addLabel.setDisable(false);
             removeElement.setDisable(dataManager.getSelectedShape() == null);
+            editLine.setDisable(false);
 
         } else if (dataManager.isInState(mapState.STARTING_TEXT)) {
             addLine.setDisable(false);
@@ -427,6 +429,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addImage.setDisable(false);
             addLabel.setDisable(false);
             removeElement.setDisable(dataManager.getSelectedShape() == null);
+            editLine.setDisable(false);
 
         } else if (dataManager.isInState(mapState.STARTING_STATION)) {
             addLine.setDisable(false);
@@ -444,6 +447,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addImage.setDisable(false);
             addLabel.setDisable(false);
             removeElement.setDisable(dataManager.getSelectedShape() == null);
+            editLine.setDisable(false);
         } else if (dataManager.isInState(mapState.SELECTING)
                 || dataManager.isInState(mapState.DRAGGING)
                 || dataManager.isInState(mapState.DRAGGING_NOTHING)) {
@@ -463,6 +467,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addImage.setDisable(false);
             addLabel.setDisable(false);
             removeElement.setDisable(dataManager.getSelectedShape() == null);
+            editLine.setDisable(false);
 
         } else if (dataManager.isInState(mapState.ROTATING_LABEL)) {
 
@@ -482,6 +487,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addImage.setDisable(false);
             addLabel.setDisable(false);
             removeElement.setDisable(dataManager.getSelectedShape() == null);
+            editLine.setDisable(false);
 
         } else {
             addLine.setDisable(false);
@@ -499,6 +505,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addImage.setDisable(false);
             addLabel.setDisable(false);
             removeElement.setDisable(dataManager.getSelectedShape() == null);
+            editLine.setDisable(false);
         }
 
     }
@@ -766,11 +773,17 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         });
 
-        //TODO: Focus on later
-//        editLine.setOnAction(e -> {
-//            mapEditController.processEditLine();
-//
-//        });
+        
+        editLine.setOnAction(e -> {
+            
+            
+            
+            if(dataManager.getSelectedShape()!=null && dataManager.getSelectedShape() instanceof DraggableLine){
+                mapEditController.processEditLine(app, (DraggableLine) dataManager.getSelectedShape());
+            }
+            
+
+        });
         addLabel.setOnAction(e -> {
             mapEditController.processAddLabel();
         });
@@ -784,6 +797,18 @@ public class mapWorkspace extends AppWorkspaceComponent {
             mapEditController.processAddStation();
         });
 
+        lineThickness.valueProperty().addListener(e->{
+            mapEditController.processLineThickness();
+        
+        });
+        
+        statThickness.valueProperty().addListener(e->{
+            
+            if (dataManager.getSelectedShape() instanceof DraggableStation)
+            mapEditController.processStatThickness(((DraggableStation)dataManager.getSelectedShape()));
+        
+        });
+        
         addToLine.setOnAction(e -> {
             
            
@@ -793,11 +818,18 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
 
         removeFromLine.setOnAction(e -> {
+            
+            
             mapEditController.processRemoveStatFromLine((DraggableStation) dataManager.getSelectedShape()); //TODO: Look Up
 
         });
         
         lines.setOnAction(e->{
+            
+            if(dataManager.getSelectedShape()!=null){
+                dataManager.unhighlightShape(dataManager.getSelectedShape());
+            }
+            
             String name = lines.getSelectionModel().getSelectedItem();
             
             if(name!=null){
@@ -807,11 +839,34 @@ public class mapWorkspace extends AppWorkspaceComponent {
                         
                         if(drag.getName().equals(name)){
                             dataManager.highlightShape(item);
+                            dataManager.setSelectedShape(item);
                         }
                     }
                 }
             }
         
+        
+        });
+        
+        stations.setOnAction(e->{
+            if(dataManager.getSelectedShape()!=null){
+                dataManager.unhighlightShape(dataManager.getSelectedShape());
+            }
+            
+            String name = stations.getSelectionModel().getSelectedItem();
+            
+            if(name!=null){
+                for(Node item: getCanvas().getChildren()){
+                    if(item instanceof DraggableStation){
+                        DraggableStation drag = (DraggableStation) item;
+                        
+                        if(drag.getName().equals(name)){
+                            dataManager.highlightShape(item);
+                        }
+                    }
+                }
+            }
+            
         
         });
 

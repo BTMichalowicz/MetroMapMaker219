@@ -143,8 +143,9 @@ public class AddLineWindow extends Stage {
             
             
             name = lineName.getText();
-            workspace.getEditLine().setBackground(new Background(new BackgroundFill(lineColor.getValue(), null, null)));
+            workspace.getEditLine().setStyle("-fx-background-color: #"+lineColor.getValue().toString().split("[x]")[1]+ ";");
             workspace.getEditLine().setText(lineColor.getValue().toString());
+            workspace.getEditLine().setDisable(false);
             resultant = e;
             close();
             
@@ -154,6 +155,7 @@ public class AddLineWindow extends Stage {
             close();
             lineName.setText("");
             lineColor.setValue(Color.WHITE);
+            workspace.getEditLine().setDisable(false);
             resultant = e;
             
         });

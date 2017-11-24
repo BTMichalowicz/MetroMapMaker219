@@ -58,16 +58,17 @@ public class AppWelcomeDialogSingleton extends Stage {
 
     //Because it's a singleton
     private AppWelcomeDialogSingleton(AppTemplate app) {
-        
-        if(single == null){
+
+        if (single == null) {
             this.app = app;
-        initLayout();
-        initData();
-        initControllers();
-        }else{
+            initLayout();
             initData();
+            initControllers();
+        } else {
+            initLayout();
+            initData();
+            initControllers();
         }
-        
 
     } //Empty Constructor for the sake of stuff
 
@@ -84,6 +85,7 @@ public class AppWelcomeDialogSingleton extends Stage {
         //Label
         l = new Label();
         l.setText("Welcome to MetroMapMaker!");
+        getIcons().add(i);
 
         //Button
         newButton = new Button("Create a new MetroMap");
@@ -163,27 +165,26 @@ public class AppWelcomeDialogSingleton extends Stage {
         file1.setOnAction(e -> {
 
             try {
-                        // RESET THE WORKSPACE
+                // RESET THE WORKSPACE
                 app.getWorkspaceComponent().resetWorkspace();
 
                 // RESET THE DATA
                 app.getDataComponent().resetData();
                 app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file1.getText().split("\\.")[0]) + "\\" + file1.getText());
-                
-                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+
+                // MAKE SURE THE WORKSPACE IS ACTIVATED
                 app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
 
                 // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
-                
                 app.getGUI().updateToolbarControls(true);
-                
+
                 close();
                 app.getGUI().getPrimaryStage().show();
-            } catch (IOException e2) {
+            } catch (Exception e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
-                a.setContentText("This action is not yet supported! Please come back later!");
-                a.setTitle("Not Supported Yet!");
+                a.setContentText("This file has not either been created or has not been given the proper attributes yet!");
+                a.setTitle("Something Went Wrong");
                 a.showAndWait();
 
             }
@@ -192,29 +193,27 @@ public class AppWelcomeDialogSingleton extends Stage {
         file2.setOnAction(e -> {
 
             try {
-                       // RESET THE WORKSPACE
+                // RESET THE WORKSPACE
                 app.getWorkspaceComponent().resetWorkspace();
 
                 // RESET THE DATA
                 app.getDataComponent().resetData();
                 app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file2.getText().split("\\.")[0]) + "\\" + file2.getText());
-                
-                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+
+                // MAKE SURE THE WORKSPACE IS ACTIVATED
                 app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
 
                 // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
-                
                 app.getGUI().updateToolbarControls(true);
-                
+
                 close();
                 app.getGUI().getPrimaryStage().show();
-            } catch (IOException e2) {
+            } catch (Exception e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
-                a.setContentText("This action is not yet supported! Please come back later!");
-                a.setTitle("Not Supported Yet!");
+                a.setContentText("This file has not either been created or has not been given the proper attributes yet!");
+                a.setTitle("Something Went Wrong");
                 a.showAndWait();
-                
 
             }
 
@@ -222,57 +221,54 @@ public class AppWelcomeDialogSingleton extends Stage {
         file3.setOnAction(e -> {
 
             try {
-                            // RESET THE WORKSPACE
+                // RESET THE WORKSPACE
                 app.getWorkspaceComponent().resetWorkspace();
 
                 // RESET THE DATA
                 app.getDataComponent().resetData();
                 app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file3.getText().split("\\.")[0]) + "\\" + file3.getText());
-                
-                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+
+                // MAKE SURE THE WORKSPACE IS ACTIVATED
                 app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
 
                 // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
-                
                 app.getGUI().updateToolbarControls(true);
-                
+
                 close();
                 app.getGUI().getPrimaryStage().show();
-            } catch (IOException e2) {
+            } catch (Exception e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
-                a.setContentText("This action is not yet supported! Please come back later!");
-                a.setTitle("Not Supported Yet!");
+                a.setContentText("This file has not either been created or has not been given the proper attributes yet!");
+                a.setTitle("Something Went Wrong");
                 a.showAndWait();
-
             }
 
         });
         file4.setOnAction(e -> {
 
             try {
-                
-                   // RESET THE WORKSPACE
+
+                // RESET THE WORKSPACE
                 app.getWorkspaceComponent().resetWorkspace();
 
                 // RESET THE DATA
                 app.getDataComponent().resetData();
                 app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file4.getText().split("\\.")[0]) + "\\" + file4.getText());
-                
-                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+
+                // MAKE SURE THE WORKSPACE IS ACTIVATED
                 app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
 
                 // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
-                
                 app.getGUI().updateToolbarControls(true);
-                
+
                 close();
                 app.getGUI().getPrimaryStage().show();
-            } catch (IOException e2) {
+            } catch (Exception e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
-                a.setContentText("This action is not yet supported! Please come back later!");
-                a.setTitle("Not Supported Yet!");
+                a.setContentText("This file has not either been created or has not been given the proper attributes yet!");
+                a.setTitle("Something Went Wrong");
                 a.showAndWait();
 
             }
@@ -281,30 +277,28 @@ public class AppWelcomeDialogSingleton extends Stage {
         file5.setOnAction(e -> {
 
             try {
-                
-                
-                            // RESET THE WORKSPACE
+
+                // RESET THE WORKSPACE
                 app.getWorkspaceComponent().resetWorkspace();
 
                 // RESET THE DATA
                 app.getDataComponent().resetData();
                 app.getFileComponent().loadData(app.getDataComponent(), "C:\\Users\\Ben Michalowicz\\Desktop\\M3\\MetroMapMaker\\work\\" + (file5.getText().split("\\.")[0]) + "\\" + file5.getText());
-                
-                    // MAKE SURE THE WORKSPACE IS ACTIVATED
+
+                // MAKE SURE THE WORKSPACE IS ACTIVATED
                 app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
 
                 // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
-                
                 app.getGUI().updateToolbarControls(true);
-                
+
                 close();
                 app.getGUI().getPrimaryStage().show();
 
-            } catch (IOException e2) {
+            } catch (Exception e2) {
                 Alert a = new Alert(AlertType.INFORMATION);
                 a.setHeaderText(null);
-                a.setContentText("This action is not yet supported! Please come back later!");
-                a.setTitle("Not Supported Yet!");
+                a.setContentText("This file has not either been created or has not been given the proper attributes yet!");
+                a.setTitle("Something Went Wrong");
                 a.showAndWait();
 
             }
@@ -318,7 +312,7 @@ public class AppWelcomeDialogSingleton extends Stage {
             single = new AppWelcomeDialogSingleton(app);
             return single;
         } else {
-            
+
             return single;
 
         }

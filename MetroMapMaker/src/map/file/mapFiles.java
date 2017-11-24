@@ -106,6 +106,7 @@ public class mapFiles implements AppFileComponent {
 
         //Let's get started creating each object
         items.forEach((node) -> {
+
             Node node2 = node;
             Draggable drag = (Draggable) node;
 
@@ -165,7 +166,6 @@ public class mapFiles implements AppFileComponent {
                         .add(JSON_END_X, dragged.getEndName().getX() - 5)
                         .add(JSON_END_Y, dragged.getEndName().getY())
                         .add(JSON_TYPE, dragged.getShapeType())
-                        
                         .build();
                 lineBuilder.add(jsonLine);
 
@@ -237,30 +237,26 @@ public class mapFiles implements AppFileComponent {
 
         JsonObject json = loadJSONFile(filePath); //TODO: Implement
 
-        dataManager.setBackgroundColor(Color.LIGHTGREY);
-
+        //dataManager.setBackgroundColor(Color.LIGHTGREY);
         JsonArray jsonItemsArray = json.getJsonArray("everything_else");
         JsonArray jsonLinesArray = json.getJsonArray(JSON_LINES);
         JsonArray jsonStatArray = json.getJsonArray(JSON_STAT);
 
-      
         for (int i = 0; i < jsonItemsArray.size(); i++) {
             JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
-            Node node = loadNode(jsonItem); //TODO: Implement
+            Node node = loadNode(jsonItem); 
             dataManager.addShape(node);
         }
-       
 
         for (int i = 0; i < jsonLinesArray.size(); i++) {
             JsonObject jsonItem = jsonLinesArray.getJsonObject(i);
-            Node node = loadNode(jsonItem); //TODO: Implement
+            Node node = loadNode(jsonItem); 
             dataManager.addShape(node);
         }
 
         for (int i = 0; i < jsonStatArray.size(); i++) {
             JsonObject jsonItem = jsonStatArray.getJsonObject(i);
-            
-            
+
             DraggableStation node = new DraggableStation(dataManager.getApp(), "");
             node.setName(jsonItem.getString(JSON_NAME));
             node.setCenterX(jsonItem.getInt(JSON_X));
@@ -268,13 +264,16 @@ public class mapFiles implements AppFileComponent {
             node.setFill(loadColor(jsonItem, JSON_COLOR));
             node.setRadiusX(jsonItem.getInt("JSON_RADIUS_X"));
             node.setRadiusY(jsonItem.getInt("JSON_RADIUS_Y"));
-            
-            
+
             dataManager.addShape(node);
+
+            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getStations().getItems().add(node.getName());
+            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getFromStat().getItems().add(node.getName());
+            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getToStat().getItems().add(node.getName());
         }
 
     }
-    
+
     private JsonObject loadJSONFile(String jsonFilePath) throws IOException {
         JsonObject json;
         try (InputStream is = new FileInputStream(jsonFilePath);
@@ -283,7 +282,7 @@ public class mapFiles implements AppFileComponent {
         }
         return json;
     }
-    
+
     private Color loadColor(JsonObject json, String colorToGet) {
         JsonObject jsonColor = json.getJsonObject(colorToGet);
         double red = getDataAsDouble(jsonColor, JSON_RED);
@@ -291,15 +290,17 @@ public class mapFiles implements AppFileComponent {
         double blue = getDataAsDouble(jsonColor, JSON_BLUE);
         double alpha = getDataAsDouble(jsonColor, JSON_ALPHA);
         Color loadedColor = new Color(red, green, blue, alpha);
+
         return loadedColor;
-        
+
     }
-    
+
     private double getDataAsDouble(JsonObject json, String dataName) {
         JsonValue value = json.get(dataName);
         JsonNumber number = (JsonNumber) value;
         return number.bigDecimalValue().doubleValue();
     }
+
     private Node loadNode(JsonObject jsonObject) {
         String type = jsonObject.getString(JSON_TYPE);
 
@@ -315,7 +316,7 @@ public class mapFiles implements AppFileComponent {
             case LINE:
                 retVal = new DraggableLine(dataManager.getApp(), "");
                 break;
-            
+
         }
 
         if (retVal instanceof DraggableImage) {
@@ -326,10 +327,11 @@ public class mapFiles implements AppFileComponent {
                 URL url = new URL(filePath);
                 Image img = new Image(url.toExternalForm());
                 ((DraggableImage) retVal).setFill(new ImagePattern(img));
-                ((DraggableImage)retVal).setWidth(img.getWidth());
-                ((DraggableImage)retVal).setHeight(img.getHeight());
-                
-                
+                ((DraggableImage) retVal).setWidth(img.getWidth());
+                ((DraggableImage) retVal).setHeight(img.getHeight());
+                ((DraggableImage) retVal).setX(jsonObject.getInt(JSON_X));
+                ((DraggableImage) retVal).setY(jsonObject.getInt(JSON_Y));
+
             } catch (MalformedURLException mue) {
                 AppMessageDialogSingleton.getSingleton().show("Image Loading Error", "There was an error loading an image");
             }
@@ -337,8 +339,8 @@ public class mapFiles implements AppFileComponent {
         } else if (retVal instanceof DraggableText) {
             ((DraggableText) retVal).setText(jsonObject.getString(JSON_TEXT));
             ((DraggableText) retVal).setFont(Font.font(jsonObject.getString(JSON_FONT_FAMILY), FontWeight.NORMAL, FontPosture.REGULAR, jsonObject.getInt(JSON_FONT_SIZE)));
-            ((DraggableText)retVal).setX(jsonObject.getInt(JSON_X));
-            ((DraggableText)retVal).setY(jsonObject.getInt(JSON_Y));
+            ((DraggableText) retVal).setX(jsonObject.getInt(JSON_X));
+            ((DraggableText) retVal).setY(jsonObject.getInt(JSON_Y));
 
         } else if (retVal instanceof DraggableLine) {
             ((DraggableLine) retVal).setName(jsonObject.getString(JSON_NAME));
@@ -359,19 +361,111 @@ public class mapFiles implements AppFileComponent {
             int x = (int) Math.floor(((DraggableLine) retVal).getPoints().get(0));
             int y = (int) Math.floor(((DraggableLine) retVal).getPoints().get(1));
 
-            ((DraggableLine) retVal).start(x, y);
+            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getLines().getItems().add(((DraggableLine) retVal).getName());
+
+            ((DraggableLine) retVal).setStrokeWidth(5);
 
         } //DraggableStation has its own thing
-        
+
         return retVal;
 
     }
-    
-    
 
     @Override
     public void exportData(AppDataComponent data, String filePath) throws IOException {
-        throw new IOException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        dataManager = (mapData) data;
+
+        mapWorkspace workspace = (mapWorkspace) dataManager.getApp().getWorkspaceComponent();
+
+        Background bg = dataManager.getB();
+        //Set the background up regardless of image or color or other
+
+        //We only care about metroLines and Stations in the file exporting
+        //FOR METRO LINES
+        JsonArrayBuilder lineBuilder = Json.createArrayBuilder();
+        //FOR METRO STATIONS
+        JsonArrayBuilder statBuilder = Json.createArrayBuilder();
+        ObservableList<Node> items = workspace.getCanvas().getChildren();
+
+        //Let's get started creating each object
+        items.forEach((node) -> {
+
+            Node node2 = node;
+            Draggable drag = (Draggable) node;
+
+            String type = drag.getShapeType();
+            double x = drag.getX();
+            double y = drag.getY();
+            double width = drag.getWidth();
+            double height = drag.getHeight();
+
+           if (node instanceof DraggableLine) { //if not instance of Draggable Text
+
+                DraggableLine dragged = (DraggableLine) node;
+                JsonObject backgroundColor = getLineBackgroundColor(dragged.getFill());
+
+               
+
+                //TODO: Implement isCircular
+               
+
+                JsonArrayBuilder stationNames = Json.createArrayBuilder();
+
+                dragged.getStations().forEach((stat) -> {
+                    stationNames.add(stat);
+                });
+
+                JsonArray statNames = stationNames.build(); //Add all the station names
+
+                JsonObject jsonLine = Json.createObjectBuilder()
+                        .add(JSON_NAME, dragged.getName())
+                        .add(JSON_CIRC, false) //TODO: Implement Circular Lines
+                        .add(JSON_COLOR, backgroundColor)
+                        .add(JSON_STAT_NAMES, statNames)
+                        .build();
+                lineBuilder.add(jsonLine);
+
+            } else if (node instanceof DraggableStation) {
+                DraggableStation statMan = (DraggableStation) node;
+
+                JsonObject color = getLineBackgroundColor(statMan.getFill());
+
+                JsonObject jsonStat = Json.createObjectBuilder()
+                        .add(JSON_NAME, statMan.getName())
+                        .add(JSON_X, statMan.getCenterX())
+                        .add(JSON_Y, statMan.getCenterY())
+                        .build();
+                statBuilder.add(jsonStat);
+
+            }
+        });
+
+        JsonArray metroLines = lineBuilder.build();
+        JsonArray metroStat = statBuilder.build();
+
+        JsonObject dataManagerJSO = Json.createObjectBuilder()
+                .add(JSON_NAME, dataManager.getLineName())
+                .add(JSON_LINES, metroLines)
+                .add(JSON_STAT, metroStat)
+                .build();
+
+        // AND NOW OUTPUT IT TO A JSON FILE WITH PRETTY PRINTING
+        Map<String, Object> properties = new HashMap<>(1);
+        properties.put(JsonGenerator.PRETTY_PRINTING, true);
+        JsonWriterFactory writerFactory = Json.createWriterFactory(properties);
+        StringWriter sw = new StringWriter();
+        try (JsonWriter jsonWriter = writerFactory.createWriter(sw)) {
+            jsonWriter.writeObject(dataManagerJSO);
+        }
+
+        // INIT THE WRITER
+        OutputStream os = new FileOutputStream(filePath);
+        JsonWriter jsonFileWriter = Json.createWriter(os);
+        jsonFileWriter.writeObject(dataManagerJSO);
+        String prettyPrinted = sw.toString();
+        try (PrintWriter pw = new PrintWriter(filePath)) {
+            pw.write(prettyPrinted);
+        }
     }
 
     // THIS METHOD WILL NOT BE USED FOR THE DURATION OF THIS PROJECT
@@ -380,7 +474,6 @@ public class mapFiles implements AppFileComponent {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-   
     private JsonObject getLineBackgroundColor(Paint stroke) {
         Color color = (Color) stroke;
         JsonObject colorJson = Json.createObjectBuilder()

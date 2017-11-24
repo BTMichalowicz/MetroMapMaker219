@@ -99,6 +99,8 @@ public class AppFileController {
         AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         try {
+            
+            
 
             ///NOW SAVE THE FILE AT THE VERY END!!
             JsonObject newFile = Json.createObjectBuilder()
@@ -120,6 +122,7 @@ public class AppFileController {
             }
 
             // INIT THE WRITER
+            
             OutputStream os = new FileOutputStream(f2.getPath() + "\\" + file + ".m3");
             JsonWriter jsonFileWriter = Json.createWriter(os);
             jsonFileWriter.writeObject(newFile);
@@ -128,6 +131,8 @@ public class AppFileController {
                 pw.write(prettyPrinted);
 
             }
+            
+            //app.getFileComponent().saveData(app.getDataComponent(), f2.getPath() + "\\" + file + ".m3");
 
             // WE MAY HAVE TO SAVE CURRENT WORK
             boolean continueToMakeNew = true;

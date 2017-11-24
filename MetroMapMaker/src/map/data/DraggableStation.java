@@ -1,4 +1,3 @@
-
 package map.data;
 
 import djf.AppTemplate;
@@ -19,16 +18,14 @@ public class DraggableStation extends Ellipse implements Draggable {
     AppTemplate app;
 
     String name;
-    
+
     DraggableText statName;
-
-
 
     public String getName() {
         return name;
     }
-    
-    public void setName(String name){
+
+    public void setName(String name) {
         this.name = name;
         this.statName.setText(name);
     }
@@ -43,27 +40,25 @@ public class DraggableStation extends Ellipse implements Draggable {
         startCenterY = 0.0;
         this.app = initApp;
         this.name = name;
-        this.statName = new DraggableText(initApp,name);
-        
-        statName.yProperty().set(statName.yProperty().get()-20);
+        this.statName = new DraggableText(initApp, name);
+
+        statName.yProperty().set(statName.yProperty().get() - 20);
         this.statName.xProperty().bind(centerXProperty());
         this.statName.yProperty().bind(centerYProperty());
-        ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().add(statName);
-        
-        
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().add(statName);
 
-        
     }
-    
-    public DraggableText getStatName(){
+
+    public DraggableText getStatName() {
         return statName;
-            }
-    
-    public void removeClause(){
-        
-            ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().remove(this.statName);
-        
     }
+
+    public void removeClause() {
+
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(this.statName);
+
+    }
+
     @Override
     public mapState getStartingState() {
         return mapState.STARTING_STATION;
@@ -76,10 +71,6 @@ public class DraggableStation extends Ellipse implements Draggable {
         setCenterX(startCenterX);
         setCenterY(startCenterY);
 
-
-        
-
-        
     }
 
     jTPS transact;
@@ -88,20 +79,14 @@ public class DraggableStation extends Ellipse implements Draggable {
     @Override
     public void drag(int x, int y) {
 
-       
         setCenterX(x);
         setCenterY(y);
         centerXProperty().set(x);
         centerYProperty().set(y);
         startCenterX = x;
         startCenterY = y;
-        
-
 
     }
-    
-    
-  
 
     @Override
     public void size(int x, int y) {
@@ -111,7 +96,6 @@ public class DraggableStation extends Ellipse implements Draggable {
         double centerY = startCenterY + (height / 2);
         setCenterX(centerX);
         setCenterY(centerY);
- 
 
     }
 
