@@ -1,6 +1,8 @@
 package map.data;
 
 import djf.AppTemplate;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.shape.Ellipse;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
@@ -42,11 +44,7 @@ public class DraggableStation extends Ellipse implements Draggable {
         this.name = name;
         this.statName = new DraggableText(initApp, name);
 
-        statName.yProperty().set(statName.yProperty().get() - 20);
-        this.statName.xProperty().bind(centerXProperty());
-        this.statName.yProperty().bind(centerYProperty());
-        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().add(statName);
-
+        //statName.yProperty().set(statName.yProperty().get() - 20);
     }
 
     public DraggableText getStatName() {
@@ -71,6 +69,15 @@ public class DraggableStation extends Ellipse implements Draggable {
         setCenterX(startCenterX);
         setCenterY(startCenterY);
 
+       this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
+        this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusYProperty().get() - 20));
+        
+        
+
+        if (!((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().contains(statName)) {
+            ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().add(statName);
+        }
+
     }
 
     jTPS transact;
@@ -85,7 +92,11 @@ public class DraggableStation extends Ellipse implements Draggable {
         centerYProperty().set(y);
         startCenterX = x;
         startCenterY = y;
+        
+               this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
+        this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusYProperty().get() - 20));
 
+      
     }
 
     @Override
@@ -94,8 +105,8 @@ public class DraggableStation extends Ellipse implements Draggable {
         double height = y - startCenterY;
         double centerX = startCenterX + (width / 2);
         double centerY = startCenterY + (height / 2);
-        setCenterX(centerX);
-        setCenterY(centerY);
+        setCenterX(x);
+        setCenterY(y);
 
     }
 

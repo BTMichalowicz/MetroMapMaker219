@@ -2,9 +2,7 @@ package map.data;
 
 import djf.AppTemplate;
 import java.util.ArrayList;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-
 import javafx.scene.shape.Polyline;
 
 import jtps.jTPS;
@@ -50,40 +48,8 @@ public class DraggableLine extends Polyline implements Draggable {
         this.startName = new DraggableText(app, this.name + "  ");
         this.endName = new DraggableText(app, "   " + this.name);
 
-        this.startName.setOnMouseDragged(e -> {
-            this.startName.drag((int) e.getX()-15, (int) e.getY());
-
-            getPoints().set(0, e.getX());
-            getPoints().set(1, e.getY());
-            
-             double x = ((getPoints().get(0) + getPoints().get(getPoints().size() - 2))) / 2;
-        double y = ((getPoints().get(1) + getPoints().get(getPoints().size() - 1))) / 2;
         
-        getPoints().set(0, e.getX());
-        getPoints().set(1, e.getY());
-        
-         getPoints().set(2, x);
-        getPoints().set(3, y);
-        
-        
-       
-
-        });
-        this.endName.setOnMouseDragged(e -> {
-            this.endName.drag((int) e.getX(), (int) e.getY());
-
-            getPoints().set(getPoints().size() - 2, e.getX() + 4);
-            getPoints().set(getPoints().size() - 1, e.getY());
-            
-             double x = ((getPoints().get(0) + getPoints().get(getPoints().size() - 2))) / 2;
-        double y = ((getPoints().get(1) + getPoints().get(getPoints().size() - 1))) / 2;
-        
-        getPoints().set(4, e.getX());
-        getPoints().set(5, e.getY());
-        
-         getPoints().set(2, x);
-        getPoints().set(3, y);
-        });
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().addAll(startName, endName);
 
     }
 
@@ -103,61 +69,8 @@ public class DraggableLine extends Polyline implements Draggable {
     }
 
     public void addStation(DraggableStation s, String statName) {
-        stations.add(statName);
 
-        s.setCenterX(getPoints().get(0) - 25);
-        s.setCenterY(getPoints().get(1));
-
-//        for(int i = 2; i< getPoints().size(); i++){
-//            
-//            getPoints().set(i, getPoints().get(i-1));
-//            getPoints().set(i-1, getPoints().get(i-2));
-//            
-//            
-//        }
-//       
-//        
-        double x = ((getPoints().get(0) + getPoints().get(getPoints().size() - 2))) / 2;
-        double y = ((getPoints().get(1) + getPoints().get(getPoints().size() - 1))) / 2;
-
-        DoubleProperty x1 = new SimpleDoubleProperty(x);
-        DoubleProperty y1 = new SimpleDoubleProperty(y);
-        
-        
-
-        s.setCenterX(x);
-        s.setCenterY(y);
-         getPoints().set(4, getPoints().get(2));
-        getPoints().set(5, getPoints().get(3));
-
-        getPoints().set(2, x);
-        getPoints().set(3, y);
-
-//        this.startName.setOnMouseDragged(e -> {
-//            this.startName.drag((int) e.getX(), (int) e.getY());
-//
-//  
-//
-//            getPoints().set(0, e.getX());
-//            getPoints().set(1, e.getY());
-//
-//        });
-//        this.endName.setOnMouseDragged(e -> {
-//            this.endName.drag((int) e.getX(), (int) e.getY());
-//
-//            getPoints().set(getPoints().size() - 2, e.getX() + 4);
-//            getPoints().set(getPoints().size() - 1, e.getY());
-//
-//        });
-//        s.setOnMouseDragged(e -> {
-//            s.drag((int)e.getX(), (int)e.getY());
-//            
-//            getPoints().add(0, e.getX());
-//            getPoints().set(1, e.getY());
-//            
-//            startName.setX(getPoints().get(0)-25);
-//            startName.setY(getPoints().get(1)-(e.getY()/100));
-//        });
+        stations.add(s.getName());
     }
 
     public String removeStation(String s) {
@@ -172,6 +85,38 @@ public class DraggableLine extends Polyline implements Draggable {
         return mapState.STARTING_LINE;
     }
 
+    private void initText() {
+
+        this.startName.setX(getPoints().get(0) - 20);
+        this.startName.setY(getPoints().get(1));
+
+        this.endName.setX(getPoints().get(getPoints().size() - 2) + 5);
+        this.endName.setY(getPoints().get(getPoints().size() - 1));
+
+        this.startName.setOnMouseDragged(e -> {
+            this.startName.drag((int) e.getX() - 15, (int) e.getY());
+
+//            getPoints().set(0, e.getX());
+//            getPoints().set(1, e.getY());
+        });
+
+        this.startName.setOnMouseReleased(e -> {
+
+            getPoints().add(0, (e.getX()));
+            getPoints().add(1, e.getY());
+        });
+
+        this.endName.setOnMouseDragged(e -> {
+            this.endName.drag((int) e.getX() + 10, (int) e.getY());
+
+        });
+
+        this.endName.setOnMouseReleased(e -> {
+            getPoints().addAll(e.getX(), e.getY());
+        });
+
+    }
+
     @Override
     public void start(int x, int y) {
 
@@ -180,21 +125,15 @@ public class DraggableLine extends Polyline implements Draggable {
         endX = x + 90;
         endY = y;
 
-        
-        getPoints().addAll(startX, startY, endX, endY);
-         double x2 = ((getPoints().get(0) + getPoints().get(getPoints().size() - 2))) / 2;
-        double y2 = ((getPoints().get(1) + getPoints().get(getPoints().size() - 1))) / 2;
-        
-        getPoints().add(2, x2);
-        getPoints().add(3, y2);
-        
+        getPoints().add(0, startX);
+        getPoints().add(1, startY);
+        getPoints().add(2, endX);
+        getPoints().add(3, endY);
 
-        this.startName.setX(getPoints().get(0) - 25);
-        this.startName.setY(getPoints().get(1));
-        this.endName.setX(getPoints().get(getPoints().size() - 2) + 5);
-        this.endName.setY(getPoints().get(getPoints().size() - 1));
-
-        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().addAll(startName, endName);
+        double x2 = (getPoints().get(0) + getPoints().get(getPoints().size() - 2)) / 2;
+        double y2 = (getPoints().get(1) + getPoints().get(getPoints().size() - 1)) / 2;
+        
+        initText();
 
     }
 
@@ -209,31 +148,6 @@ public class DraggableLine extends Polyline implements Draggable {
     @Override
     public void drag(int x, int y) {
 
-//        //For dragging the line end
-//        if ((x == getPoints().get(0) && y == getPoints().get(1))) {
-//            double diffX = x + startX;
-//
-//            double diffY = y + startY;
-//            double newX = getX() - diffX;
-//            double newY = getY() -diffY;
-//
-//            getPoints().addAll(newX, newY);
-//            startX = x;
-//            startY = y;
-//        } else if ((x == getPoints().get(getPoints().size() - 2) && y == getPoints().get(getPoints().size() - 1))) {
-//            double diffX = x + startX;
-//
-//            double diffY = y + startY;
-//            double newX = getX() + diffX;
-//            double newY = getY() + diffY;
-//
-//            getPoints().add(getPoints().size() - 2, newX);
-//            getPoints().add(getPoints().size() - 1, newY);
-//            startX = x;
-//            startY = y;
-//        }else{
-//            
-//        }
     }
 
     @Override

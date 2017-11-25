@@ -1,14 +1,14 @@
 package map.css;
 
 /**
- * This class lists all CSS style types for this application. These
- * are used by JavaFX to apply style properties to controls like
- * buttons, labels, and panes.
-
+ * This class lists all CSS style types for this application. These are used by
+ * JavaFX to apply style properties to controls like buttons, labels, and panes.
+ *
  * @author Benjamin Michalowicz
  * @version 1.0
  */
 public class mapStyle {
+
     // THESE CONSTANTS ARE FOR TYING THE PRESENTATION STYLE OF
     // THIS golWorkspace'S COMPONENTS TO A STYLE SHEET THAT IT USES
     public static final String CLASS_MAX_PANE = "max_pane";

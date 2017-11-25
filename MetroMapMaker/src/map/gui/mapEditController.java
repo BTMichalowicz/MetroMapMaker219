@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
@@ -33,6 +34,8 @@ import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 import map.data.DraggableLine;
 import map.data.DraggableStation;
+import map.data.DraggableText;
+import map.data.ListStationsWindow;
 import map.data.mapData;
 import map.data.mapState;
 import map.file.mapFiles;
@@ -208,9 +211,25 @@ public class mapEditController {
      * @param draggableStation The draggable station in question.
      */
     public void processRemoveStat(DraggableStation draggableStation) {
-        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(draggableStation);
-        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(draggableStation.getStatName());
-        ((mapWorkspace) app.getWorkspaceComponent()).getStations().getItems().remove(draggableStation.getName());
+        
+        
+        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+        (work).getCanvas().getChildren().remove(draggableStation);
+        (work).getCanvas().getChildren().remove(draggableStation.getStatName());
+        (work).getStations().getItems().remove(draggableStation.getName());
+        work.getFromStat().getItems().remove(draggableStation.getName());
+        work.getToStat().getItems().remove(draggableStation.getName());
+        
+        for(Node n: work.getCanvas().getChildren()){
+            
+            if(n instanceof DraggableLine){
+                DraggableLine node = (DraggableLine) n;
+                
+                if(node.getStations().contains(draggableStation.getName())){
+                    node.getStations().remove(draggableStation.getName());
+                }
+            }
+        }
         // draggableStation = null; // Remove the reference
     }
 
@@ -300,44 +319,18 @@ public class mapEditController {
         workspace.reloadWorkspace(dataManager);
     }
 
-    public void processAddStatToLine(DraggableLine draggableLine) {
+    public void processAddStatToLine() {
 
+        // CHANGE THE CURSOR
+        Scene scene = app.getGUI().getPrimaryScene();
+        scene.setCursor(Cursor.CROSSHAIR);
+
+        // CHANGE THE STATE
+        dataManager.setState(mapState.ADD_STAT_TO_LINE);
+
+        // ENABLE/DISABLE THE PROPER BUTTONS
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
-        TextInputDialog statName = new TextInputDialog();
-        statName.setTitle("Make a station Name!");
-        statName.setHeaderText(null);
-        statName.setContentText("Add a name for your station!");
-
-        Optional<String> result = statName.showAndWait();
-
-        while (!result.isPresent()) {
-            Alert duplicate = new Alert(AlertType.ERROR);
-            duplicate.setHeaderText(null);
-            duplicate.setContentText("You need a name for the station!!");
-            duplicate.showAndWait();
-            result = statName.showAndWait();
-
-        }
-
-        DraggableStation newStation = new DraggableStation(app, result.get());
-        draggableLine.addStation(newStation, newStation.getName());
-        workspace.getStations().getItems().add(newStation.getName());
-        workspace.getFromStat().getItems().add(newStation.getName());
-        workspace.getToStat().getItems().add(newStation.getName());
-
-        workspace.getStations().getItems().add(newStation.getName());
-
-        dataManager.unhighlightShape(dataManager.getSelectedShape());
-
-        app.getGUI().updateToolbarControls(false);
-
-        newStation.setFill(workspace.getOutlineColorPicker().getValue());
-        newStation.setStroke(workspace.getOutlineColorPicker().getValue());
-        newStation.setStrokeWidth(workspace.getStatThickness().getValue());
-        dataManager.setState(mapState.SIZING_ITEM);
-        workspace.getCanvas().getChildren().add(newStation);
-
-        app.getGUI().updateToolbarControls(false);
+        workspace.reloadWorkspace(dataManager);
 
     }
 
@@ -350,16 +343,20 @@ public class mapEditController {
 
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
 
-        workspace.getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).map((n) -> (DraggableLine) n).filter((node) -> (node.getStations().contains(removedStation.getName()))).forEachOrdered((node) -> {
-            node.getStations().remove(removedStation.getName());
-
-            workspace.getStations().getItems().remove(removedStation.getName());
-            workspace.getFromStat().getItems().remove(removedStation.getName());
-            workspace.getToStat().getItems().remove(removedStation.getName());
-        });
+        for(Node n: workspace.getCanvas().getChildren()){
+            
+            if(n instanceof DraggableLine){
+                DraggableLine node = (DraggableLine) n;
+                
+                if(node.getStations().contains(removedStation.getName())){
+                    node.getStations().remove(removedStation.getName());
+                }
+            }
+        }
+                
 
         //Just in case
-        workspace.getCanvas().getChildren().remove(removedStation);
+
 
     }
 
@@ -387,6 +384,41 @@ public class mapEditController {
         draggableStation.setRadiusY(work.getStatThickness().getValue() / 2);
         app.getGUI().updateToolbarControls(false);
 
+    }
+
+    void processStationColor(DraggableStation draggableStation) {
+        ColorPicker stationColor = ((mapWorkspace) app.getWorkspaceComponent()).getStationColorPicker();
+
+        draggableStation.setFill(stationColor.getValue());
+
+    }
+
+    void processColorTextSelection(DraggableText draggableText) {
+        ColorPicker textColor = ((mapWorkspace) app.getWorkspaceComponent()).getFontColorPicker();
+
+        draggableText.setFill(textColor.getValue());
+    }
+
+    void rotateText() {
+        // CHANGE THE CURSOR
+        Scene scene = app.getGUI().getPrimaryScene();
+        scene.setCursor(Cursor.CROSSHAIR);
+
+        // CHANGE THE STATE
+        dataManager.setState(mapState.ROTATING_LABEL);
+
+        // ENABLE/DISABLE THE PROPER BUTTONS
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        workspace.reloadWorkspace(dataManager);
+    }
+    
+
+    void listStationsOnLine(DraggableLine draggableLine) {
+        
+        ListStationsWindow lister = new ListStationsWindow (app, draggableLine);
+        
+        lister.show();
+        
     }
 
 }

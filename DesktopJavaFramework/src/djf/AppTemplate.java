@@ -47,16 +47,16 @@ public abstract class AppTemplate extends Application {
      * components used by the app in the proper order according to the
      * particular app's dependencies.
      */
-    
     String lineName;
-    
-    public String getLineName(){
+
+    public String getLineName() {
         return lineName;
     }
-    
-    public void setLineName(String lineName){
+
+    public void setLineName(String lineName) {
         this.lineName = lineName;
     }
+
     public abstract void buildAppComponentsHook();
 
     // COMPONENT ACCESSOR METHODS
@@ -128,8 +128,6 @@ public abstract class AppTemplate extends Application {
 
                 welcome.show();
                 // NOW OPEN UP THE WINDOW
-                
-               
 
                 welcome.getNewButton().setOnAction((ActionEvent e) -> {
                     welcome.close();
@@ -163,7 +161,6 @@ public abstract class AppTemplate extends Application {
                         lineName = result.get();
                         primaryStage.show();
                         getGUI().getFileController().handleNewWelcomeRequest(result.get());
-                        
 
                     } else {
                         primaryStage.show();
@@ -171,13 +168,10 @@ public abstract class AppTemplate extends Application {
                     }
 
                 });
-                
-                
 
                 welcome.setOnCloseRequest(e -> {
-                    
-                    
-                        primaryStage.show();
+
+                    primaryStage.show();
                 });
 
                 primaryStage.setOnCloseRequest(e -> {

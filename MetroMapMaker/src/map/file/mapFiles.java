@@ -244,13 +244,13 @@ public class mapFiles implements AppFileComponent {
 
         for (int i = 0; i < jsonItemsArray.size(); i++) {
             JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
-            Node node = loadNode(jsonItem); 
+            Node node = loadNode(jsonItem);
             dataManager.addShape(node);
         }
 
         for (int i = 0; i < jsonLinesArray.size(); i++) {
             JsonObject jsonItem = jsonLinesArray.getJsonObject(i);
-            Node node = loadNode(jsonItem); 
+            Node node = loadNode(jsonItem);
             dataManager.addShape(node);
         }
 
@@ -350,16 +350,14 @@ public class mapFiles implements AppFileComponent {
             for (int i = 0; i < statNames.size(); i++) {
                 ((DraggableLine) retVal).getStations().add(statNames.getString(i));
             }
-            ((DraggableLine) retVal).setFill(loadColor(jsonObject, JSON_COLOR));
+            ((DraggableLine) retVal).setStroke(loadColor(jsonObject, JSON_COLOR));
 
             JsonArray linePoints = jsonObject.getJsonArray(JSON_POINTS);
 
             for (int i = 0; i < linePoints.size(); i++) {
                 ((DraggableLine) retVal).getPoints().add((double) linePoints.getInt(i));
-            }
 
-            int x = (int) Math.floor(((DraggableLine) retVal).getPoints().get(0));
-            int y = (int) Math.floor(((DraggableLine) retVal).getPoints().get(1));
+            }
 
             ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getLines().getItems().add(((DraggableLine) retVal).getName());
 
@@ -399,16 +397,12 @@ public class mapFiles implements AppFileComponent {
             double width = drag.getWidth();
             double height = drag.getHeight();
 
-           if (node instanceof DraggableLine) { //if not instance of Draggable Text
+            if (node instanceof DraggableLine) { //if not instance of Draggable Text
 
                 DraggableLine dragged = (DraggableLine) node;
                 JsonObject backgroundColor = getLineBackgroundColor(dragged.getFill());
 
-               
-
                 //TODO: Implement isCircular
-               
-
                 JsonArrayBuilder stationNames = Json.createArrayBuilder();
 
                 dragged.getStations().forEach((stat) -> {

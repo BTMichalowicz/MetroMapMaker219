@@ -8,6 +8,8 @@ import static djf.ui.AppGUI.CLASS_FILE_BUTTON;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -333,15 +335,18 @@ public class AppWelcomeDialogSingleton extends Stage {
     }
 
     private void sortFiles(ArrayList<File> recentWorks) {
-        for (int idx = 0; idx < recentWorks.size() - 1; idx++) {
-            for (int j = 0; j < recentWorks.size() - idx - 1; idx++) {
-                if (recentWorks.get(j).lastModified() < recentWorks.get(j + 1).lastModified()) {
-                    File temp = recentWorks.get(j + 1);
-                    recentWorks.set(j + 1, recentWorks.get(j));
-                    recentWorks.set(j, temp);
-                }
-            }
+
+        FileComparator fileC = new FileComparator();
+        Collections.sort(recentWorks, fileC);
+    }
+
+    class FileComparator implements Comparator<File> {
+
+        @Override
+        public int compare(File t, File t1) {
+            return (int) (t1.lastModified() - t.lastModified());
         }
+
     }
 
     private void renameLinks(ArrayList<File> recentWorks) {

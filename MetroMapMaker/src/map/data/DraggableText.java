@@ -38,9 +38,9 @@ public class DraggableText extends Text implements Draggable {
     public void setStartY(double startY) {
         this.startY = startY;
     }
-    
+
     AppTemplate app;
-    
+
     jTPS transact;
     jTPS_Transaction t;
 
@@ -56,16 +56,16 @@ public class DraggableText extends Text implements Draggable {
         startX = 0.0;
         startY = 0.0;
 
-        setText( "Your text here" );
-        
+        setText("Your text here");
+
         this.app = initApp;
 
     }
-    
-    public DraggableText(AppTemplate initApp, String name){
+
+    public DraggableText(AppTemplate initApp, String name) {
         setOpacity(1.0);
         this.app = initApp;
-        setText(name+ "      ");
+        setText(name + "      ");
     }
 
     @Override
@@ -78,10 +78,9 @@ public class DraggableText extends Text implements Draggable {
 
         startX = x;
         startY = y;
-        
+
         setX(x);
         setY(y);
-       
 
     }
 
@@ -92,7 +91,7 @@ public class DraggableText extends Text implements Draggable {
         textBox.setHeaderText("");
         setWrappingWidth(getWidth() - (getWidth() / 2));
 
-        textBox.setTitle( "Add your text!");
+        textBox.setTitle("Add your text!");
         Optional<String> result = textBox.showAndWait();
         if (result.isPresent()) {
             setText(result.get());
@@ -102,7 +101,7 @@ public class DraggableText extends Text implements Draggable {
 
     @Override
     public void drag(int x, int y) {
-        
+
         double diffX = x - startX;
         double diffY = y - startY;
         double newX = getX() + diffX;
@@ -112,8 +111,7 @@ public class DraggableText extends Text implements Draggable {
         setY(y);
         startX = x;
         startY = y;
-        
-        
+
     }
 
     @Override

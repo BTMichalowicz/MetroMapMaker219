@@ -99,8 +99,6 @@ public class AppFileController {
         AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         try {
-            
-            
 
             ///NOW SAVE THE FILE AT THE VERY END!!
             JsonObject newFile = Json.createObjectBuilder()
@@ -108,7 +106,6 @@ public class AppFileController {
 
             File f = new File(PATH_WORK);
 
-            
             File f2 = new File(PATH_WORK + file);
             boolean b = f2.mkdir();
 
@@ -122,7 +119,6 @@ public class AppFileController {
             }
 
             // INIT THE WRITER
-            
             OutputStream os = new FileOutputStream(f2.getPath() + "\\" + file + ".m3");
             JsonWriter jsonFileWriter = Json.createWriter(os);
             jsonFileWriter.writeObject(newFile);
@@ -131,9 +127,8 @@ public class AppFileController {
                 pw.write(prettyPrinted);
 
             }
-            
-            //app.getFileComponent().saveData(app.getDataComponent(), f2.getPath() + "\\" + file + ".m3");
 
+            //app.getFileComponent().saveData(app.getDataComponent(), f2.getPath() + "\\" + file + ".m3");
             // WE MAY HAVE TO SAVE CURRENT WORK
             boolean continueToMakeNew = true;
             if (!saved) {
@@ -485,19 +480,16 @@ public class AppFileController {
         if (recentWorks.isEmpty()) {
             return true;
         }
-        
-            //If the list of recentworks that is the entire work directory
-         
-            for (File dirFile : recentWorks) {
-                if (dirFile.getName().split("\\.")[0].equals(fileName.split("\\.")[0])) {
-                    return false; // There does exist a duplicate
-                }
-            }
-            //There does not exist a duplicate, so
-            return true;
 
+        //If the list of recentworks that is the entire work directory
+        for (File dirFile : recentWorks) {
+            if (dirFile.getName().split("\\.")[0].equals(fileName.split("\\.")[0])) {
+                return false; // There does exist a duplicate
+            }
         }
-        
-       
+        //There does not exist a duplicate, so
+        return true;
 
     }
+
+}

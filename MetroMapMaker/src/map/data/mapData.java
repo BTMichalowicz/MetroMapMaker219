@@ -34,6 +34,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.stage.FileChooser;
 import jtps.jTPS;
 import static map.data.mapState.SELECTING;
+import map.gui.CanvasController;
 import map.gui.mapWorkspace;
 import properties_manager.PropertiesManager;
 
@@ -57,13 +58,12 @@ public class mapData implements AppDataComponent {
     public void setList(ObservableList<Node> list) {
         this.items = list;
     }
-    public AppTemplate getApp(){
+
+    public AppTemplate getApp() {
         return app;
     }
-    
+
     String lineName;
-    
-    
 
     // THE BACKGROUND COLOR
     Color backgroundColor;
@@ -101,7 +101,7 @@ public class mapData implements AppDataComponent {
     jTPS transact;
 
     public mapData(AppTemplate initApp) {
-        
+
         // KEEP THE APP FOR LATER
         app = initApp;
 
@@ -127,8 +127,8 @@ public class mapData implements AppDataComponent {
 
         transact = new jTPS();
     }
-    
-    public String getLineName(){
+
+    public String getLineName() {
         return app.getLineName();
     }
 
@@ -159,7 +159,7 @@ public class mapData implements AppDataComponent {
         BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
         Background background = new Background(fill);
         canvas.setBackground(background);
-         b = work.getCanvas().getBackground();
+        b = work.getCanvas().getBackground();
     }
 
     public void setCurrentFillColor(Color initColor) {
@@ -309,11 +309,11 @@ public class mapData implements AppDataComponent {
             if (selectedNode instanceof DraggableStation) {
                 workspace.getCanvas().getChildren().remove(((DraggableStation) selectedNode).getStatName());
                 workspace.getStations().getItems().remove(((DraggableStation) selectedNode).getName());
-            }else if(selectedNode instanceof DraggableLine){
+            } else if (selectedNode instanceof DraggableLine) {
                 workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getStartName());
                 workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getEndName());
                 workspace.getLines().getItems().remove(((DraggableLine) selectedNode).getName());
-                
+
             }
             selectedNode = null;
 
@@ -325,10 +325,10 @@ public class mapData implements AppDataComponent {
     public String getS() {
         return s;
     }
-    
+
     Background b;
-    
-    public Background getB(){
+
+    public Background getB() {
         return b;
     }
 
@@ -355,7 +355,7 @@ public class mapData implements AppDataComponent {
                         BackgroundSize.DEFAULT)));
 
                 s = selectedFile.getPath();
-                
+
                 b = work.getCanvas().getBackground();
 
             } catch (MalformedURLException e) {
@@ -436,8 +436,6 @@ public class mapData implements AppDataComponent {
         // USE THE CURRENT SETTINGS FOR THIS NEW SHAPE
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
 
-        
-
         // GO INTO SHAPE SIZING MODE
         state = mapState.SIZING_ITEM;
         state = mapState.SELECTING;
@@ -463,24 +461,78 @@ public class mapData implements AppDataComponent {
 
         if (addLiner.getResultant().getSource() == addLiner.getBtnCancel()) {
             state = SELECTING;
-            
+
         } else {
 
             DraggableLine newDraggableLine = new DraggableLine(app, addLiner.getName());
-            newDraggableLine.setFill(addLiner.getLineColor().getValue());
-            newDraggableLine.setStroke(newDraggableLine.getFill());
+
+            newDraggableLine.setStroke(addLiner.getLineColor().getValue());
             newDraggableLine.setStrokeWidth(5);
-            
-            newDraggableLine.getStartName().setFill(newDraggableLine.getFill());
-            newDraggableLine.getEndName().setFill(newDraggableLine.getFill());
-            
+
+            newDraggableLine.getStartName().setFill(addLiner.getLineColor().getValue());
+            newDraggableLine.getEndName().setFill(addLiner.getLineColor().getValue());
 
             workspace.getLines().getItems().add(addLiner.getName());
 
             newDraggableLine.start(x, y);
+
             newNode = newDraggableLine;
             initNode();
         }
+    }
+
+    public void rotateLabel() {
+        if (selectedNode != null && selectedNode instanceof DraggableText) {
+            if (((DraggableText) selectedNode).getRotate() == 90) {
+                ((DraggableText) selectedNode).setRotate(0);
+            } else {
+                ((DraggableText) selectedNode).setRotate(90);
+            }
+        }
+
+    }
+
+    double dividing_factor = 1.5;
+
+    public void addStatToLine(int x, int y, DraggableLine draggableLine) {
+        state = SELECTING;
+
+        
+            mapData dataManager = (mapData) app.getDataComponent();
+
+            Node node = dataManager.selectTopShape(x, y);
+            Scene scene = app.getGUI().getPrimaryScene();
+
+            //We're off to the Drag... Races
+            if (node != null) {
+                if ( node instanceof DraggableStation) {
+                    DraggableStation station = (DraggableStation) node;
+
+                    int startIdx1 = 0;
+                    int startY = 1;
+                    int endIDX1 = draggableLine.getPoints().size() - 2;
+                    int endIDX2 = draggableLine.getPoints().size() - 1;
+
+                    double x2 = draggableLine.getPoints().get((int) ((endIDX1 - startIdx1) / (dividing_factor)));
+                    double y2 = draggableLine.getPoints().get((int) ((endIDX2 - startY) / (dividing_factor)));
+                    dividing_factor += 0.5;
+
+                    station.setCenterX(x2);
+                    station.setCenterY(y2);
+                    
+                    draggableLine.addStation(station, station.getName());
+                    
+
+                    
+
+                } else {
+                    scene.setCursor(Cursor.DEFAULT);
+                    dataManager.setState(mapState.DRAGGING_NOTHING);
+                    app.getWorkspaceComponent().reloadWorkspace(dataManager);
+                }
+            }
+
+       
     }
 
 }

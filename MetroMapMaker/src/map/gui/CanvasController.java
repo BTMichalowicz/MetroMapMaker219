@@ -5,6 +5,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import map.data.Draggable;
+import map.data.DraggableLine;
 import map.data.mapData;
 import map.data.mapState;
 
@@ -53,13 +54,17 @@ public class CanvasController {
             dataManager.startNewImage(x, y);
         } else if (dataManager.isInState(mapState.STARTING_TEXT)) {
             dataManager.startNewText(x, y);
-//        } else if (dataManager.isInState(mapState.ROTATING_LABEL)) {
-//            dataManager.rotateLabel();
-//        }
+        } else if (dataManager.isInState(mapState.ROTATING_LABEL)) {
+            dataManager.rotateLabel();
+
+        }else if (dataManager.isInState(mapState.ADD_STAT_TO_LINE)){
+            
+            if(dataManager.getSelectedShape()!=null && dataManager.getSelectedShape() instanceof DraggableLine)
+            dataManager.addStatToLine(x, y,(DraggableLine)(dataManager.getSelectedShape()));
         }
 
         app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);
-        
+
         app.getWorkspaceComponent().reloadWorkspace(dataManager);
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);

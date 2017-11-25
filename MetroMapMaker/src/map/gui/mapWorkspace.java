@@ -254,6 +254,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
     //COLOR PICKERS
     ColorPicker lineColorPicker, stationColorPicker, backgroundColorPicker, fontColorPicker;
 
+    public ColorPicker getStationColorPicker() {
+        return stationColorPicker;
+    }
+
     public ColorPicker getOutlineColorPicker() {
         return lineColorPicker;
     }
@@ -362,6 +366,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
     public void resetWorkspace() {
 
     }
+    
+    public CanvasController getCanvasController(){
+        return canvasController;
+    }
 
     public Button getEditLine() {
         return editLine;
@@ -399,7 +407,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(true);
             removeLine.setDisable(true);
             addToLine.setDisable(false);
-            removeFromLine.setDisable(removeFrom);
+            removeFromLine.setDisable(false);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(true);
@@ -417,7 +425,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(false);
             addToLine.setDisable(false);
-            removeFromLine.setDisable(true);
+            removeFromLine.setDisable(false);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -455,7 +463,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(false);
             addToLine.setDisable(false);
-            removeFromLine.setDisable(true);
+            removeFromLine.setDisable(false);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -475,7 +483,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(false);
             addToLine.setDisable(false);
-            removeFromLine.setDisable(true);
+            removeFromLine.setDisable(false);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -493,7 +501,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             addLine.setDisable(false);
             removeLine.setDisable(false);
             addToLine.setDisable(false);
-            removeFromLine.setDisable(true);
+            removeFromLine.setDisable(false);
             details.setDisable(false);
             addStat.setDisable(false);
             removeStat.setDisable(false);
@@ -731,11 +739,26 @@ public class mapWorkspace extends AppWorkspaceComponent {
     boolean isBold, isItalic;
 
     private void initControllers() {
+        mapEditController = new mapEditController(app);
+        dataManager = (mapData) app.getDataComponent();
 
         isBold = false;
         isItalic = false;
 
-        mapEditController = new mapEditController(app);
+        fontColorPicker.setOnAction(e -> {
+            if (dataManager.getSelectedShape() != null && dataManager.getSelectedShape() instanceof DraggableText) {
+                mapEditController.processColorTextSelection((DraggableText) dataManager.getSelectedShape());
+            }
+
+        });
+
+        stationColorPicker.setOnAction(e -> {
+            if (dataManager.getSelectedShape() != null && dataManager.getSelectedShape() instanceof DraggableStation) {
+                mapEditController.processStationColor((DraggableStation) dataManager.getSelectedShape());
+            }
+
+        });
+
         about.setOnAction(e -> {
             mapEditController.processAboutRequest();
         });
@@ -773,15 +796,11 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         });
 
-        
         editLine.setOnAction(e -> {
-            
-            
-            
-            if(dataManager.getSelectedShape()!=null && dataManager.getSelectedShape() instanceof DraggableLine){
+
+            if (dataManager.getSelectedShape() != null && dataManager.getSelectedShape() instanceof DraggableLine) {
                 mapEditController.processEditLine(app, (DraggableLine) dataManager.getSelectedShape());
             }
-            
 
         });
         addLabel.setOnAction(e -> {
@@ -797,77 +816,70 @@ public class mapWorkspace extends AppWorkspaceComponent {
             mapEditController.processAddStation();
         });
 
-        lineThickness.valueProperty().addListener(e->{
+        lineThickness.valueProperty().addListener(e -> {
             mapEditController.processLineThickness();
-        
-        });
-        
-        statThickness.valueProperty().addListener(e->{
-            
-            if (dataManager.getSelectedShape() instanceof DraggableStation)
-            mapEditController.processStatThickness(((DraggableStation)dataManager.getSelectedShape()));
-        
-        });
-        
-        addToLine.setOnAction(e -> {
-            
-           
 
-            mapEditController.processAddStatToLine((DraggableLine) dataManager.getSelectedShape()); //TODO: Include some sort of identifier for this
+        });
+
+        statThickness.valueProperty().addListener(e -> {
+
+            if (dataManager.getSelectedShape() instanceof DraggableStation) {
+                mapEditController.processStatThickness(((DraggableStation) dataManager.getSelectedShape()));
+            }
+
+        });
+
+        addToLine.setOnAction(e -> {
+
+            mapEditController.processAddStatToLine(); //TODO: Include some sort of identifier for this
 
         });
 
         removeFromLine.setOnAction(e -> {
-            
-            
+           
+           if(dataManager.getSelectedShape()!=null && dataManager.getSelectedShape() instanceof DraggableStation)
             mapEditController.processRemoveStatFromLine((DraggableStation) dataManager.getSelectedShape()); //TODO: Look Up
 
         });
-        
-        lines.setOnAction(e->{
-            
-            if(dataManager.getSelectedShape()!=null){
+
+        lines.setOnAction(e -> {
+
+            if (dataManager.getSelectedShape() != null) {
                 dataManager.unhighlightShape(dataManager.getSelectedShape());
             }
-            
+
             String name = lines.getSelectionModel().getSelectedItem();
-            
-            if(name!=null){
-                for(Node item: getCanvas().getChildren()){
-                    if(item instanceof DraggableLine){
+
+            if (name != null) {
+                for (Node item : getCanvas().getChildren()) {
+                    if (item instanceof DraggableLine) {
                         DraggableLine drag = (DraggableLine) item;
-                        
-                        if(drag.getName().equals(name)){
+
+                        if (drag.getName().equals(name)) {
                             dataManager.highlightShape(item);
                             dataManager.setSelectedShape(item);
                         }
                     }
                 }
             }
-        
-        
+
         });
-        
-        stations.setOnAction(e->{
-            if(dataManager.getSelectedShape()!=null){
+
+        stations.setOnAction(e -> {
+            if (dataManager.getSelectedShape() != null) {
                 dataManager.unhighlightShape(dataManager.getSelectedShape());
             }
-            
             String name = stations.getSelectionModel().getSelectedItem();
-            
-            if(name!=null){
-                for(Node item: getCanvas().getChildren()){
-                    if(item instanceof DraggableStation){
-                        DraggableStation drag = (DraggableStation) item;
-                        
-                        if(drag.getName().equals(name)){
-                            dataManager.highlightShape(item);
-                        }
+
+            if (name != null) {
+                getCanvas().getChildren().stream().filter((item) -> (item instanceof DraggableStation)).forEachOrdered((item) -> {
+                    DraggableStation drag = (DraggableStation) item;
+                    if (drag.getName().equals(name)) {
+                        dataManager.highlightShape(item);
                     }
-                }
+                });
             }
-            
-        
+
         });
 
         canvas.setOnMouseClicked(e -> {
@@ -881,17 +893,28 @@ public class mapWorkspace extends AppWorkspaceComponent {
             canvasController.processCanvasMouseDragged((int) e.getX(), (int) e.getY());
         });
 
-//        details.setOnAction(e -> {
-//
-//            if (lines.getSelectionModel().getSelectedItem() instanceof DraggableLine) {
-//                mapEditController.listStationsOnLine((DraggableLine) lines.getSelectionModel().getSelectedItem());
-//            }
-//        });
-//
-//        rotate.setOnAction(e -> {
-//            mapEditController.rotateText();
-//        });
-//
+        details.setOnAction(e -> {
+
+            if (lines.getSelectionModel().getSelectedItem()!=null) {
+                
+                
+                
+                for(Node n: canvas.getChildren()){
+                    if(n instanceof DraggableLine){
+                        if(((DraggableLine)n).getName().equals(lines.getSelectionModel().getSelectedItem())){
+                            mapEditController.listStationsOnLine((DraggableLine)n);
+                            break;
+                        }
+                    }
+                }
+                
+            }
+        });
+
+        rotate.setOnAction(e -> {
+            mapEditController.rotateText();
+        });
+
 //        lineThickness.valueProperty().addListener(e -> {
 //            mapEditController.processSelectOutlineThickness();
 //        });
@@ -964,8 +987,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
         //Also several Fonts to go with it
         EventHandler<ActionEvent> fontHandler = e -> {
 
-           
-
             Node node = dataManager.getSelectedShape();
 
             if (node != null && node instanceof DraggableText) {
@@ -973,18 +994,17 @@ public class mapWorkspace extends AppWorkspaceComponent {
                 if (bold.isSelected() && italicize.isSelected()) {
                     isBold = true;
                     isItalic = true;
-                    
-                   
+
                     text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, FontPosture.ITALIC, text.getFont().getSize())); // Both check boxes checked
                 } else if (bold.isSelected()) {
                     isBold = true;
                     isItalic = false;
-                    
+
                     text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, FontPosture.REGULAR, text.getFont().getSize()));
                 } else if (italicize.isSelected()) {
                     isBold = false;
                     isItalic = true;
-       
+
                     text.setFont(Font.font(text.getFont().getFamily(), FontWeight.NORMAL, FontPosture.ITALIC, text.getFont().getSize()));
                 } else {
                     isItalic = false;

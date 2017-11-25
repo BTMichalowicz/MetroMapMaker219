@@ -1,9 +1,9 @@
 package djf.components;
 
 /**
- * This interface provides the structure for data components in
- * our applications.
- * 
+ * This interface provides the structure for data components in our
+ * applications.
+ *
  * @author Richard McKenna
  * @version 1.0
  */

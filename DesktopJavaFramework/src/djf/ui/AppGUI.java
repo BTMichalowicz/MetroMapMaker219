@@ -214,7 +214,7 @@ public class AppGUI {
 
             if (result.isPresent()) {
 
-                boolean isDuplicate = getFileController().checkDuplicateFileName(result.get(), AppWelcomeDialogSingleton.getAppWelcomeDialog(app).getRecentFiles()); 
+                boolean isDuplicate = getFileController().checkDuplicateFileName(result.get(), AppWelcomeDialogSingleton.getAppWelcomeDialog(app).getRecentFiles());
                 while (!isDuplicate) {
                     Alert duplicate = new Alert(Alert.AlertType.ERROR);
                     duplicate.setHeaderText(null);
@@ -253,8 +253,8 @@ public class AppGUI {
         topToolbarPane = new FlowPane();
         topToolbarPane.getChildren().add(fileToolbar);
     }
-    
-    public Stage getPrimaryStage(){
+
+    public Stage getPrimaryStage() {
         return primaryStage;
     }
 

@@ -3,15 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/file/mapFiles.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/DraggableLine.java</file>
-            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/DraggableImage.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/file/mapFiles.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/AddLineWindow.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/DraggableText.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/mapWorkspace.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/EditLineTool.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/CanvasController.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/DraggableStation.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/ListStationsWindow.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/gui/mapEditController.java</file>
+            <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/mapState.java</file>
             <file>file:/C:/Users/Ben%20Michalowicz/Desktop/M3/MetroMapMaker/src/map/data/mapData.java</file>
         </group>
     </open-files>

@@ -45,12 +45,6 @@ public class DraggableImage extends Rectangle implements Draggable {
     public DraggableImage(AppTemplate app) {
         this.app = app;
 
-      
-
-        
-
-        
-
     }
 
     public Image getNewImage() {
@@ -67,27 +61,27 @@ public class DraggableImage extends Rectangle implements Draggable {
         File selectedFile = fc.showOpenDialog(null);
 
         ((mapData) app.getDataComponent()).setState(mapState.DRAGGING);
-        
-        if(selectedFile!= null){
 
-        try {
-            URL fileU = selectedFile.toURI().toURL();
+        if (selectedFile != null) {
 
-            Image image = new Image(fileU.toExternalForm());
+            try {
+                URL fileU = selectedFile.toURI().toURL();
 
-            filePath = selectedFile.getPath();
-            imgPattern = new ImagePattern(image);
-            setWidth(image.getWidth());
-        setHeight(image.getHeight());
-        setFill(imgPattern);
-            img = image;
-            return image;
-        } catch (MalformedURLException muee) {
+                Image image = new Image(fileU.toExternalForm());
 
-            AppMessageDialogSingleton.getSingleton().show("Loading image error", "There was an error loading the image as follows" + Arrays.toString(muee.getStackTrace()));
-            return null;
-        }
-        }else{
+                filePath = selectedFile.getPath();
+                imgPattern = new ImagePattern(image);
+                setWidth(image.getWidth());
+                setHeight(image.getHeight());
+                setFill(imgPattern);
+                img = image;
+                return image;
+            } catch (MalformedURLException muee) {
+
+                AppMessageDialogSingleton.getSingleton().show("Loading image error", "There was an error loading the image as follows" + Arrays.toString(muee.getStackTrace()));
+                return null;
+            }
+        } else {
             return null;
         }
 
@@ -104,7 +98,7 @@ public class DraggableImage extends Rectangle implements Draggable {
 
     @Override
     public void start(int x, int y) {
-           setX(x);
+        setX(x);
         setY(y);
     }
 
@@ -114,8 +108,7 @@ public class DraggableImage extends Rectangle implements Draggable {
         double diffY = y - startY;
         double newX = getX() + diffX;
         double newY = getY() + diffY;
-        
-        
+
         setX(x);
         setY(y);
         startX = x;
