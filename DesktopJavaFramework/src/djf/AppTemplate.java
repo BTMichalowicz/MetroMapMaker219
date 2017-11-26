@@ -121,13 +121,9 @@ public abstract class AppTemplate extends Application {
                 // BUILD THE BASIC APP GUI OBJECT FIRST
                 gui = new AppGUI(primaryStage, appTitle, this);
 
-                // THIS BUILDS ALL OF THE COMPONENTS, NOTE THAT
-                // IT WOULD BE DEFINED IN AN APPLICATION-SPECIFIC
-                // CHILD CLASS
                 buildAppComponentsHook();
 
                 welcome.show();
-                // NOW OPEN UP THE WINDOW
 
                 welcome.getNewButton().setOnAction((ActionEvent e) -> {
                     welcome.close();
@@ -152,23 +148,31 @@ public abstract class AppTemplate extends Application {
                                 isDuplicate = getGUI().getFileController().checkDuplicateFileName(result.get(), welcome.getRecentFiles());
                                 continue;
                             } else {
+
+                                lineName = result.get();
+
                                 primaryStage.show();
                                 getGUI().getFileController().handleNewWelcomeRequest(result.get());
-                                lineName = result.get();
                                 break;
                             }
                         }
                         lineName = result.get();
+
                         primaryStage.show();
                         getGUI().getFileController().handleNewWelcomeRequest(result.get());
 
                     } else {
+
                         primaryStage.show();
 
                     }
 
                 });
 
+                // THIS BUILDS ALL OF THE COMPONENTS, NOTE THAT
+                // IT WOULD BE DEFINED IN AN APPLICATION-SPECIFIC
+                // CHILD CLASS
+                // NOW OPEN UP THE WINDOW
                 welcome.setOnCloseRequest(e -> {
 
                     primaryStage.show();

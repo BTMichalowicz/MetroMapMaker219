@@ -70,7 +70,7 @@ public class EditLineTool extends Stage {
 
         container.getChildren().addAll(lineDetails, metroLineText, lineColor, h);
 
-        Scene scene = new Scene(container, 200, 200);
+        Scene scene = new Scene(container, 500, 550);
         setScene(scene);
     }
 
@@ -85,7 +85,7 @@ public class EditLineTool extends Stage {
             metroLine.setName(metroLineText.getText());
             metroLine.setStyle(metroLine.getStyle() + "-fx-color: #" + lineColor.getValue().toString().split("[x]")[1] + ";");
             (work).getEditLine().setStyle("-fx-background-color: #" + lineColor.getValue().toString().split("[x]")[1] + ";");
-
+            (work).getEditLine().setText(lineColor.getValue().toString());
             close();
 
         });

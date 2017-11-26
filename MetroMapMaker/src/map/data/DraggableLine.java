@@ -48,7 +48,6 @@ public class DraggableLine extends Polyline implements Draggable {
         this.startName = new DraggableText(app, this.name + "  ");
         this.endName = new DraggableText(app, "   " + this.name);
 
-        
         ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().addAll(startName, endName);
 
     }
@@ -95,6 +94,8 @@ public class DraggableLine extends Polyline implements Draggable {
 
         this.startName.setOnMouseDragged(e -> {
             this.startName.drag((int) e.getX() - 15, (int) e.getY());
+            getPoints().add(0, (e.getX()));
+            getPoints().add(1, e.getY());
 
 //            getPoints().set(0, e.getX());
 //            getPoints().set(1, e.getY());
@@ -102,17 +103,16 @@ public class DraggableLine extends Polyline implements Draggable {
 
         this.startName.setOnMouseReleased(e -> {
 
-            getPoints().add(0, (e.getX()));
-            getPoints().add(1, e.getY());
         });
 
         this.endName.setOnMouseDragged(e -> {
             this.endName.drag((int) e.getX() + 10, (int) e.getY());
+            getPoints().addAll(e.getX(), e.getY());
 
         });
 
         this.endName.setOnMouseReleased(e -> {
-            getPoints().addAll(e.getX(), e.getY());
+
         });
 
     }
@@ -122,7 +122,7 @@ public class DraggableLine extends Polyline implements Draggable {
 
         startX = x;
         startY = y;
-        endX = x + 90;
+        endX = x + 30;
         endY = y;
 
         getPoints().add(0, startX);
@@ -132,7 +132,7 @@ public class DraggableLine extends Polyline implements Draggable {
 
         double x2 = (getPoints().get(0) + getPoints().get(getPoints().size() - 2)) / 2;
         double y2 = (getPoints().get(1) + getPoints().get(getPoints().size() - 1)) / 2;
-        
+
         initText();
 
     }

@@ -69,10 +69,8 @@ public class DraggableStation extends Ellipse implements Draggable {
         setCenterX(startCenterX);
         setCenterY(startCenterY);
 
-       this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
+        this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
         this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusYProperty().get() - 20));
-        
-        
 
         if (!((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().contains(statName)) {
             ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().add(statName);
@@ -92,11 +90,10 @@ public class DraggableStation extends Ellipse implements Draggable {
         centerYProperty().set(y);
         startCenterX = x;
         startCenterY = y;
-        
-               this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
+
+        this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
         this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusYProperty().get() - 20));
 
-      
     }
 
     @Override

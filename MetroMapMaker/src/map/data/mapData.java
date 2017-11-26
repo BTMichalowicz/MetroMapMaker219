@@ -294,7 +294,7 @@ public class mapData implements AppDataComponent {
         return newNode;
     }
 
-    public Node getSelectedShape() {
+    public Object getSelectedShape() {
         return selectedNode;
     }
 
@@ -404,7 +404,7 @@ public class mapData implements AppDataComponent {
 
         Optional<String> result = statName.showAndWait();
 
-        while (!result.isPresent()) {
+        while (result.get()=="") {
             Alert duplicate = new Alert(Alert.AlertType.ERROR);
             duplicate.setHeaderText(null);
             duplicate.setContentText("You need a name for the station!!");
@@ -492,47 +492,41 @@ public class mapData implements AppDataComponent {
 
     }
 
-    double dividing_factor = 1.5;
+    double dividing_factor = 2;
 
     public void addStatToLine(int x, int y, DraggableLine draggableLine) {
         state = SELECTING;
 
-        
-            mapData dataManager = (mapData) app.getDataComponent();
+        mapData dataManager = (mapData) app.getDataComponent();
 
-            Node node = dataManager.selectTopShape(x, y);
-            Scene scene = app.getGUI().getPrimaryScene();
+        Node node = dataManager.selectTopShape(x, y);
+        Scene scene = app.getGUI().getPrimaryScene();
 
-            //We're off to the Drag... Races
-            if (node != null) {
-                if ( node instanceof DraggableStation) {
-                    DraggableStation station = (DraggableStation) node;
+        //We're off to the Drag... Races
+        if (node != null) {
+            if (node instanceof DraggableStation) {
+                DraggableStation station = (DraggableStation) node;
 
-                    int startIdx1 = 0;
-                    int startY = 1;
-                    int endIDX1 = draggableLine.getPoints().size() - 2;
-                    int endIDX2 = draggableLine.getPoints().size() - 1;
+                int startIdx1 = 0;
 
-                    double x2 = draggableLine.getPoints().get((int) ((endIDX1 - startIdx1) / (dividing_factor)));
-                    double y2 = draggableLine.getPoints().get((int) ((endIDX2 - startY) / (dividing_factor)));
-                    dividing_factor += 0.5;
+                int endIDX1 = draggableLine.getPoints().size() - 2;
 
-                    station.setCenterX(x2);
-                    station.setCenterY(y2);
-                    
-                    draggableLine.addStation(station, station.getName());
-                    
+                double x2 = draggableLine.getPoints().get((int) ((endIDX1 - startIdx1) / 3)); //Choose indexes for points
+                double y2 = draggableLine.getPoints().get((int) ((1 - startIdx1+1) / 3));
+                dividing_factor += 0.0001;
 
-                    
+                station.setCenterX(x2);
+                station.setCenterY(y2);
 
-                } else {
-                    scene.setCursor(Cursor.DEFAULT);
-                    dataManager.setState(mapState.DRAGGING_NOTHING);
-                    app.getWorkspaceComponent().reloadWorkspace(dataManager);
-                }
+                draggableLine.addStation(station, station.getName());
+
+            } else {
+                scene.setCursor(Cursor.DEFAULT);
+                dataManager.setState(mapState.DRAGGING_NOTHING);
+                app.getWorkspaceComponent().reloadWorkspace(dataManager);
             }
+        }
 
-       
     }
 
 }

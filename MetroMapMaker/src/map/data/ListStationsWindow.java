@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -39,26 +40,34 @@ public class ListStationsWindow extends Stage {
 
         stationList = new Label();
 
-        label = new Label("Details of " + drag.getName() + "line and its stations: ");
+        label = new Label("Details of the " + drag.getName() + "  line and its stations: ");
 
         btnOK = new Button("OK; take me back now, please.");
-        
+
         VBox container = new VBox(25);
         container.getChildren().addAll(label, stationList, btnOK);
-        
-        Scene s = new Scene(container, 150, 200);
+
+        Scene s = new Scene(container, 300, 500);
+
+        label.setWrapText(true);
+
+        label.setFont(Font.font(20));
         setScene(s);
 
     }
 
     private void listStations(DraggableLine drag) {
-        
+
         StringBuilder str = new StringBuilder();
         drag.getStations().forEach((s) -> {
             str.append("\u2022 ").append(s).append("\n");
         });
-        
+
         stationList.setText(str.toString());
+
+        stationList.setFont(Font.font(16));
+
+        stationList.setWrapText(true);
     }
 
     private void initControllers() {

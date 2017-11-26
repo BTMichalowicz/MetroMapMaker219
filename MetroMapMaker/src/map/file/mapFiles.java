@@ -136,7 +136,7 @@ public class mapFiles implements AppFileComponent {
             } else if (node instanceof DraggableLine) { //if not instance of Draggable Text
 
                 DraggableLine dragged = (DraggableLine) node;
-                JsonObject backgroundColor = getLineBackgroundColor(dragged.getFill());
+                JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
 
                 JsonArrayBuilder points = Json.createArrayBuilder();
 
@@ -237,23 +237,23 @@ public class mapFiles implements AppFileComponent {
 
         JsonObject json = loadJSONFile(filePath); //TODO: Implement
 
+        dataManager.getApp().setLineName(json.getString(JSON_NAME));
+
         //dataManager.setBackgroundColor(Color.LIGHTGREY);
         JsonArray jsonItemsArray = json.getJsonArray("everything_else");
         JsonArray jsonLinesArray = json.getJsonArray(JSON_LINES);
         JsonArray jsonStatArray = json.getJsonArray(JSON_STAT);
-
-        for (int i = 0; i < jsonItemsArray.size(); i++) {
-            JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
-            Node node = loadNode(jsonItem);
-            dataManager.addShape(node);
-        }
-
-        for (int i = 0; i < jsonLinesArray.size(); i++) {
+        
+        
+          for (int i = 0; i < jsonLinesArray.size(); i++) {
             JsonObject jsonItem = jsonLinesArray.getJsonObject(i);
             Node node = loadNode(jsonItem);
-            dataManager.addShape(node);
+            
+                dataManager.addShape(node);
+            
+            
         }
-
+        
         for (int i = 0; i < jsonStatArray.size(); i++) {
             JsonObject jsonItem = jsonStatArray.getJsonObject(i);
 
@@ -271,6 +271,20 @@ public class mapFiles implements AppFileComponent {
             ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getFromStat().getItems().add(node.getName());
             ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getToStat().getItems().add(node.getName());
         }
+
+        for (int i = 0; i < jsonItemsArray.size(); i++) {
+            JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
+            Node node = loadNode(jsonItem);
+            
+            
+            if(!dataManager.getShapeList().contains(node)){
+                dataManager.addShape(node);
+            }
+        }
+
+      
+
+        
 
     }
 
@@ -354,10 +368,15 @@ public class mapFiles implements AppFileComponent {
 
             JsonArray linePoints = jsonObject.getJsonArray(JSON_POINTS);
 
-            for (int i = 0; i < linePoints.size(); i++) {
+            for (int i = 4; i < linePoints.size(); i++) {
                 ((DraggableLine) retVal).getPoints().add((double) linePoints.getInt(i));
 
             }
+
+            int x = linePoints.getInt(0);
+            int y = linePoints.getInt(1);
+
+            ((DraggableLine) retVal).start(x, y);
 
             ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getLines().getItems().add(((DraggableLine) retVal).getName());
 
@@ -400,7 +419,7 @@ public class mapFiles implements AppFileComponent {
             if (node instanceof DraggableLine) { //if not instance of Draggable Text
 
                 DraggableLine dragged = (DraggableLine) node;
-                JsonObject backgroundColor = getLineBackgroundColor(dragged.getFill());
+                JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
 
                 //TODO: Implement isCircular
                 JsonArrayBuilder stationNames = Json.createArrayBuilder();

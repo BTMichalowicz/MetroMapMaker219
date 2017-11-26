@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
@@ -110,6 +111,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             zoomIn,
             zoomOut, increaseMapSize, decreaseMapSize,
             addToLine, removeFromLine, export, editLine;
+    Label mapName;
 
     public void setGui(AppGUI gui) {
         this.gui = gui;
@@ -366,8 +368,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
     public void resetWorkspace() {
 
     }
-    
-    public CanvasController getCanvasController(){
+
+    public CanvasController getCanvasController() {
         return canvasController;
     }
 
@@ -379,10 +381,9 @@ public class mapWorkspace extends AppWorkspaceComponent {
     public void reloadWorkspace(AppDataComponent dataComponent) {
         dataManager = (mapData) dataComponent;
 
-        Node data = dataManager.getSelectedShape();
+        Node data = (Node)dataManager.getSelectedShape();
 
-        boolean addL = (data != null && data instanceof DraggableLine);
-        boolean removeFrom = (data != null && data instanceof DraggableStation);
+       
 
         if (dataManager.isInState(mapState.STARTING_LINE)) {
             addLine.setDisable(true);
@@ -520,6 +521,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
     private void initLayout() {
         editToolbar = new VBox();
+
+        mapName = new Label(app.getLineName());
+
+        mapName.setFont(Font.font(48));
 
         FlowPane undoRedo = new FlowPane();
         export = gui.initChildButton(gui.getFileToolbar(), EXPORT_ICON.toString(), EXPORT_TOOLTIP.toString(), false);
@@ -706,6 +711,9 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         ((BorderPane) workspace).setLeft(editToolbar);
         ((BorderPane) workspace).setCenter(canvas);
+
+        ((BorderPane) workspace).setBottom(mapName);
+
     }
 
     private void initStyle() {
@@ -744,6 +752,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         isBold = false;
         isItalic = false;
+
+        backgroundColorPicker.setOnAction(e -> {
+            dataManager.setBackgroundColor(backgroundColorPicker.getValue());
+        });
 
         fontColorPicker.setOnAction(e -> {
             if (dataManager.getSelectedShape() != null && dataManager.getSelectedShape() instanceof DraggableText) {
@@ -836,38 +848,35 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
 
         removeFromLine.setOnAction(e -> {
-           
-           if(dataManager.getSelectedShape()!=null && dataManager.getSelectedShape() instanceof DraggableStation)
-            mapEditController.processRemoveStatFromLine((DraggableStation) dataManager.getSelectedShape()); //TODO: Look Up
 
+            if (dataManager.getSelectedShape() != null && dataManager.getSelectedShape() instanceof DraggableStation) {
+                mapEditController.processRemoveStatFromLine((DraggableStation) dataManager.getSelectedShape()); //TODO: Look Up
+            }
         });
 
         lines.setOnAction(e -> {
 
             if (dataManager.getSelectedShape() != null) {
-                dataManager.unhighlightShape(dataManager.getSelectedShape());
+                dataManager.unhighlightShape((Node)dataManager.getSelectedShape());
             }
 
             String name = lines.getSelectionModel().getSelectedItem();
 
             if (name != null) {
-                for (Node item : getCanvas().getChildren()) {
-                    if (item instanceof DraggableLine) {
-                        DraggableLine drag = (DraggableLine) item;
-
-                        if (drag.getName().equals(name)) {
-                            dataManager.highlightShape(item);
-                            dataManager.setSelectedShape(item);
-                        }
+                getCanvas().getChildren().stream().filter((item) -> (item instanceof DraggableLine)).forEachOrdered((item) -> {
+                    DraggableLine drag = (DraggableLine) item;
+                    if (drag.getName().equals(name)) {
+                        dataManager.highlightShape(item);
+                        dataManager.setSelectedShape(item);
                     }
-                }
+                });
             }
 
         });
 
         stations.setOnAction(e -> {
             if (dataManager.getSelectedShape() != null) {
-                dataManager.unhighlightShape(dataManager.getSelectedShape());
+                dataManager.unhighlightShape((Node)dataManager.getSelectedShape());
             }
             String name = stations.getSelectionModel().getSelectedItem();
 
@@ -895,19 +904,17 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         details.setOnAction(e -> {
 
-            if (lines.getSelectionModel().getSelectedItem()!=null) {
-                
-                
-                
-                for(Node n: canvas.getChildren()){
-                    if(n instanceof DraggableLine){
-                        if(((DraggableLine)n).getName().equals(lines.getSelectionModel().getSelectedItem())){
-                            mapEditController.listStationsOnLine((DraggableLine)n);
+            if (lines.getSelectionModel().getSelectedItem() != null) {
+
+                for (Node n : canvas.getChildren()) {
+                    if (n instanceof DraggableLine) {
+                        if (((DraggableLine) n).getName().equals(lines.getSelectionModel().getSelectedItem())) {
+                            mapEditController.listStationsOnLine((DraggableLine) n);
                             break;
                         }
                     }
                 }
-                
+
             }
         });
 
@@ -949,7 +956,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
 //            canvasController.decreaseMapSize();
 //        });
         fontFamilies.setOnAction(e -> {
-            Node node = dataManager.getSelectedShape();
+            Node node = (Node) dataManager.getSelectedShape();
 
             if (node != null & node instanceof DraggableText) {
 
@@ -968,7 +975,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
 
         fontSizes.setOnAction(e -> {
-            Node node = dataManager.getSelectedShape();
+            Node node = (Node)dataManager.getSelectedShape();
 
             if (node != null & node instanceof DraggableText) {
                 double prevFont = ((DraggableText) node).getFont().getSize();
@@ -987,7 +994,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         //Also several Fonts to go with it
         EventHandler<ActionEvent> fontHandler = e -> {
 
-            Node node = dataManager.getSelectedShape();
+            Node node = (Node)dataManager.getSelectedShape();
 
             if (node != null && node instanceof DraggableText) {
                 DraggableText text = (DraggableText) node;

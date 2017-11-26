@@ -57,10 +57,11 @@ public class CanvasController {
         } else if (dataManager.isInState(mapState.ROTATING_LABEL)) {
             dataManager.rotateLabel();
 
-        }else if (dataManager.isInState(mapState.ADD_STAT_TO_LINE)){
-            
-            if(dataManager.getSelectedShape()!=null && dataManager.getSelectedShape() instanceof DraggableLine)
-            dataManager.addStatToLine(x, y,(DraggableLine)(dataManager.getSelectedShape()));
+        } else if (dataManager.isInState(mapState.ADD_STAT_TO_LINE)) {
+
+            if (dataManager.getSelectedShape() != null && dataManager.getSelectedShape() instanceof DraggableLine) {
+                dataManager.addStatToLine(x, y, (DraggableLine) (dataManager.getSelectedShape()));
+            }
         }
 
         app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);

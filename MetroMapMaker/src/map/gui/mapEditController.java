@@ -211,21 +211,20 @@ public class mapEditController {
      * @param draggableStation The draggable station in question.
      */
     public void processRemoveStat(DraggableStation draggableStation) {
-        
-        
+
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
         (work).getCanvas().getChildren().remove(draggableStation);
         (work).getCanvas().getChildren().remove(draggableStation.getStatName());
         (work).getStations().getItems().remove(draggableStation.getName());
         work.getFromStat().getItems().remove(draggableStation.getName());
         work.getToStat().getItems().remove(draggableStation.getName());
-        
-        for(Node n: work.getCanvas().getChildren()){
-            
-            if(n instanceof DraggableLine){
+
+        for (Node n : work.getCanvas().getChildren()) {
+
+            if (n instanceof DraggableLine) {
                 DraggableLine node = (DraggableLine) n;
-                
-                if(node.getStations().contains(draggableStation.getName())){
+
+                if (node.getStations().contains(draggableStation.getName())) {
                     node.getStations().remove(draggableStation.getName());
                 }
             }
@@ -343,21 +342,18 @@ public class mapEditController {
 
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
 
-        for(Node n: workspace.getCanvas().getChildren()){
-            
-            if(n instanceof DraggableLine){
+        for (Node n : workspace.getCanvas().getChildren()) {
+
+            if (n instanceof DraggableLine) {
                 DraggableLine node = (DraggableLine) n;
-                
-                if(node.getStations().contains(removedStation.getName())){
+
+                if (node.getStations().contains(removedStation.getName())) {
                     node.getStations().remove(removedStation.getName());
                 }
             }
         }
-                
 
         //Just in case
-
-
     }
 
     public void processEditLine(AppTemplate app, DraggableLine line) {
@@ -411,14 +407,13 @@ public class mapEditController {
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
     }
-    
 
     void listStationsOnLine(DraggableLine draggableLine) {
-        
-        ListStationsWindow lister = new ListStationsWindow (app, draggableLine);
-        
+
+        ListStationsWindow lister = new ListStationsWindow(app, draggableLine);
+
         lister.show();
-        
+
     }
 
 }

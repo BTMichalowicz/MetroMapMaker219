@@ -228,6 +228,7 @@ public class AppGUI {
                     }
                 }
                 app.setLineName(result.get());
+
                 getFileController().handleNewWelcomeRequest(result.get());
 
             } else {
