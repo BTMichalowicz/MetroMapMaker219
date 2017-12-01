@@ -1,0 +1,26 @@
+
+{
+    "name":"Test12",
+    "lines":[
+        {
+            "name":"adf",
+            "circular":false,
+            "color":{
+                "red":0.501960813999176,
+                "green":0.3019607961177826,
+                "blue":0.501960813999176,
+                "alpha":1.0
+            },
+            "station_names":[
+                "adf"
+            ]
+        }
+    ],
+    "station":[
+        {
+            "name":"adf",
+            "x":610.0,
+            "y":180.0
+        }
+    ]
+}

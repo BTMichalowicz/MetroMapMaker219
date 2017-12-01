@@ -16,21 +16,26 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -85,6 +90,9 @@ import static map.mapLanguageProperty.ZOOM_OUT_TOOLTIP;
  * @version 1.0
  */
 public class mapWorkspace extends AppWorkspaceComponent {
+
+    Group mainSpot;
+    ScrollPane outerCanvas;
 
     AppTemplate app; //The main app that will be used
 
@@ -217,7 +225,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         this.backgroundColorPicker = backgroundColorPicker;
     }
 
-    public void setCanvas(Pane canvas) {
+    public void setCanvas(ZoomPane canvas) {
         this.canvas = canvas;
     }
 
@@ -316,13 +324,15 @@ public class mapWorkspace extends AppWorkspaceComponent {
     }
 
     //THE MAIN CANVAS FOR THE APPLICATION
-    Pane canvas;
+    ZoomPane canvas;
 
     Text debugText;
 
     public Text getDebugText() {
         return debugText;
     }
+
+    GridPane gp; //FOR SHOWING THE GRID ON THE CANVAS
 
     public void setDebugText(Text debugText) {
         this.debugText = debugText;
@@ -381,9 +391,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
     public void reloadWorkspace(AppDataComponent dataComponent) {
         dataManager = (mapData) dataComponent;
 
-        Node data = (Node)dataManager.getSelectedShape();
-
-       
+        Node data = (Node) dataManager.getSelectedShape();
 
         if (dataManager.isInState(mapState.STARTING_LINE)) {
             addLine.setDisable(true);
@@ -520,6 +528,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
     }
 
     private void initLayout() {
+
+        gp = new GridPane();
         editToolbar = new VBox();
 
         mapName = new Label(app.getLineName());
@@ -696,8 +706,9 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest, decor1,
                 font1, nav1);
+        outerCanvas = new ScrollPane();
 
-        canvas = new Pane();
+        canvas = new ZoomPane();
 
         debugText = new Text();
         canvas.getChildren().add(debugText);
@@ -709,10 +720,14 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         workspace = new BorderPane();
 
-        ((BorderPane) workspace).setLeft(editToolbar);
+        outerCanvas.setContent(canvas);
+        canvas.minWidth(outerCanvas.getWidth());
+        canvas.minHeight(outerCanvas.getHeight());
+
+        canvas.getChildren().add(gp);
         ((BorderPane) workspace).setCenter(canvas);
 
-        ((BorderPane) workspace).setBottom(mapName);
+        ((BorderPane) workspace).setLeft(editToolbar);
 
     }
 
@@ -780,7 +795,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
         }));
 
         removeElement.setOnAction(e -> {
-            mapEditController.processRemoveElement();
+
+            if (dataManager.getSelectedShape() != null && !(dataManager.getSelectedShape() instanceof DraggableStation || dataManager.getSelectedShape() instanceof DraggableLine)) {
+                mapEditController.processRemoveElement();
+            }
 
         });
 
@@ -857,7 +875,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         lines.setOnAction(e -> {
 
             if (dataManager.getSelectedShape() != null) {
-                dataManager.unhighlightShape((Node)dataManager.getSelectedShape());
+                dataManager.unhighlightShape((Node) dataManager.getSelectedShape());
             }
 
             String name = lines.getSelectionModel().getSelectedItem();
@@ -876,7 +894,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         stations.setOnAction(e -> {
             if (dataManager.getSelectedShape() != null) {
-                dataManager.unhighlightShape((Node)dataManager.getSelectedShape());
+                dataManager.unhighlightShape((Node) dataManager.getSelectedShape());
             }
             String name = stations.getSelectionModel().getSelectedItem();
 
@@ -892,14 +910,20 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
 
         canvas.setOnMouseClicked(e -> {
+
             canvasController.processCanvasMousPressed((int) e.getX(), (int) e.getY());
+
         });
 
         canvas.setOnMouseReleased(e -> {
+
             canvasController.processCanvasMouseRelease((int) e.getX(), (int) e.getY());
+
         });
         canvas.setOnMouseDragged(e -> {
+
             canvasController.processCanvasMouseDragged((int) e.getX(), (int) e.getY());
+
         });
 
         details.setOnAction(e -> {
@@ -922,13 +946,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
             mapEditController.rotateText();
         });
 
-//        lineThickness.valueProperty().addListener(e -> {
-//            mapEditController.processSelectOutlineThickness();
-//        });
-//
-//        statThickness.valueProperty().addListener(e -> {
-//            mapEditController.processStationThickness();
-//        });
 //
 //        fromToPop.setOnAction(e -> {
 //            mapEditController.processDirections(); //Create a Singleton for this perhaps?
@@ -939,13 +956,18 @@ public class mapWorkspace extends AppWorkspaceComponent {
 //
 //        });
 //
-//        showGrid.setOnAction(e -> {
-//            mapEditController.showGrid();
-//        });
-//
-//        zoomIn.setOnAction(e -> canvasController.zoomIn());
-//
-//        zoomOut.setOnAction(e -> canvasController.zoomOut());
+        showGrid.setOnAction(e -> {
+
+            if (showGrid.isSelected()) {
+                mapEditController.showGrid();
+            } else {
+                mapEditController.hideGrid();
+            }
+        });
+
+        zoomIn.setOnAction(e -> canvasController.zoomIn());
+
+        zoomOut.setOnAction(e -> canvasController.zoomOut());
 //
 //        increaseMapSize.setOnAction(e -> {
 //            canvasController.increaseMapSize();
@@ -975,7 +997,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
 
         fontSizes.setOnAction(e -> {
-            Node node = (Node)dataManager.getSelectedShape();
+            Node node = (Node) dataManager.getSelectedShape();
 
             if (node != null & node instanceof DraggableText) {
                 double prevFont = ((DraggableText) node).getFont().getSize();
@@ -994,7 +1016,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         //Also several Fonts to go with it
         EventHandler<ActionEvent> fontHandler = e -> {
 
-            Node node = (Node)dataManager.getSelectedShape();
+            Node node = (Node) dataManager.getSelectedShape();
 
             if (node != null && node instanceof DraggableText) {
                 DraggableText text = (DraggableText) node;
@@ -1023,6 +1045,14 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         bold.setOnAction(fontHandler);
         italicize.setOnAction(fontHandler);
+    }
+
+    public CheckBox getShowGrid() {
+        return showGrid;
+    }
+
+    public GridPane getGp() {
+        return gp;
     }
 
     public Slider getLineThickness() {
@@ -1060,19 +1090,20 @@ public class mapWorkspace extends AppWorkspaceComponent {
 // HELPER METHOD
     public void loadSelectedShapeSettings(Node shape) {
         if (shape != null) {
-
-            //Color fillColor = (Color) ((Shape) shape).getFill();
             Color strokeColor = (Color) ((Shape) shape).getStroke();
-            //double lineThickness = ((Shape) shape).getStrokeWidth();
-
-            // fillColorPicker.setValue(fillColor);
             lineColorPicker.setValue(strokeColor);
-            // outlineThicknessSlider.setValue(lineThickness);
-
         }
     }
 
-    public Pane getCanvas() {
+    public ScrollPane getOuterCanvas() {
+        return outerCanvas;
+    }
+
+    public void setOuterCanvas(ScrollPane outerCanvas) {
+        this.outerCanvas = outerCanvas;
+    }
+
+    public ZoomPane getCanvas() {
         return canvas;
     }
 

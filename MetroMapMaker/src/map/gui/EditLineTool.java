@@ -70,7 +70,7 @@ public class EditLineTool extends Stage {
 
         container.getChildren().addAll(lineDetails, metroLineText, lineColor, h);
 
-        Scene scene = new Scene(container, 500, 550);
+        Scene scene = new Scene(container, 300, 300);
         setScene(scene);
     }
 

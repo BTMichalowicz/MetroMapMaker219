@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import javafx.embed.swing.SwingFXUtils;
@@ -29,7 +30,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 import map.data.DraggableLine;
@@ -51,10 +54,13 @@ public class mapEditController {
 
     public AppTemplate app;
     public mapData dataManager;
+    
+    ArrayList <Line> lines;
 
     public mapEditController(AppTemplate app) {
         this.app = app;
         this.dataManager = (mapData) app.getDataComponent();
+        lines = new ArrayList<>();
     }
 
     public void processSelectSelectionTool() {
@@ -124,7 +130,7 @@ public class mapEditController {
             /*
             Once the fule has been exported as some sort of PNG image, then we go to exporting the data
              */
-            fileControl.exportData(dataManager, PATH_EXPORTS + result.get() + ".m3");
+            fileControl.exportData(dataManager, PATH_EXPORTS + result.get() + ".json");
 
         } catch (IOException ioe) {
 
@@ -219,17 +225,9 @@ public class mapEditController {
         work.getFromStat().getItems().remove(draggableStation.getName());
         work.getToStat().getItems().remove(draggableStation.getName());
 
-        for (Node n : work.getCanvas().getChildren()) {
-
-            if (n instanceof DraggableLine) {
-                DraggableLine node = (DraggableLine) n;
-
-                if (node.getStations().contains(draggableStation.getName())) {
-                    node.getStations().remove(draggableStation.getName());
-                }
-            }
-        }
-        // draggableStation = null; // Remove the reference
+        work.getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).map((n) -> (DraggableLine) n).filter((node) -> (node.getStations().contains(draggableStation.getName()))).forEachOrdered((node) -> {
+            node.getStations().remove(draggableStation.getName());
+        }); // draggableStation = null; // Remove the reference
     }
 
     public void processImageOverlay() {
@@ -342,18 +340,12 @@ public class mapEditController {
 
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
 
-        for (Node n : workspace.getCanvas().getChildren()) {
-
-            if (n instanceof DraggableLine) {
-                DraggableLine node = (DraggableLine) n;
-
-                if (node.getStations().contains(removedStation.getName())) {
-                    node.getStations().remove(removedStation.getName());
-                }
-            }
-        }
-
-        //Just in case
+        workspace.getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).map((n) -> (DraggableLine) n).filter((node) -> (node.getStations().contains(removedStation.getName()))).map((node) -> {
+            node.getStations().remove(removedStation.getName());
+            return node;
+        }).forEachOrdered((node) -> {
+            node.removeStation(removedStation);
+        }); //Just in case
     }
 
     public void processEditLine(AppTemplate app, DraggableLine line) {
@@ -376,8 +368,8 @@ public class mapEditController {
 
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
 
-        draggableStation.setRadiusX(work.getStatThickness().getValue() / 2);
-        draggableStation.setRadiusY(work.getStatThickness().getValue() / 2);
+        draggableStation.setRadius(work.getStatThickness().getValue() / 2);
+
         app.getGUI().updateToolbarControls(false);
 
     }
@@ -414,6 +406,52 @@ public class mapEditController {
 
         lister.show();
 
+    }
+
+    void showGrid() {
+        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+
+            showLines(lines);
+
+        
+    }
+
+    private void showLines(ArrayList<Line> lines) {
+
+        ZoomPane canvas = ((mapWorkspace) app.getWorkspaceComponent()).getCanvas();
+
+        for (int x = 0; x < 10000; x += 10) {
+            lines.add(createLine(x, x, 0, canvas.getWidth() * 4));
+        }
+
+        for (int x = 0; x < 10000; x += 10) {
+            lines.add((createLine(0, canvas.getHeight() * 4, x, x)));
+        }
+        
+        
+        canvas.getChildren().addAll(lines);
+
+    }
+
+    private Line createLine(double x1, double x2, double y1, double y2) {
+        Line l = new Line();
+
+        l.setStartX(x1);
+        l.setEndX(x2);
+        l.setStartY(y1);
+        l.setEndY(y2);
+        l.setStroke(Color.BLACK);
+        l.setStrokeWidth(0.1);
+        l.setDisable(true);
+        
+        return l;
+    }
+
+    void hideGrid() {
+        lines.forEach((l) -> {
+            l.setVisible(false);
+        });
+        lines.clear();
     }
 
 }

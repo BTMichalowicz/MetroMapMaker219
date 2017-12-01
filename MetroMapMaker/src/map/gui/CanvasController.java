@@ -1,9 +1,11 @@
 package map.gui;
 
 import djf.AppTemplate;
+import javafx.event.ActionEvent;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import map.data.Draggable;
 import map.data.DraggableLine;
 import map.data.mapData;
@@ -113,6 +115,61 @@ public class CanvasController {
             dataManager.setState(mapState.SELECTING);
 
         }
+    }
+
+    //Two private data fields used for zooming in and out
+    private final double MIN_SCALE = 0.1d;
+    private final double MAX_SCALE = 10.0d;
+
+    private final double delta = 1.1; //increase by 10% zoom
+
+    void zoomIn() {
+               mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+
+
+        double scale1 = workspace.getCanvas().getScaler();
+       
+
+        scale1 *= delta;
+    
+
+        scale1 = clamp(scale1, MIN_SCALE, MAX_SCALE);
+        
+
+        workspace.getCanvas().setScaler(scale1);
+
+    }
+
+    private double clamp(double value, double min, double max) {
+
+        if (Double.compare(value, min) < 0) {
+            return min;
+        }
+
+        if (Double.compare(value, max) > 0) {
+            return max;
+        }
+
+        return value;
+    }
+
+    void zoomOut() {
+        
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+
+
+        double scale1 = workspace.getCanvas().getScaler();
+       
+
+        scale1 /= delta;
+    
+
+        scale1 = clamp(scale1, MIN_SCALE, MAX_SCALE);
+        
+
+        workspace.getCanvas().setScaler(scale1);
+         
+
     }
 
 }

@@ -1,9 +1,8 @@
 package map.data;
 
 import djf.AppTemplate;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Circle;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 import map.gui.mapWorkspace;
@@ -12,7 +11,7 @@ import map.gui.mapWorkspace;
  *
  * @author Ben Michalowicz
  */
-public class DraggableStation extends Ellipse implements Draggable {
+public class DraggableStation extends Circle implements Draggable {
 
     double startCenterX;
     double startCenterY;
@@ -22,6 +21,16 @@ public class DraggableStation extends Ellipse implements Draggable {
     String name;
 
     DraggableText statName;
+
+    StationTo lineStat;
+
+    public StationTo getLineStat() {
+        return lineStat;
+    }
+
+    public void setLineStat(StationTo lineStat) {
+        this.lineStat = lineStat;
+    }
 
     public String getName() {
         return name;
@@ -35,14 +44,15 @@ public class DraggableStation extends Ellipse implements Draggable {
     public DraggableStation(AppTemplate initApp, String name) {
         setCenterX(0.0);
         setCenterY(0.0);
-        setRadiusX(5);
-        setRadiusY(5);
+        setRadius(5);
         setOpacity(1.0);
         startCenterX = 0.0;
         startCenterY = 0.0;
         this.app = initApp;
         this.name = name;
         this.statName = new DraggableText(initApp, name);
+
+        lineStat = new StationTo(this);
 
         //statName.yProperty().set(statName.yProperty().get() - 20);
     }
@@ -69,12 +79,15 @@ public class DraggableStation extends Ellipse implements Draggable {
         setCenterX(startCenterX);
         setCenterY(startCenterY);
 
-        this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
-        this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusYProperty().get() - 20));
+        this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusProperty().get()));
+        this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusProperty().get() - 20));
 
         if (!((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().contains(statName)) {
             ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().add(statName);
         }
+
+        lineStat.setX(x);
+        lineStat.setY(y);
 
     }
 
@@ -91,48 +104,51 @@ public class DraggableStation extends Ellipse implements Draggable {
         startCenterX = x;
         startCenterY = y;
 
-        this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusXProperty().get()));
-        this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusYProperty().get() - 20));
+        this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusProperty().get()));
+        this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusProperty().get() - 20));
+
+        lineStat.setX(x);
+        lineStat.setY(y);
 
     }
 
     @Override
     public void size(int x, int y) {
-        double width = x - startCenterX;
-        double height = y - startCenterY;
-        double centerX = startCenterX + (width / 2);
-        double centerY = startCenterY + (height / 2);
+
         setCenterX(x);
         setCenterY(y);
+         lineStat.setX(x);
+        lineStat.setY(y);
 
     }
 
     @Override
     public double getX() {
-        return getCenterX() - getRadiusX();
+        return getCenterX() - getRadius();
     }
 
     @Override
     public double getY() {
-        return getCenterY() - getRadiusY();
+        return getCenterY() - getRadius();
     }
 
     @Override
     public double getWidth() {
-        return getRadiusX() * 2;
+        return getRadius() * 2;
     }
 
     @Override
     public double getHeight() {
-        return getRadiusY() * 2;
+        return getRadius() * 2;
     }
 
     @Override
     public void setLocationAndSize(double initX, double initY, double initWidth, double initHeight) {
         setCenterX(initX + (initWidth / 2));
         setCenterY(initY + (initHeight / 2));
-        setRadiusX(5);
-        setRadiusY(5); // 10 Pixel diameter should work
+         lineStat.setX(initX);
+        lineStat.setY(initY);
+        setRadius(5);
 
     }
 

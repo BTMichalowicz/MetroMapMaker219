@@ -2,8 +2,9 @@ package map.data;
 
 import djf.AppTemplate;
 import java.util.ArrayList;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.shape.Polyline;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
@@ -13,7 +14,7 @@ import map.gui.mapWorkspace;
  *
  * @author Ben Michalowicz
  */
-public class DraggableLine extends Polyline implements Draggable {
+public class DraggableLine extends Path implements Draggable {
 
     AppTemplate app;
 
@@ -44,13 +45,14 @@ public class DraggableLine extends Polyline implements Draggable {
         stations = new ArrayList<>();
 
         this.name = name;
+        setStrokeWidth(3);
 
         this.startName = new DraggableText(app, this.name + "  ");
         this.endName = new DraggableText(app, "   " + this.name);
 
-        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().addAll(startName, endName);
-
     }
+
+    LineTo line;
 
     public ArrayList<String> getStations() {
         return stations;
@@ -67,16 +69,32 @@ public class DraggableLine extends Polyline implements Draggable {
 
     }
 
-    public void addStation(DraggableStation s, String statName) {
+    public void addStation(DraggableStation s) {
 
         stations.add(s.getName());
+
+        if (getElements().size() <= 4) {
+            getElements().add(1, s.getLineStat());
+        } else {
+            getElements().add(getElements().size() - 2, s.getLineStat());
+        }
+
+        s.getLineStat().setX(s.centerXProperty().get());
+        s.getLineStat().setY(s.centerYProperty().get());
+
     }
 
-    public String removeStation(String s) {
-        String ret = stations.get(stations.indexOf(s));
+    public void removeStation(DraggableStation s) {
+        //String ret = stations.get(stations.indexOf(s.getName()));
 
-        stations.remove(s);
-        return ret;
+//        line= ((LineTo)((getElements().get((getElements().indexOf(new LineTo(s.centerXProperty().get(), s.centerYProperty().get())))))));
+        s.getLineStat().xProperty().unbind();
+        s.getLineStat().yProperty().unbind();
+
+        getElements().remove(s.getLineStat());
+
+        stations.remove(s.getName());
+
     }
 
     @Override
@@ -86,34 +104,28 @@ public class DraggableLine extends Polyline implements Draggable {
 
     private void initText() {
 
-        this.startName.setX(getPoints().get(0) - 20);
-        this.startName.setY(getPoints().get(1));
+        ((MoveTo) getElements().get(0)).xProperty().bind(this.startName.xProperty());
+        (((MoveTo) getElements().get(0)).yProperty()).bind(this.startName.yProperty());
 
-        this.endName.setX(getPoints().get(getPoints().size() - 2) + 5);
-        this.endName.setY(getPoints().get(getPoints().size() - 1));
+        (((LineTo) getElements().get(getElements().size() - 1)).xProperty()).bind(this.endName.xProperty());
+        (((LineTo) getElements().get(getElements().size() - 1)).yProperty()).bind(this.endName.yProperty());
 
         this.startName.setOnMouseDragged(e -> {
             this.startName.drag((int) e.getX() - 15, (int) e.getY());
-            getPoints().add(0, (e.getX()));
-            getPoints().add(1, e.getY());
 
 //            getPoints().set(0, e.getX());
 //            getPoints().set(1, e.getY());
         });
 
-        this.startName.setOnMouseReleased(e -> {
-
-        });
-
         this.endName.setOnMouseDragged(e -> {
             this.endName.drag((int) e.getX() + 10, (int) e.getY());
-            getPoints().addAll(e.getX(), e.getY());
 
         });
 
         this.endName.setOnMouseReleased(e -> {
 
         });
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().addAll(startName, endName);
 
     }
 
@@ -124,14 +136,20 @@ public class DraggableLine extends Polyline implements Draggable {
         startY = y;
         endX = x + 30;
         endY = y;
+        
+        MoveTo start = new MoveTo(startX, startY);
+        
+        startName.setX(startX);
+        startName.setY(startY);
+        
+        endName.setX(endX);
+        endName.setY(endY);
+        
+        LineTo end = new LineTo(endX, endY);
 
-        getPoints().add(0, startX);
-        getPoints().add(1, startY);
-        getPoints().add(2, endX);
-        getPoints().add(3, endY);
+        getElements().add(start);
 
-        double x2 = (getPoints().get(0) + getPoints().get(getPoints().size() - 2)) / 2;
-        double y2 = (getPoints().get(1) + getPoints().get(getPoints().size() - 1)) / 2;
+        getElements().add(end);
 
         initText();
 

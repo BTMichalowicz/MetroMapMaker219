@@ -82,6 +82,8 @@ public class mapFiles implements AppFileComponent {
     static final String JSON_END_X = "end_x";
     static final String JSON_END_Y = "end_y";
 
+    static final String JSON_RADIUS = "radius";
+
     static final String DEFAULT_DOCTYPE_DECLARATION = "<!doctype html>\n";
     static final String DEFAULT_ATTRIBUTE_VALUE = "";
 
@@ -138,14 +140,7 @@ public class mapFiles implements AppFileComponent {
                 DraggableLine dragged = (DraggableLine) node;
                 JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
 
-                JsonArrayBuilder points = Json.createArrayBuilder();
-
-                dragged.getPoints().forEach((point) -> {
-                    points.add(point);
-                });
-
-                //TODO: Implement isCircular
-                JsonArray listPoints = points.build(); //Add all the coordinate points to the line
+               
 
                 JsonArrayBuilder stationNames = Json.createArrayBuilder();
 
@@ -160,7 +155,7 @@ public class mapFiles implements AppFileComponent {
                         .add(JSON_COLOR, backgroundColor)
                         .add(JSON_CIRC, false) //TODO: Implement Circular Lines
                         .add(JSON_STAT_NAMES, statNames)
-                        .add(JSON_POINTS, listPoints)
+                       
                         .add(JSON_START_X, dragged.getStartName().getX() + 25)
                         .add(JSON_START_Y, dragged.getStartName().getY())
                         .add(JSON_END_X, dragged.getEndName().getX() - 5)
@@ -180,8 +175,7 @@ public class mapFiles implements AppFileComponent {
                         .add(JSON_Y, statMan.getCenterY())
                         .add(JSON_TYPE, statMan.getShapeType())
                         .add(JSON_COLOR, color)
-                        .add("JSON_RADIUS_X", statMan.getRadiusX())
-                        .add("JSON_RADIUS_Y", statMan.getRadiusY())
+                        .add(JSON_RADIUS, statMan.getRadius())
                         .build();
                 statBuilder.add(jsonStat);
 
@@ -192,7 +186,7 @@ public class mapFiles implements AppFileComponent {
                         .add(JSON_Y, image.getY())
                         .add(JSON_WIDTH, image.getWidth())
                         .add(JSON_HEIGHT, image.getHeight())
-                        .add(JSON_IMG, image.getFilePath()) //TODO: USE PATHFINDER THING IN HW 6
+                        .add(JSON_IMG, image.getFilePath())
                         .add(JSON_TYPE, image.getShapeType())
                         .build();
                 arrayBuilder.add(jsonImage);
@@ -243,48 +237,47 @@ public class mapFiles implements AppFileComponent {
         JsonArray jsonItemsArray = json.getJsonArray("everything_else");
         JsonArray jsonLinesArray = json.getJsonArray(JSON_LINES);
         JsonArray jsonStatArray = json.getJsonArray(JSON_STAT);
-        
-        
-          for (int i = 0; i < jsonLinesArray.size(); i++) {
+
+        for (int i = 0; i < jsonLinesArray.size(); i++) {
             JsonObject jsonItem = jsonLinesArray.getJsonObject(i);
             Node node = loadNode(jsonItem);
-            
-                dataManager.addShape(node);
-            
-            
-        }
-        
-        for (int i = 0; i < jsonStatArray.size(); i++) {
-            JsonObject jsonItem = jsonStatArray.getJsonObject(i);
 
-            DraggableStation node = new DraggableStation(dataManager.getApp(), "");
-            node.setName(jsonItem.getString(JSON_NAME));
-            node.setCenterX(jsonItem.getInt(JSON_X));
-            node.setCenterY(jsonItem.getInt(JSON_Y));
-            node.setFill(loadColor(jsonItem, JSON_COLOR));
-            node.setRadiusX(jsonItem.getInt("JSON_RADIUS_X"));
-            node.setRadiusY(jsonItem.getInt("JSON_RADIUS_Y"));
+            DraggableLine line = (DraggableLine) node;
 
-            dataManager.addShape(node);
+            dataManager.addShape(line);
 
-            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getStations().getItems().add(node.getName());
-            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getFromStat().getItems().add(node.getName());
-            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getToStat().getItems().add(node.getName());
+            for (int j = 0; j < jsonStatArray.size(); j++) {
+                JsonObject jsonItem2 = jsonStatArray.getJsonObject(j);
+
+                DraggableStation node2 = new DraggableStation(dataManager.getApp(), "");
+                node2.setName(jsonItem2.getString(JSON_NAME));
+                node2.setCenterX(jsonItem2.getInt(JSON_X));
+                node2.setCenterY(jsonItem2.getInt(JSON_Y));
+                node2.setFill(loadColor(jsonItem2, JSON_COLOR));
+                node2.setRadius(jsonItem2.getInt(JSON_RADIUS));
+
+                dataManager.addShape(node2);
+                
+                if(line.getStations().contains(node2.getName())){
+                    line.addStation(node2);
+                }
+
+                ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getStations().getItems().add(node2.getName());
+                ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getFromStat().getItems().add(node2.getName());
+                ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getToStat().getItems().add(node2.getName());
+            }
+
         }
 
         for (int i = 0; i < jsonItemsArray.size(); i++) {
             JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
             Node node = loadNode(jsonItem);
-            
-            
-            if(!dataManager.getShapeList().contains(node)){
-                dataManager.addShape(node);
+
+            if (!((mapWorkspace)dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().contains(node)) {
+                
+                ((mapWorkspace)dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
             }
         }
-
-      
-
-        
 
     }
 
@@ -366,15 +359,11 @@ public class mapFiles implements AppFileComponent {
             }
             ((DraggableLine) retVal).setStroke(loadColor(jsonObject, JSON_COLOR));
 
-            JsonArray linePoints = jsonObject.getJsonArray(JSON_POINTS);
+           
+      
 
-            for (int i = 4; i < linePoints.size(); i++) {
-                ((DraggableLine) retVal).getPoints().add((double) linePoints.getInt(i));
-
-            }
-
-            int x = linePoints.getInt(0);
-            int y = linePoints.getInt(1);
+            int x = (int)(30 + Math.random()*100);
+            int y = (int)(30 + Math.random()*100);
 
             ((DraggableLine) retVal).start(x, y);
 

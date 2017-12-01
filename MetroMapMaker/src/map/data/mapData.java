@@ -19,6 +19,7 @@ import djf.ui.AppMessageDialogSingleton;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Optional;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -31,6 +32,7 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.LineTo;
 import javafx.stage.FileChooser;
 import jtps.jTPS;
 import static map.data.mapState.SELECTING;
@@ -62,6 +64,8 @@ public class mapData implements AppDataComponent {
     public AppTemplate getApp() {
         return app;
     }
+    
+    
 
     String lineName;
 
@@ -309,10 +313,14 @@ public class mapData implements AppDataComponent {
             if (selectedNode instanceof DraggableStation) {
                 workspace.getCanvas().getChildren().remove(((DraggableStation) selectedNode).getStatName());
                 workspace.getStations().getItems().remove(((DraggableStation) selectedNode).getName());
+                ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).filter((n) -> (((DraggableLine)n).getStations().contains((((DraggableStation) selectedNode).getName())))).forEachOrdered((n) -> {
+                    ((DraggableLine)n).removeStation(((DraggableStation)selectedNode));
+                });
             } else if (selectedNode instanceof DraggableLine) {
                 workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getStartName());
                 workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getEndName());
                 workspace.getLines().getItems().remove(((DraggableLine) selectedNode).getName());
+                
 
             }
             selectedNode = null;
@@ -378,7 +386,7 @@ public class mapData implements AppDataComponent {
         d.setImg(d.getNewImage());
 
         d.start(x, y);
-
+        d.toBack();
         newNode = d;
 
         initNode();
@@ -404,12 +412,16 @@ public class mapData implements AppDataComponent {
 
         Optional<String> result = statName.showAndWait();
 
-        while (result.get()=="") {
+        while (result.get() == "") {
             Alert duplicate = new Alert(Alert.AlertType.ERROR);
             duplicate.setHeaderText(null);
             duplicate.setContentText("You need a name for the station!!");
             duplicate.showAndWait();
             result = statName.showAndWait();
+            
+            if(!result.isPresent()){
+                return;
+            }
 
         }
 
@@ -467,7 +479,7 @@ public class mapData implements AppDataComponent {
             DraggableLine newDraggableLine = new DraggableLine(app, addLiner.getName());
 
             newDraggableLine.setStroke(addLiner.getLineColor().getValue());
-            newDraggableLine.setStrokeWidth(5);
+            newDraggableLine.setStrokeWidth(3);
 
             newDraggableLine.getStartName().setFill(addLiner.getLineColor().getValue());
             newDraggableLine.getEndName().setFill(addLiner.getLineColor().getValue());
@@ -492,40 +504,37 @@ public class mapData implements AppDataComponent {
 
     }
 
-    double dividing_factor = 2;
-
     public void addStatToLine(int x, int y, DraggableLine draggableLine) {
         state = SELECTING;
 
         mapData dataManager = (mapData) app.getDataComponent();
 
-        Node node = dataManager.selectTopShape(x, y);
         Scene scene = app.getGUI().getPrimaryScene();
 
         //We're off to the Drag... Races
-        if (node != null) {
+        Node node = dataManager.selectTopShape(x, y);
+        while (node != null) {
+            node = (Node)dataManager.getSelectedShape();
             if (node instanceof DraggableStation) {
                 DraggableStation station = (DraggableStation) node;
 
-                int startIdx1 = 0;
+                station.start(x, y);
 
-                int endIDX1 = draggableLine.getPoints().size() - 2;
-
-                double x2 = draggableLine.getPoints().get((int) ((endIDX1 - startIdx1) / 3)); //Choose indexes for points
-                double y2 = draggableLine.getPoints().get((int) ((1 - startIdx1+1) / 3));
-                dividing_factor += 0.0001;
-
-                station.setCenterX(x2);
-                station.setCenterY(y2);
-
-                draggableLine.addStation(station, station.getName());
+                draggableLine.addStation(station);
+                
+                node = null;
 
             } else {
-                scene.setCursor(Cursor.DEFAULT);
-                dataManager.setState(mapState.DRAGGING_NOTHING);
-                app.getWorkspaceComponent().reloadWorkspace(dataManager);
+                break;
+
             }
+
         }
+
+        scene.setCursor(Cursor.DEFAULT);
+        dataManager.setState(mapState.DRAGGING_NOTHING);
+
+        app.getWorkspaceComponent().reloadWorkspace(dataManager);
 
     }
 

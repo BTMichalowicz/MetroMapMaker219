@@ -45,8 +45,7 @@ public class DraggableText extends Text implements Draggable {
     jTPS_Transaction t;
 
     public DraggableText(AppTemplate initApp) {
-        setX(50);
-        setY(75);
+     
         width = 0;
 
         height = 0;
@@ -102,10 +101,8 @@ public class DraggableText extends Text implements Draggable {
     @Override
     public void drag(int x, int y) {
 
-        double diffX = x - startX;
-        double diffY = y - startY;
-        double newX = getX() + diffX;
-        double newY = getY() + diffY;
+       
+ 
 
         setX(x);
         setY(y);
@@ -127,14 +124,7 @@ public class DraggableText extends Text implements Draggable {
 
     @Override
     public void setLocationAndSize(double initX, double initY, double initWidth, double initHeight) {
-        xProperty().set(initX);
-        yProperty().set(initY);
-
-        width = initWidth;
-        height = initHeight;
-
-        setX(initX);
-        setY(initY);
+        
 
     }
 
