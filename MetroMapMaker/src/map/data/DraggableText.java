@@ -11,6 +11,8 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.text.Text;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
+import map.gui.mapWorkspace;
+import map.transact.DragStuff;
 
 /**
  *
@@ -45,7 +47,7 @@ public class DraggableText extends Text implements Draggable {
     jTPS_Transaction t;
 
     public DraggableText(AppTemplate initApp) {
-     
+
         width = 0;
 
         height = 0;
@@ -100,14 +102,20 @@ public class DraggableText extends Text implements Draggable {
 
     @Override
     public void drag(int x, int y) {
-
-       
- 
+       transact = ((mapData) app.getDataComponent()).getTransact();
+        double diffX = x - startX;
+        double diffY = y - startY;
+        double newX = getX() + diffX;
+        double newY = getY() + diffY;
 
         setX(x);
         setY(y);
         startX = x;
         startY = y;
+
+        t = new DragStuff(app, this, x, y, getX(), getY());
+        transact.addTransaction(t);
+        ((mapWorkspace) app.getWorkspaceComponent()).getUndo().setDisable(false);
 
     }
 
@@ -124,7 +132,6 @@ public class DraggableText extends Text implements Draggable {
 
     @Override
     public void setLocationAndSize(double initX, double initY, double initWidth, double initHeight) {
-        
 
     }
 

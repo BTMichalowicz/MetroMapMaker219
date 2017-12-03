@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Alert;
@@ -35,14 +34,18 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
-import map.data.DraggableLine;
 import map.data.DraggableStation;
 import map.data.DraggableText;
 import map.data.ListStationsWindow;
 import map.data.mapData;
 import map.data.mapState;
 import map.file.mapFiles;
+import map.data.DraggableLine;
 import properties_manager.PropertiesManager;
+import javafx.scene.Node;
+import jtps.jTPS;
+import jtps.jTPS_Transaction;
+import map.transact.RemoveFromLine;
 
 /**
  * This class responds to interactions with the UI's editing controls. Hopefully
@@ -55,7 +58,10 @@ public class mapEditController {
     public AppTemplate app;
     public mapData dataManager;
     
-    ArrayList <Line> lines;
+    jTPS transact;
+    jTPS_Transaction t;
+
+    ArrayList<Line> lines;
 
     public mapEditController(AppTemplate app) {
         this.app = app;
@@ -149,21 +155,8 @@ public class mapEditController {
         if (result.isPresent()) {
             file = new File(PATH_EXPORTS + result.get() + ".png");
 
-            if (file.exists()) {
-                // If the file exists already, then just save it with a given number after it
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
 
-                file = new File(PATH_EXPORTS + result.get() + "(" + i + ").png");
-                //If the file exists with the given number, keep going until the file (x(number).png) no longer exists
-                while (file.exists()) {
-                    i++;
-                    file = new File(PATH_EXPORTS + result.get() + "(" + i + ").png");
-                }
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file); //Only save the file
-                //After the loop has finished
-
-            } else {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            }
         }
 
     }
@@ -187,27 +180,12 @@ public class mapEditController {
      * @param selectedLine The selected Draggable Line in question
      */
     public void processRemoveLine(DraggableLine selectedLine) {
-
-        selectedLine.getStations().forEach((d) -> {
-            selectedLine.getStations().remove(d);
-            for (Node item : ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren()) {
-                if (item instanceof DraggableStation) {
-                    DraggableStation s = (DraggableStation) item;
-                    if (s.getName().equals(d)) {
-                        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(s);
-                        ((mapWorkspace) app.getWorkspaceComponent()).getStations().getItems().remove(d);
-                        ((mapWorkspace) app.getWorkspaceComponent()).getFromStat().getItems().remove(d);
-                        ((mapWorkspace) app.getWorkspaceComponent()).getToStat().getItems().remove(d);
-                        break;
-                    }
-                }
-            }
-
-        });
-
-        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().removeAll(selectedLine.getEndName(), selectedLine.getStartName());
-
+        
+        dataManager.setSelectedShape(selectedLine);
+        
         processRemoveElement();
+
+       
     }
 
     /**
@@ -217,17 +195,13 @@ public class mapEditController {
      * @param draggableStation The draggable station in question.
      */
     public void processRemoveStat(DraggableStation draggableStation) {
+        
+        
+        dataManager.setSelectedShape(draggableStation);
+        
+        processRemoveElement();
 
-        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
-        (work).getCanvas().getChildren().remove(draggableStation);
-        (work).getCanvas().getChildren().remove(draggableStation.getStatName());
-        (work).getStations().getItems().remove(draggableStation.getName());
-        work.getFromStat().getItems().remove(draggableStation.getName());
-        work.getToStat().getItems().remove(draggableStation.getName());
-
-        work.getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).map((n) -> (DraggableLine) n).filter((node) -> (node.getStations().contains(draggableStation.getName()))).forEachOrdered((node) -> {
-            node.getStations().remove(draggableStation.getName());
-        }); // draggableStation = null; // Remove the reference
+        
     }
 
     public void processImageOverlay() {
@@ -337,15 +311,27 @@ public class mapEditController {
      * @param removedStation
      */
     public void processRemoveStatFromLine(DraggableStation removedStation) {
-
+        dataManager = (mapData) app.getDataComponent();
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        
+        
+        
+        for(Node n: workspace.getCanvas().getChildren()){
+            if(n instanceof DraggableLine){
+                DraggableLine l = (DraggableLine) n;
+                
+                if(l.getStations().contains(removedStation.getName())){
+                    int x = (int) removedStation.getX();
+                    int y = (int)removedStation.getY();
+                    
+                    t = new RemoveFromLine(app, l, removedStation,x, y);
+                    transact = dataManager.getTransact();
+                    transact.addTransaction(t);
+                }
+            }
+        }
 
-        workspace.getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).map((n) -> (DraggableLine) n).filter((node) -> (node.getStations().contains(removedStation.getName()))).map((node) -> {
-            node.getStations().remove(removedStation.getName());
-            return node;
-        }).forEachOrdered((node) -> {
-            node.removeStation(removedStation);
-        }); //Just in case
+        
     }
 
     public void processEditLine(AppTemplate app, DraggableLine line) {
@@ -409,26 +395,23 @@ public class mapEditController {
     }
 
     void showGrid() {
-        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
 
-            showLines(lines);
+        showLines(lines);
 
-        
     }
 
     private void showLines(ArrayList<Line> lines) {
 
         ZoomPane canvas = ((mapWorkspace) app.getWorkspaceComponent()).getCanvas();
 
-        for (int x = 0; x < 10000; x += 10) {
-            lines.add(createLine(x, x, 0, canvas.getWidth() * 4));
+        for (int x = 0; x < 100000; x += 10) {
+            lines.add(createLine(x, x, 0, canvas.getWidth() * 3));
         }
 
-        for (int x = 0; x < 10000; x += 10) {
-            lines.add((createLine(0, canvas.getHeight() * 4, x, x)));
+        for (int x = 0; x < 100000; x += 10) {
+            lines.add((createLine(0, canvas.getHeight() * 3, x, x)));
         }
-        
-        
+
         canvas.getChildren().addAll(lines);
 
     }
@@ -443,15 +426,27 @@ public class mapEditController {
         l.setStroke(Color.BLACK);
         l.setStrokeWidth(0.1);
         l.setDisable(true);
-        
+
         return l;
     }
 
     void hideGrid() {
         lines.forEach((l) -> {
             l.setVisible(false);
+            ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(l);
         });
         lines.clear();
+    }
+
+    void processSnapToGrid() {
+
+    }
+
+    void processDirections(DraggableStation toStat1, DraggableStation fromStat1) {
+        int station_cost = 3;
+        int transfer_cost = 10;
+
+        ArrayList<DraggableLine> tripLines = new ArrayList<>();
     }
 
 }

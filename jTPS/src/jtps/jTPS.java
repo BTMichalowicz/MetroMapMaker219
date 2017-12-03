@@ -10,6 +10,13 @@ public class jTPS {
 
     private ArrayList<jTPS_Transaction> transactions = new ArrayList<>();
     private int mostRecentTransaction = -1;
+    
+    public int getMostRecentTransaction(){
+        return mostRecentTransaction;
+    }
+    public ArrayList<jTPS_Transaction> getTransactions(){
+        return transactions;
+    }
 
     public jTPS() {
     }

@@ -9,15 +9,21 @@ import djf.AppTemplate;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import jtps.jTPS;
+import jtps.jTPS_Transaction;
 import map.data.DraggableLine;
+import map.data.mapData;
+import map.transact.EditLine;
 
 /**
  * A class that will handle all line edits.
@@ -28,11 +34,16 @@ import map.data.DraggableLine;
  */
 public class EditLineTool extends Stage {
 
+    jTPS transact;
+    jTPS_Transaction t;
+
     ColorPicker lineColor;
 
     Label lineDetails;
 
     DraggableLine metroLine;
+
+    CheckBox cb;
 
     TextField metroLineText;
 
@@ -65,27 +76,29 @@ public class EditLineTool extends Stage {
 
         container = new VBox(25);
 
+        cb = new CheckBox();
+        Label l2 = new Label("Circular Map?");
+
         HBox h = new HBox(20);
-        h.getChildren().addAll(ok, cancel);
+        h.getChildren().addAll(ok, cancel, cb, l2);
 
         container.getChildren().addAll(lineDetails, metroLineText, lineColor, h);
 
-        Scene scene = new Scene(container, 300, 300);
+        Scene scene = new Scene(container, 250, 300);
         setScene(scene);
     }
 
     private void initControllers() {
         ok.setOnAction((ActionEvent e) -> {
 
-            mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+            Color prevColor = (Color) metroLine.getStroke();
+            String prevName = metroLine.getName();
 
-            work.getLines().getItems().set(work.getLines().getItems().indexOf(metroLine.getName()), metroLineText.getText());
+            transact = ((mapData) app.getDataComponent()).getTransact();
+            t = new EditLine(app, cb, prevColor, (Color) lineColor.getValue(), prevName, metroLineText.getText(), metroLine);
 
-            metroLine.setStroke(lineColor.getValue());
-            metroLine.setName(metroLineText.getText());
-            metroLine.setStyle(metroLine.getStyle() + "-fx-color: #" + lineColor.getValue().toString().split("[x]")[1] + ";");
-            (work).getEditLine().setStyle("-fx-background-color: #" + lineColor.getValue().toString().split("[x]")[1] + ";");
-            (work).getEditLine().setText(lineColor.getValue().toString());
+            transact.addTransaction(t);
+
             close();
 
         });

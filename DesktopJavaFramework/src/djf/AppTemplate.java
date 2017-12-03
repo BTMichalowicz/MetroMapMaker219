@@ -192,6 +192,7 @@ public abstract class AppTemplate extends Application {
         } catch (Exception e) {
             AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
             dialog.show(props.getProperty(PROPERTIES_LOAD_ERROR_TITLE), props.getProperty(PROPERTIES_LOAD_ERROR_MESSAGE));
+            e.printStackTrace();
         }
     }
 

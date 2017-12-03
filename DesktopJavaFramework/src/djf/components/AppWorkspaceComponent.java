@@ -37,6 +37,10 @@ public abstract class AppWorkspaceComponent {
         if (!workspaceActivated) {
             // PUT THE WORKSPACE IN THE GUI
             appPane.setCenter(workspace);
+            appPane.topProperty().get().toFront();
+            
+            appPane.getCenter().setClip(appPane.getTop());
+            
             workspaceActivated = true;
         }
     }

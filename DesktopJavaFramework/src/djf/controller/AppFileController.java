@@ -26,6 +26,7 @@ import static djf.settings.AppPropertyType.SAVE_ERROR_TITLE;
 import static djf.settings.AppPropertyType.SAVE_UNSAVED_WORK_MESSAGE;
 import static djf.settings.AppPropertyType.SAVE_UNSAVED_WORK_TITLE;
 import static djf.settings.AppPropertyType.SAVE_WORK_TITLE;
+import static djf.settings.AppStartupConstants.PATH_EXPORTS;
 import static djf.settings.AppStartupConstants.PATH_WORK;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -104,10 +105,11 @@ public class AppFileController {
             JsonObject newFile = Json.createObjectBuilder()
                     .build();
 
-            File f = new File(PATH_WORK);
+            File f = new File(PATH_EXPORTS+file);
 
             File f2 = new File(PATH_WORK + file);
             boolean b = f2.mkdir();
+            boolean b1 = f.mkdir();
 
             // AND NOW OUTPUT IT TO A JSON FILE WITH PRETTY PRINTING
             Map<String, Object> properties = new HashMap<>(1);
@@ -124,6 +126,16 @@ public class AppFileController {
             jsonFileWriter.writeObject(newFile);
             String prettyPrinted = sw.toString();
             try (PrintWriter pw = new PrintWriter(f2.getPath() + "\\" + file + ".m3")) {
+                pw.write(prettyPrinted);
+
+            }
+            
+            // INIT THE WRITER
+           os = new FileOutputStream(f.getPath() + "\\" + file + ".m3");
+             jsonFileWriter = Json.createWriter(os);
+            jsonFileWriter.writeObject(newFile);
+             prettyPrinted = sw.toString();
+            try (PrintWriter pw = new PrintWriter(f.getPath() + "\\" + file + ".m3")) {
                 pw.write(prettyPrinted);
 
             }

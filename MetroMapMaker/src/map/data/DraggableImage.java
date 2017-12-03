@@ -17,7 +17,10 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
+import jtps.jTPS;
+import jtps.jTPS_Transaction;
 import map.gui.mapWorkspace;
+import map.transact.DragStuff;
 import properties_manager.PropertiesManager;
 
 /**
@@ -26,9 +29,14 @@ import properties_manager.PropertiesManager;
  * @author Ben Michalowicz
  */
 public class DraggableImage extends Rectangle implements Draggable {
+    
+    jTPS_Transaction t;
+    jTPS transactions;
 
     String filePath;
     double startX, startY;
+
+    mapData dataManager;
 
     Image img;
 
@@ -44,6 +52,7 @@ public class DraggableImage extends Rectangle implements Draggable {
 
     public DraggableImage(AppTemplate app) {
         this.app = app;
+        this.dataManager = (mapData) app.getDataComponent();
 
     }
 
@@ -104,6 +113,8 @@ public class DraggableImage extends Rectangle implements Draggable {
 
     @Override
     public void drag(int x, int y) {
+        
+        transactions = ((mapData)app.getDataComponent()).getTransact();
         double diffX = x - startX;
         double diffY = y - startY;
         double newX = getX() + diffX;
@@ -111,8 +122,14 @@ public class DraggableImage extends Rectangle implements Draggable {
 
         setX(x);
         setY(y);
+        
         startX = x;
         startY = y;
+        
+        t = new DragStuff(app, this, x, y, getX(), getY());
+        transactions.addTransaction(t);
+        
+        ((mapWorkspace) app.getWorkspaceComponent()).getUndo().setDisable(false);
     }
 
     @Override

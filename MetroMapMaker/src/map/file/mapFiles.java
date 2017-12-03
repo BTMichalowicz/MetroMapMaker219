@@ -65,7 +65,7 @@ public class mapFiles implements AppFileComponent {
     static final String JSON_OUTLINE_COLOR = "outline_color";
     static final String JSON_OUTLINE_THICKNESS = "outline_thickness";
     static final String JSON_IMG = "image_path";
-    static final String JSON_STAT = "station";
+    static final String JSON_STAT = "stations";
     static final String JSON_X = "x";
     static final String JSON_Y = "y";
     static final String JSON_CIRC = "circular";
@@ -140,8 +140,6 @@ public class mapFiles implements AppFileComponent {
                 DraggableLine dragged = (DraggableLine) node;
                 JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
 
-               
-
                 JsonArrayBuilder stationNames = Json.createArrayBuilder();
 
                 dragged.getStations().forEach((stat) -> {
@@ -153,9 +151,8 @@ public class mapFiles implements AppFileComponent {
                 JsonObject jsonLine = Json.createObjectBuilder()
                         .add(JSON_NAME, dragged.getName())
                         .add(JSON_COLOR, backgroundColor)
-                        .add(JSON_CIRC, false) //TODO: Implement Circular Lines
+                        .add(JSON_CIRC, dragged.getCircular()) //TODO: Implement Circular Lines
                         .add(JSON_STAT_NAMES, statNames)
-                       
                         .add(JSON_START_X, dragged.getStartName().getX() + 25)
                         .add(JSON_START_Y, dragged.getStartName().getY())
                         .add(JSON_END_X, dragged.getEndName().getX() - 5)
@@ -257,8 +254,8 @@ public class mapFiles implements AppFileComponent {
                 node2.setRadius(jsonItem2.getInt(JSON_RADIUS));
 
                 dataManager.addShape(node2);
-                
-                if(line.getStations().contains(node2.getName())){
+
+                if (line.getStations().contains(node2.getName())) {
                     line.addStation(node2);
                 }
 
@@ -273,9 +270,9 @@ public class mapFiles implements AppFileComponent {
             JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
             Node node = loadNode(jsonItem);
 
-            if (!((mapWorkspace)dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().contains(node)) {
-                
-                ((mapWorkspace)dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
+            if (!((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().contains(node)) {
+
+                ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
             }
         }
 
@@ -359,11 +356,8 @@ public class mapFiles implements AppFileComponent {
             }
             ((DraggableLine) retVal).setStroke(loadColor(jsonObject, JSON_COLOR));
 
-           
-      
-
-            int x = (int)(30 + Math.random()*100);
-            int y = (int)(30 + Math.random()*100);
+            int x = (int) (30 + Math.random() * 100);
+            int y = (int) (30 + Math.random() * 100);
 
             ((DraggableLine) retVal).start(x, y);
 
@@ -383,8 +377,7 @@ public class mapFiles implements AppFileComponent {
 
         mapWorkspace workspace = (mapWorkspace) dataManager.getApp().getWorkspaceComponent();
 
-        Background bg = dataManager.getB();
-        //Set the background up regardless of image or color or other
+        
 
         //We only care about metroLines and Stations in the file exporting
         //FOR METRO LINES
@@ -421,7 +414,7 @@ public class mapFiles implements AppFileComponent {
 
                 JsonObject jsonLine = Json.createObjectBuilder()
                         .add(JSON_NAME, dragged.getName())
-                        .add(JSON_CIRC, false) //TODO: Implement Circular Lines
+                        .add(JSON_CIRC, dragged.getCircular()) //TODO: Implement Circular Lines
                         .add(JSON_COLOR, backgroundColor)
                         .add(JSON_STAT_NAMES, statNames)
                         .build();

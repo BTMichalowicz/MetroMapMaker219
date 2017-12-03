@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -28,6 +29,8 @@ public class AddLineWindow extends Stage {
     TextField lineName;
 
     ActionEvent resultant;
+    
+    CheckBox cb;
 
     public ActionEvent getResultant() {
         return resultant;
@@ -95,6 +98,9 @@ public class AddLineWindow extends Stage {
 
         btnOk = new Button("Let's create a line!");
         btnCancel = new Button("Let's not create a new line!");
+        
+        cb = new CheckBox();
+        Label l = new Label("Circular Line?");
 
         FlowPane window = new FlowPane();
 
@@ -102,7 +108,7 @@ public class AddLineWindow extends Stage {
 
         buttons.getChildren().addAll(btnOk, btnCancel);
         HBox top = new HBox(10);
-        top.getChildren().addAll(notice, lineName);
+        top.getChildren().addAll(notice, lineName, cb, l);
 
         VBox base = new VBox(12);
 
@@ -112,7 +118,7 @@ public class AddLineWindow extends Stage {
         window.getChildren().add(base);
         window.setStyle("-fx-background-color: #F8ECC2;");
 
-        Scene primary = new Scene(window, 600, 600);
+        Scene primary = new Scene(window, 450, 300);
 
         setScene(primary);
 

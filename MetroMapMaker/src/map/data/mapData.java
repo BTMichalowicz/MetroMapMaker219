@@ -35,9 +35,15 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.LineTo;
 import javafx.stage.FileChooser;
 import jtps.jTPS;
+import jtps.jTPS_Transaction;
 import static map.data.mapState.SELECTING;
 import map.gui.CanvasController;
+import map.gui.ZoomPane;
 import map.gui.mapWorkspace;
+import map.transact.AddToLine;
+import map.transact.BackgroundEdit;
+import map.transact.addNode;
+import map.transact.removeNode;
 import properties_manager.PropertiesManager;
 
 /**
@@ -64,8 +70,6 @@ public class mapData implements AppDataComponent {
     public AppTemplate getApp() {
         return app;
     }
-    
-    
 
     String lineName;
 
@@ -102,7 +106,16 @@ public class mapData implements AppDataComponent {
     public static final Paint HIGHLIGHTED_COLOR = Paint.valueOf(YELLOW_HEX);
     public static final int HIGHLIGHTED_STROKE_THICKNESS = 1;
 
-    jTPS transact;
+    private static jTPS transact;
+    private static jTPS_Transaction t;
+
+    public jTPS getTransact() {
+        return transact;
+    }
+
+    public jTPS_Transaction getT() {
+        return t;
+    }
 
     public mapData(AppTemplate initApp) {
 
@@ -157,13 +170,17 @@ public class mapData implements AppDataComponent {
     }
 
     public void setBackgroundColor(Color initBackgroundColor) {
-        backgroundColor = initBackgroundColor;
+
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
-        Pane canvas = work.getCanvas();
+        ZoomPane canvas = work.getCanvas();
+        Background prev = canvas.getBackground();
+
+        backgroundColor = initBackgroundColor;
+
         BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
         Background background = new Background(fill);
-        canvas.setBackground(background);
-        b = work.getCanvas().getBackground();
+        t = new BackgroundEdit(app, prev, b, canvas);
+        transact.addTransaction(t);
     }
 
     public void setCurrentFillColor(Color initColor) {
@@ -307,25 +324,16 @@ public class mapData implements AppDataComponent {
     }
 
     public void removeSelectedItem() {
+
         if (selectedNode != null) {
-            ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().removeAll(selectedNode);
 
-            if (selectedNode instanceof DraggableStation) {
-                workspace.getCanvas().getChildren().remove(((DraggableStation) selectedNode).getStatName());
-                workspace.getStations().getItems().remove(((DraggableStation) selectedNode).getName());
-                ((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().stream().filter((n) -> (n instanceof DraggableLine)).filter((n) -> (((DraggableLine)n).getStations().contains((((DraggableStation) selectedNode).getName())))).forEachOrdered((n) -> {
-                    ((DraggableLine)n).removeStation(((DraggableStation)selectedNode));
-                });
-            } else if (selectedNode instanceof DraggableLine) {
-                workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getStartName());
-                workspace.getCanvas().getChildren().remove(((DraggableLine) selectedNode).getEndName());
-                workspace.getLines().getItems().remove(((DraggableLine) selectedNode).getName());
-                
+            t = new removeNode(app, selectedNode);
 
-            }
+            transact.addTransaction(t);
+
             selectedNode = null;
-
         }
+
     }
 
     public String s;
@@ -342,9 +350,9 @@ public class mapData implements AppDataComponent {
 
     public void startNewBackground() {
 
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
-        Scene scene = app.getGUI().getPrimaryScene();
+
+        Background b1 = work.getCanvas().getBackground();
 
         FileChooser fc = new FileChooser();
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
@@ -357,14 +365,17 @@ public class mapData implements AppDataComponent {
                 setState(mapState.STARTING_BCKGROUND);
 
                 work.getCanvas().setBackground(new Background(new BackgroundImage(loadImg(selectedFile),
-                        BackgroundRepeat.SPACE,
-                        BackgroundRepeat.SPACE,
-                        BackgroundPosition.CENTER,
+                        BackgroundRepeat.ROUND,
+                        BackgroundRepeat.ROUND,
+                        BackgroundPosition.DEFAULT,
                         BackgroundSize.DEFAULT)));
 
                 s = selectedFile.getPath();
 
                 b = work.getCanvas().getBackground();
+
+                t = new BackgroundEdit(app, b1, b, work.getCanvas());
+                transact.addTransaction(t);
 
             } catch (MalformedURLException e) {
                 AppMessageDialogSingleton.getSingleton().show("Background Image Error", "You encountered an error loading your background image");
@@ -412,17 +423,18 @@ public class mapData implements AppDataComponent {
 
         Optional<String> result = statName.showAndWait();
 
-        while (result.get() == "") {
-            Alert duplicate = new Alert(Alert.AlertType.ERROR);
-            duplicate.setHeaderText(null);
-            duplicate.setContentText("You need a name for the station!!");
-            duplicate.showAndWait();
-            result = statName.showAndWait();
-            
-            if(!result.isPresent()){
-                return;
-            }
+        if (!result.isPresent()) {
+            return;
+        } else {
 
+            while (result.get() == "") {
+                Alert duplicate = new Alert(Alert.AlertType.ERROR);
+                duplicate.setHeaderText(null);
+                duplicate.setContentText("You need a name for the station!!");
+                duplicate.showAndWait();
+                result = statName.showAndWait();
+
+            }
         }
 
         DraggableStation newStation = new DraggableStation(app, result.get());
@@ -457,9 +469,11 @@ public class mapData implements AppDataComponent {
             ((DraggableText) newNode).addText();
 
         }
-
-        work.getCanvas().getChildren().add(newNode);
         app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);
+        workspace = (mapWorkspace) app.getWorkspaceComponent();
+        workspace.getUndo().setDisable(false);
+        t = new addNode(app, newNode);
+        transact.addTransaction(t);
 
     }
 
@@ -483,6 +497,7 @@ public class mapData implements AppDataComponent {
 
             newDraggableLine.getStartName().setFill(addLiner.getLineColor().getValue());
             newDraggableLine.getEndName().setFill(addLiner.getLineColor().getValue());
+            newDraggableLine.setCircular(addLiner.cb.isSelected());
 
             workspace.getLines().getItems().add(addLiner.getName());
 
@@ -514,14 +529,13 @@ public class mapData implements AppDataComponent {
         //We're off to the Drag... Races
         Node node = dataManager.selectTopShape(x, y);
         while (node != null) {
-            node = (Node)dataManager.getSelectedShape();
+            node = (Node) dataManager.getSelectedShape();
             if (node instanceof DraggableStation) {
                 DraggableStation station = (DraggableStation) node;
-
-                station.start(x, y);
-
-                draggableLine.addStation(station);
                 
+                t = new AddToLine(app, draggableLine, station, x, y);
+                transact.addTransaction(t);
+
                 node = null;
 
             } else {

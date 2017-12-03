@@ -23,6 +23,8 @@ public class DraggableStation extends Circle implements Draggable {
     DraggableText statName;
 
     StationTo lineStat;
+    
+    double prevX, prevY, curX, curY;
 
     public StationTo getLineStat() {
         return lineStat;
@@ -51,10 +53,26 @@ public class DraggableStation extends Circle implements Draggable {
         this.app = initApp;
         this.name = name;
         this.statName = new DraggableText(initApp, name);
+        prevX = prevY = curX = curY = 0;
 
         lineStat = new StationTo(this);
 
         //statName.yProperty().set(statName.yProperty().get() - 20);
+        this.setOnMouseDragged(e -> {
+            setCenterX(e.getX());
+            setCenterY(e.getY());
+            centerXProperty().set(e.getX());
+            centerYProperty().set(e.getY());
+            startCenterX = e.getX();
+            startCenterY = e.getY();
+
+            this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusProperty().get()));
+            this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusProperty().get() - 20));
+
+            lineStat.setX(e.getX());
+            lineStat.setY(e.getY());
+
+        });
     }
 
     public DraggableText getStatName() {
@@ -97,19 +115,6 @@ public class DraggableStation extends Circle implements Draggable {
     @Override
     public void drag(int x, int y) {
 
-        setCenterX(x);
-        setCenterY(y);
-        centerXProperty().set(x);
-        centerYProperty().set(y);
-        startCenterX = x;
-        startCenterY = y;
-
-        this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusProperty().get()));
-        this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusProperty().get() - 20));
-
-        lineStat.setX(x);
-        lineStat.setY(y);
-
     }
 
     @Override
@@ -117,7 +122,7 @@ public class DraggableStation extends Circle implements Draggable {
 
         setCenterX(x);
         setCenterY(y);
-         lineStat.setX(x);
+        lineStat.setX(x);
         lineStat.setY(y);
 
     }
@@ -125,6 +130,20 @@ public class DraggableStation extends Circle implements Draggable {
     @Override
     public double getX() {
         return getCenterX() - getRadius();
+    }
+
+    public void setX(double value) {
+
+        setCenterX(value);
+
+        lineStat.setX(value);
+
+    }
+
+    public void setY(double value) {
+        setCenterY(value);
+
+        lineStat.setY(value);
     }
 
     @Override
@@ -146,7 +165,7 @@ public class DraggableStation extends Circle implements Draggable {
     public void setLocationAndSize(double initX, double initY, double initWidth, double initHeight) {
         setCenterX(initX + (initWidth / 2));
         setCenterY(initY + (initHeight / 2));
-         lineStat.setX(initX);
+        lineStat.setX(initX);
         lineStat.setY(initY);
         setRadius(5);
 

@@ -6,37 +6,34 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
 /**
- *
+ *  Some sort of Pane such that zooming things is easier
  * @author Ben Michalowicz
  */
-public class ZoomPane extends Pane{
-    
-    private DoubleProperty scaler = new SimpleDoubleProperty(1.0);
-    
-    
-    public ZoomPane(){
+public class ZoomPane extends Pane {
+
+    private final DoubleProperty scaler = new SimpleDoubleProperty(1.0);
+
+    public ZoomPane() {
         super();
-        
+
         scaleXProperty().bind(scaler);
         scaleYProperty().bind(scaler);
-       
+
     }
-    
-    
-    public ZoomPane(Node... elements){
+
+    public ZoomPane(Node... elements) {
         super(elements);
-        
-         scaleXProperty().bind(scaler);
+
+        scaleXProperty().bind(scaler);
         scaleYProperty().bind(scaler);
     }
-    
-    
-    public double getScaler(){
+
+    public double getScaler() {
         return scaler.get();
     }
-    
-    public void setScaler(double value){
+
+    public void setScaler(double value) {
         scaler.set(value);
     }
-    
+
 }

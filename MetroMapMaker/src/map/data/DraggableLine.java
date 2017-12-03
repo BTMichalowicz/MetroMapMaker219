@@ -23,6 +23,8 @@ public class DraggableLine extends Path implements Draggable {
     ArrayList<String> stations;
 
     DraggableText startName, endName;
+    
+    boolean isCircular;
 
     jTPS transactl;
     jTPS_Transaction t;
@@ -49,7 +51,17 @@ public class DraggableLine extends Path implements Draggable {
 
         this.startName = new DraggableText(app, this.name + "  ");
         this.endName = new DraggableText(app, "   " + this.name);
+        
+        this.isCircular = false;
 
+    }
+    
+    public void setCircular(boolean isCircular){
+        this.isCircular = isCircular;
+    }
+    
+    public boolean getCircular(){
+        return isCircular;
     }
 
     LineTo line;
@@ -73,11 +85,9 @@ public class DraggableLine extends Path implements Draggable {
 
         stations.add(s.getName());
 
-        if (getElements().size() <= 4) {
-            getElements().add(1, s.getLineStat());
-        } else {
-            getElements().add(getElements().size() - 2, s.getLineStat());
-        }
+
+            getElements().add(getElements().size() - 1, s.getLineStat());
+        
 
         s.getLineStat().setX(s.centerXProperty().get());
         s.getLineStat().setY(s.centerYProperty().get());
@@ -136,15 +146,15 @@ public class DraggableLine extends Path implements Draggable {
         startY = y;
         endX = x + 30;
         endY = y;
-        
+
         MoveTo start = new MoveTo(startX, startY);
-        
+
         startName.setX(startX);
         startName.setY(startY);
-        
+
         endName.setX(endX);
         endName.setY(endY);
-        
+
         LineTo end = new LineTo(endX, endY);
 
         getElements().add(start);

@@ -12,30 +12,36 @@ import static djf.ui.AppGUI.CLASS_BORDERED_PANE;
 import static djf.ui.AppGUI.CLASS_FILE_BUTTON;
 import djf.ui.AppMessageDialogSingleton;
 import djf.ui.AppYesNoCancelDialogSingleton;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -92,6 +98,10 @@ import static map.mapLanguageProperty.ZOOM_OUT_TOOLTIP;
 public class mapWorkspace extends AppWorkspaceComponent {
 
     Group mainSpot;
+
+    public Group getMainSpot() {
+        return mainSpot;
+    }
     ScrollPane outerCanvas;
 
     AppTemplate app; //The main app that will be used
@@ -120,6 +130,14 @@ public class mapWorkspace extends AppWorkspaceComponent {
             zoomOut, increaseMapSize, decreaseMapSize,
             addToLine, removeFromLine, export, editLine;
     Label mapName;
+
+    public Button getUndo() {
+        return undo;
+    }
+
+    public Button getRedo() {
+        return redo;
+    }
 
     public void setGui(AppGUI gui) {
         this.gui = gui;
@@ -537,6 +555,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         mapName.setFont(Font.font(48));
 
         FlowPane undoRedo = new FlowPane();
+
         export = gui.initChildButton(gui.getFileToolbar(), EXPORT_ICON.toString(), EXPORT_TOOLTIP.toString(), false);
         redo = gui.initChildButton(undoRedo, REDO_ICON.toString(), REDO_TOOLTIP.toString(), true);
         undo = gui.initChildButton(undoRedo, UNDO_ICON.toString(), UNDO_TOOLTIP.toString(), true);
@@ -706,11 +725,15 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest, decor1,
                 font1, nav1);
-        outerCanvas = new ScrollPane();
 
         canvas = new ZoomPane();
 
+        Group g = new Group();
+
+        outerCanvas = (ScrollPane) createZoomPane(g);
+
         debugText = new Text();
+
         canvas.getChildren().add(debugText);
         debugText.setX(100);
         debugText.setY(100);
@@ -721,11 +744,19 @@ public class mapWorkspace extends AppWorkspaceComponent {
         workspace = new BorderPane();
 
         outerCanvas.setContent(canvas);
-        canvas.minWidth(outerCanvas.getWidth());
-        canvas.minHeight(outerCanvas.getHeight());
+//        outerCanvas.setHbarPolicy(ScrollBarPolicy.ALWAYS);
+//        outerCanvas.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+//
+//        mainSpot = new Group(outerCanvas);
+//        mainSpot.prefHeight(app.getGUI().getAppPane().getHeight() - app.getGUI().getTopToolbarPane().getHeight());
+//        mainSpot.prefWidth(app.getGUI().getAppPane().getWidth() - editToolbar.getWidth());
+//        mainSpot.autosize();
+//        outerCanvas.setPrefViewportHeight(canvas.getHeight());
+//        outerCanvas.setPrefViewportWidth(canvas.getWidth());
 
-        canvas.getChildren().add(gp);
         ((BorderPane) workspace).setCenter(canvas);
+
+        editToolbar.setTranslateY(editToolbar.getTranslateY() + 100);
 
         ((BorderPane) workspace).setLeft(editToolbar);
 
@@ -796,7 +827,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         removeElement.setOnAction(e -> {
 
-            if (dataManager.getSelectedShape() != null && !(dataManager.getSelectedShape() instanceof DraggableStation || dataManager.getSelectedShape() instanceof DraggableLine)) {
+            if (dataManager.getSelectedShape() != null) {
                 mapEditController.processRemoveElement();
             }
 
@@ -892,6 +923,32 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         });
 
+        undo.setOnAction(e -> {
+
+            dataManager = (mapData) app.getDataComponent();
+
+            dataManager.getTransact().undoTransaction();
+
+            check();
+
+            redo.setDisable(false);
+
+            app.getGUI().updateToolbarControls(false);
+
+        });
+
+        redo.setOnAction(e -> {
+
+            dataManager = (mapData) app.getDataComponent();
+
+            dataManager.getTransact().doTransaction();
+
+            check();
+
+            app.getGUI().updateToolbarControls(false);
+
+        });
+
         stations.setOnAction(e -> {
             if (dataManager.getSelectedShape() != null) {
                 dataManager.unhighlightShape((Node) dataManager.getSelectedShape());
@@ -903,6 +960,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
                     DraggableStation drag = (DraggableStation) item;
                     if (drag.getName().equals(name)) {
                         dataManager.highlightShape(item);
+                        dataManager.setSelectedShape(item);
                     }
                 });
             }
@@ -946,16 +1004,42 @@ public class mapWorkspace extends AppWorkspaceComponent {
             mapEditController.rotateText();
         });
 
-//
 //        fromToPop.setOnAction(e -> {
-//            mapEditController.processDirections(); //Create a Singleton for this perhaps?
+//            if (fromStat.getSelectionModel().getSelectedItem() != null && toStat.getSelectionModel().getSelectedItem() != null) {
+//
+//                DraggableStation toStat1 = null, fromStat1 = null;
+//
+//                for (Node n : canvas.getChildren()) {
+//                    if (n instanceof DraggableStation) {
+//                        DraggableStation drag = (DraggableStation) n;
+//
+//                        if (drag.getName().equals(fromStat.getSelectionModel().getSelectedItem())) {
+//                            toStat1 = drag;
+//                            break;
+//                        }
+//                    }
+//                }
+//
+//                for (Node n : canvas.getChildren()) {
+//                    if (n instanceof DraggableStation) {
+//                        DraggableStation drag = (DraggableStation) n;
+//
+//                        if (drag.getName().equals(toStat.getSelectionModel().getSelectedItem())) {
+//                            fromStat1 = drag;
+//                            break;
+//                        }
+//                    }
+//                }
+//
+//                mapEditController.processDirections(toStat1, fromStat1);
+//            }
 //
 //        });
-//        snapToGrid.setOnAction(e -> {
-//            mapEditController.processSnapToGrid();
-//
-//        });
-//
+        snapToGrid.setOnAction(e -> {
+            mapEditController.processSnapToGrid();
+
+        });
+
         showGrid.setOnAction(e -> {
 
             if (showGrid.isSelected()) {
@@ -996,13 +1080,33 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         });
 
+        canvas.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case W:
+
+                    canvas.setLayoutY(canvas.getLayoutY() + 10);
+                    break;
+                case D:
+                    canvas.setLayoutX(canvas.getLayoutX() + 10);
+                    break;
+                case A:
+                    canvas.setLayoutX(canvas.getLayoutX() - 10);
+                    break;
+                case S:
+                    canvas.setLayoutY(canvas.getLayoutY() - 10);
+                    break;
+                default:
+                    break;
+            }
+        });
+
         fontSizes.setOnAction(e -> {
             Node node = (Node) dataManager.getSelectedShape();
 
             if (node != null & node instanceof DraggableText) {
                 double prevFont = ((DraggableText) node).getFont().getSize();
 
-                Integer i = fontSizes.getSelectionModel().getSelectedItem();
+                int i = fontSizes.getSelectionModel().getSelectedItem();
 
                 ((DraggableText) node).setFont(Font.font(((DraggableText) node).getFont().getFamily(), isBold ? FontWeight.BOLD : FontWeight.NORMAL, isItalic ? FontPosture.ITALIC : FontPosture.REGULAR, i));
 
@@ -1045,6 +1149,21 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         bold.setOnAction(fontHandler);
         italicize.setOnAction(fontHandler);
+    }
+
+    void check() {
+        if (dataManager.getTransact().getMostRecentTransaction() == -1) {
+            undo.setDisable(true);
+        } else {
+            undo.setDisable(false);
+        }
+
+        if (dataManager.getTransact().getMostRecentTransaction() == dataManager.getTransact().getTransactions().size() - 1) {
+            redo.setDisable(true);
+        } else {
+            redo.setDisable(false);
+        }
+
     }
 
     public CheckBox getShowGrid() {
@@ -1105,6 +1224,51 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
     public ZoomPane getCanvas() {
         return canvas;
+    }
+
+    private Parent createZoomPane(final Group group) {
+        final double SCALE_DELTA = 1.1;
+        final StackPane zoomPane = new StackPane();
+
+        zoomPane.getChildren().add(group);
+
+        final ScrollPane scroller = new ScrollPane();
+        final Group scrollContent = new Group(zoomPane);
+        scroller.setContent(scrollContent);
+
+        scroller.viewportBoundsProperty().addListener((ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) -> {
+            zoomPane.setMinSize(newValue.getWidth(), newValue.getHeight());
+        });
+
+        scroller.setPrefViewportWidth(canvas.getWidth());
+        scroller.setPrefViewportHeight(canvas.getWidth());
+
+        zoomPane.setOnScroll(event -> {
+            event.consume();
+
+            if (event.getDeltaY() == 0) {
+                return;
+            }
+
+            double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA
+                    : 1 / SCALE_DELTA;
+
+            // amount of scrolling in each direction in scrollContent coordinate
+            // units
+            group.setScaleX(group.getScaleX() * scaleFactor);
+            group.setScaleY(group.getScaleY() * scaleFactor);
+
+            // move viewport so that old center remains in the center after the
+            // scaling
+        });
+
+        // Panning via drag....
+        final ObjectProperty<Point2D> lastMouseCoordinates = new SimpleObjectProperty<>();
+        scrollContent.setOnMousePressed((MouseEvent event) -> {
+            lastMouseCoordinates.set(new Point2D(event.getX(), event.getY()));
+        });
+
+        return scroller;
     }
 
 }
