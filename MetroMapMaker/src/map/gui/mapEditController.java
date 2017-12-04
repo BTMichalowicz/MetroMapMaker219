@@ -345,6 +345,8 @@ public class mapEditController {
 
     void processLineThickness() {
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
+        
+
 
         dataManager.setCurrentOutlineThickness((int) work.getLineThickness().getValue());
         app.getGUI().updateToolbarControls(false);
@@ -404,11 +406,11 @@ public class mapEditController {
 
         ZoomPane canvas = ((mapWorkspace) app.getWorkspaceComponent()).getCanvas();
 
-        for (int x = 0; x < 100000; x += 10) {
+        for (int x = 0; x < 10000; x += 10) {
             lines.add(createLine(x, x, 0, canvas.getWidth() * 3));
         }
 
-        for (int x = 0; x < 100000; x += 10) {
+        for (int x = 0; x < 10000; x += 10) {
             lines.add((createLine(0, canvas.getHeight() * 3, x, x)));
         }
 

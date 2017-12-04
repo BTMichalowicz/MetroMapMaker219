@@ -6,6 +6,7 @@ import javafx.scene.shape.Circle;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 import map.gui.mapWorkspace;
+import map.transact.DragStuff;
 
 /**
  *
@@ -59,6 +60,8 @@ public class DraggableStation extends Circle implements Draggable {
 
         //statName.yProperty().set(statName.yProperty().get() - 20);
         this.setOnMouseDragged(e -> {
+            
+            transact = ((mapData) app.getDataComponent()).getTransact();
             setCenterX(e.getX());
             setCenterY(e.getY());
             centerXProperty().set(e.getX());
@@ -71,6 +74,8 @@ public class DraggableStation extends Circle implements Draggable {
 
             lineStat.setX(e.getX());
             lineStat.setY(e.getY());
+            t = new DragStuff(app, this, e.getX(), e.getY(), getX(), getY());
+            transact.addTransaction(t);
 
         });
     }

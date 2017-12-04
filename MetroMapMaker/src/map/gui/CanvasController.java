@@ -6,11 +6,15 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
+import jtps.jTPS;
+import jtps.jTPS_Transaction;
 import map.data.Draggable;
 import map.data.DraggableLine;
 import map.data.DraggableStation;
 import map.data.mapData;
 import map.data.mapState;
+import map.transact.ZoomIn;
+import map.transact.ZoomOut;
 
 /**
  * This class is made for interactions with the canvas/rendering surface.
@@ -61,7 +65,7 @@ public class CanvasController {
             dataManager.rotateLabel();
 
         } else if (dataManager.isInState(mapState.ADD_STAT_TO_LINE)) {
-            
+
             dataManager.addStatToLine(x, y, (DraggableLine) (dataManager.getSelectedShape()));
 
         }
@@ -84,9 +88,6 @@ public class CanvasController {
      */
     public void processCanvasMouseDragged(int x, int y) {
         dataManager = (mapData) app.getDataComponent();
-        
-        
-        
 
         if (dataManager.isInState(mapState.SIZING_ITEM)) {
             Draggable draggableShape = (Draggable) dataManager.getNewShape();
@@ -95,8 +96,7 @@ public class CanvasController {
             app.getGUI().updateToolbarControls(false);
         } else if (dataManager.isInState(mapState.DRAGGING)) {
             Draggable selectedNode = (Draggable) dataManager.getSelectedShape();
-            
-            
+
             selectedNode.drag(x, y);
             app.getGUI().updateToolbarControls(false);
         }
@@ -127,21 +127,27 @@ public class CanvasController {
     private final double MAX_SCALE = 10.0d;
 
     private final double delta = 1.1; //increase by 10% zoom
+    
+    jTPS transact;
+    jTPS_Transaction t;
 
     void zoomIn() {
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        
+        transact = ((mapData) app.getDataComponent()).getTransact();
 
         double scale1 = workspace.getCanvas().getScaler();
+        double scale2 = scale1;
+        
+        
 
         scale1 *= delta;
 
         scale1 = clamp(scale1, MIN_SCALE, MAX_SCALE);
 
-        workspace.getCanvas().setScaler(scale1);
+        t = new ZoomIn(app, workspace.getCanvas(), scale2, scale1);
+        transact.addTransaction(t);
 
-//        workspace.getCanvas().setPrefHeight(workspace.getOuterCanvas().getHeight());
-//        workspace.getCanvas().setPrefWidth(workspace.getCanvas().getWidth());
-//        workspace.getCanvas().autosize();
     }
 
     private double clamp(double value, double min, double max) {
@@ -160,18 +166,16 @@ public class CanvasController {
     void zoomOut() {
 
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        
+        transact = ((mapData) app.getDataComponent()).getTransact();
 
         double scale1 = workspace.getCanvas().getScaler();
+        double scale2 = scale1;
 
         scale1 /= delta;
 
         scale1 = clamp(scale1, MIN_SCALE, MAX_SCALE);
-
-        workspace.getCanvas().setScaler(scale1);
-
-//        workspace.getCanvas().setPrefHeight(workspace.getOuterCanvas().getHeight());
-//        workspace.getCanvas().setPrefWidth(workspace.getCanvas().getWidth());
-//        workspace.getCanvas().autosize();
+        t = new ZoomOut(app, workspace.getCanvas(), scale2, scale1);
 
     }
 

@@ -42,6 +42,7 @@ import map.gui.ZoomPane;
 import map.gui.mapWorkspace;
 import map.transact.AddToLine;
 import map.transact.BackgroundEdit;
+import map.transact.LineThick;
 import map.transact.addNode;
 import map.transact.removeNode;
 import properties_manager.PropertiesManager;
@@ -207,8 +208,11 @@ public class mapData implements AppDataComponent {
         currentBorderWidth = initBorderWidth;
         if (selectedNode != null) {
 
+            
             if (selectedNode instanceof Shape) {
-                ((Shape) selectedNode).setStrokeWidth(initBorderWidth);
+                t = new LineThick(app,((Shape)selectedNode), (int) ((Shape)selectedNode).getStrokeWidth(), initBorderWidth);
+                transact.addTransaction(t);
+                
             }
         }
     }

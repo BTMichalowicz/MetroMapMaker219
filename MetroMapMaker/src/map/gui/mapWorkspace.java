@@ -31,6 +31,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
@@ -89,6 +90,7 @@ import static map.mapLanguageProperty.ZOOM_IN_ICON;
 import static map.mapLanguageProperty.ZOOM_IN_TOOLTIP;
 import static map.mapLanguageProperty.ZOOM_OUT_ICON;
 import static map.mapLanguageProperty.ZOOM_OUT_TOOLTIP;
+import map.transact.TextFontColorContent;
 
 /**
  *
@@ -728,10 +730,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         canvas = new ZoomPane();
 
-        Group g = new Group();
-
-        outerCanvas = (ScrollPane) createZoomPane(g);
-
         debugText = new Text();
 
         canvas.getChildren().add(debugText);
@@ -743,20 +741,28 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         workspace = new BorderPane();
 
+        mainSpot = new Group();
+        mainSpot.setOpacity(000);
+        mainSpot.getChildren().add(canvas);
+        outerCanvas = new ScrollPane(mainSpot);
+        
+        mainSpot.prefHeight(outerCanvas.getHeight());
+        mainSpot.prefWidth(outerCanvas.getWidth());
+        
+        mainSpot.autosize();
+
+        outerCanvas.setOpacity(0);
+
+        outerCanvas = new ScrollPane();
         outerCanvas.setContent(canvas);
-//        outerCanvas.setHbarPolicy(ScrollBarPolicy.ALWAYS);
-//        outerCanvas.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-//
-//        mainSpot = new Group(outerCanvas);
-//        mainSpot.prefHeight(app.getGUI().getAppPane().getHeight() - app.getGUI().getTopToolbarPane().getHeight());
-//        mainSpot.prefWidth(app.getGUI().getAppPane().getWidth() - editToolbar.getWidth());
-//        mainSpot.autosize();
-//        outerCanvas.setPrefViewportHeight(canvas.getHeight());
-//        outerCanvas.setPrefViewportWidth(canvas.getWidth());
+        outerCanvas.setHbarPolicy(ScrollBarPolicy.NEVER);
+        outerCanvas.setVbarPolicy(ScrollBarPolicy.NEVER);
+
 
         ((BorderPane) workspace).setCenter(canvas);
 
         editToolbar.setTranslateY(editToolbar.getTranslateY() + 100);
+        outerCanvas.setTranslateY(canvas.getTranslateY() + 100);
 
         ((BorderPane) workspace).setLeft(editToolbar);
 
@@ -978,7 +984,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             canvasController.processCanvasMouseRelease((int) e.getX(), (int) e.getY());
 
         });
-        canvas.setOnMouseDragged(e -> {
+        outerCanvas.setOnMouseDragged(e -> {
 
             canvasController.processCanvasMouseDragged((int) e.getX(), (int) e.getY());
 
@@ -1071,8 +1077,17 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
                 if (s != null) {
 
+                    Font f = ((DraggableText) node).getFont();
+                    Color fill = (Color) ((DraggableText) node).getFill();
+
                     ((DraggableText) node).setFont(Font.font(s, isBold ? FontWeight.BOLD : FontWeight.NORMAL, isItalic ? FontPosture.ITALIC : FontPosture.REGULAR, ((DraggableText) node).getFont().getSize()));
                     String curFontChoice = ((DraggableText) node).getFont().getFamily();
+
+                    Font f2 = ((DraggableText) node).getFont();
+                    Color fill2 = (Color) ((DraggableText) node).getFill();
+
+                    transaction = new TextFontColorContent(app, ((DraggableText) node), fill, fill2, f, f2);
+                    dataManager.getTransact().addTransaction(transaction);
 
                 }
 
@@ -1101,6 +1116,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
 
         fontSizes.setOnAction(e -> {
+            dataManager = (mapData) app.getDataComponent();
             Node node = (Node) dataManager.getSelectedShape();
 
             if (node != null & node instanceof DraggableText) {
@@ -1108,7 +1124,16 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
                 int i = fontSizes.getSelectionModel().getSelectedItem();
 
+                Font f = ((DraggableText) node).getFont();
+                Color fill = (Color) ((DraggableText) node).getFill();
+
                 ((DraggableText) node).setFont(Font.font(((DraggableText) node).getFont().getFamily(), isBold ? FontWeight.BOLD : FontWeight.NORMAL, isItalic ? FontPosture.ITALIC : FontPosture.REGULAR, i));
+
+                Font f2 = ((DraggableText) node).getFont();
+                Color fill2 = (Color) ((DraggableText) node).getFill();
+
+                transaction = new TextFontColorContent(app, ((DraggableText) node), fill, fill2, f, f2);
+                dataManager.getTransact().addTransaction(transaction);
 
                 double curFont = ((DraggableText) node).getFont().getSize();
 
@@ -1224,51 +1249,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
     public ZoomPane getCanvas() {
         return canvas;
-    }
-
-    private Parent createZoomPane(final Group group) {
-        final double SCALE_DELTA = 1.1;
-        final StackPane zoomPane = new StackPane();
-
-        zoomPane.getChildren().add(group);
-
-        final ScrollPane scroller = new ScrollPane();
-        final Group scrollContent = new Group(zoomPane);
-        scroller.setContent(scrollContent);
-
-        scroller.viewportBoundsProperty().addListener((ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) -> {
-            zoomPane.setMinSize(newValue.getWidth(), newValue.getHeight());
-        });
-
-        scroller.setPrefViewportWidth(canvas.getWidth());
-        scroller.setPrefViewportHeight(canvas.getWidth());
-
-        zoomPane.setOnScroll(event -> {
-            event.consume();
-
-            if (event.getDeltaY() == 0) {
-                return;
-            }
-
-            double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA
-                    : 1 / SCALE_DELTA;
-
-            // amount of scrolling in each direction in scrollContent coordinate
-            // units
-            group.setScaleX(group.getScaleX() * scaleFactor);
-            group.setScaleY(group.getScaleY() * scaleFactor);
-
-            // move viewport so that old center remains in the center after the
-            // scaling
-        });
-
-        // Panning via drag....
-        final ObjectProperty<Point2D> lastMouseCoordinates = new SimpleObjectProperty<>();
-        scrollContent.setOnMousePressed((MouseEvent event) -> {
-            lastMouseCoordinates.set(new Point2D(event.getX(), event.getY()));
-        });
-
-        return scroller;
     }
 
 }
