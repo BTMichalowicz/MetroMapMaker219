@@ -108,85 +108,87 @@ public class mapFiles implements AppFileComponent {
 
         //Let's get started creating each object
         items.forEach((node) -> {
+            if (node instanceof Draggable) {
+                Node node2 = node;
 
-            Node node2 = node;
-            Draggable drag = (Draggable) node;
+                Draggable drag = (Draggable) node;
 
-            String type = drag.getShapeType();
-            double x = drag.getX();
-            double y = drag.getY();
-            double width = drag.getWidth();
-            double height = drag.getHeight();
+                String type = drag.getShapeType();
+                double x = drag.getX();
+                double y = drag.getY();
+                double width = drag.getWidth();
+                double height = drag.getHeight();
 
-            if (node instanceof DraggableText) {
+                if (node instanceof DraggableText) {
 
-                DraggableText t = (DraggableText) node;
+                    DraggableText t = (DraggableText) node;
 
-                JsonObject dText = Json.createObjectBuilder()
-                        .add(JSON_TYPE, type)
-                        .add(JSON_X, x)
-                        .add(JSON_Y, y)
-                        .add(JSON_WIDTH, width)
-                        .add(JSON_HEIGHT, height)
-                        .add(JSON_TEXT, t.getText())
-                        .add(JSON_FONT_SIZE, t.getFont().getSize())
-                        .add(JSON_FONT_FAMILY, t.getFont().getFamily())
-                        .add(JSON_STYLE, t.getFont().getStyle())
-                        .add(JSON_TYPE, t.getShapeType())
-                        .build();
-                arrayBuilder.add(dText);
-            } else if (node instanceof DraggableLine) { //if not instance of Draggable Text
+                    JsonObject dText = Json.createObjectBuilder()
+                            .add(JSON_TYPE, type)
+                            .add(JSON_X, x)
+                            .add(JSON_Y, y)
+                            .add(JSON_WIDTH, width)
+                            .add(JSON_HEIGHT, height)
+                            .add(JSON_TEXT, t.getText())
+                            .add(JSON_FONT_SIZE, t.getFont().getSize())
+                            .add(JSON_FONT_FAMILY, t.getFont().getFamily())
+                            .add(JSON_STYLE, t.getFont().getStyle())
+                            .add(JSON_TYPE, t.getShapeType())
+                            .build();
+                    arrayBuilder.add(dText);
+                } else if (node instanceof DraggableLine) { //if not instance of Draggable Text
 
-                DraggableLine dragged = (DraggableLine) node;
-                JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
+                    DraggableLine dragged = (DraggableLine) node;
+                    JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
 
-                JsonArrayBuilder stationNames = Json.createArrayBuilder();
+                    JsonArrayBuilder stationNames = Json.createArrayBuilder();
 
-                dragged.getStations().forEach((stat) -> {
-                    stationNames.add(stat);
-                });
+                    dragged.getStations().forEach((stat) -> {
+                        stationNames.add(stat);
+                    });
 
-                JsonArray statNames = stationNames.build(); //Add all the station names
+                    JsonArray statNames = stationNames.build(); //Add all the station names
 
-                JsonObject jsonLine = Json.createObjectBuilder()
-                        .add(JSON_NAME, dragged.getName())
-                        .add(JSON_COLOR, backgroundColor)
-                        .add(JSON_CIRC, dragged.getCircular()) //TODO: Implement Circular Lines
-                        .add(JSON_STAT_NAMES, statNames)
-                        .add(JSON_START_X, dragged.getStartName().getX() + 25)
-                        .add(JSON_START_Y, dragged.getStartName().getY())
-                        .add(JSON_END_X, dragged.getEndName().getX() - 5)
-                        .add(JSON_END_Y, dragged.getEndName().getY())
-                        .add(JSON_TYPE, dragged.getShapeType())
-                        .build();
-                lineBuilder.add(jsonLine);
+                    JsonObject jsonLine = Json.createObjectBuilder()
+                            .add(JSON_NAME, dragged.getName())
+                            .add(JSON_COLOR, backgroundColor)
+                            .add(JSON_CIRC, dragged.getCircular()) //TODO: Implement Circular Lines
+                            .add(JSON_STAT_NAMES, statNames)
+                            .add(JSON_START_X, dragged.getStartName().getX() + 25)
+                            .add(JSON_START_Y, dragged.getStartName().getY())
+                            .add(JSON_END_X, dragged.getEndName().getX() - 5)
+                            .add(JSON_END_Y, dragged.getEndName().getY())
+                            .add(JSON_TYPE, dragged.getShapeType())
+                            .build();
+                    lineBuilder.add(jsonLine);
 
-            } else if (node instanceof DraggableStation) {
-                DraggableStation statMan = (DraggableStation) node;
+                } else if (node instanceof DraggableStation) {
+                    DraggableStation statMan = (DraggableStation) node;
 
-                JsonObject color = getLineBackgroundColor(statMan.getFill());
+                    JsonObject color = getLineBackgroundColor(statMan.getFill());
 
-                JsonObject jsonStat = Json.createObjectBuilder()
-                        .add(JSON_NAME, statMan.getName())
-                        .add(JSON_X, statMan.getCenterX())
-                        .add(JSON_Y, statMan.getCenterY())
-                        .add(JSON_TYPE, statMan.getShapeType())
-                        .add(JSON_COLOR, color)
-                        .add(JSON_RADIUS, statMan.getRadius())
-                        .build();
-                statBuilder.add(jsonStat);
+                    JsonObject jsonStat = Json.createObjectBuilder()
+                            .add(JSON_NAME, statMan.getName())
+                            .add(JSON_X, statMan.getCenterX())
+                            .add(JSON_Y, statMan.getCenterY())
+                            .add(JSON_TYPE, statMan.getShapeType())
+                            .add(JSON_COLOR, color)
+                            .add(JSON_RADIUS, statMan.getRadius())
+                            .build();
+                    statBuilder.add(jsonStat);
 
-            } else if (node instanceof DraggableImage) {
-                DraggableImage image = (DraggableImage) node;
-                JsonObject jsonImage = Json.createObjectBuilder()
-                        .add(JSON_X, image.getX())
-                        .add(JSON_Y, image.getY())
-                        .add(JSON_WIDTH, image.getWidth())
-                        .add(JSON_HEIGHT, image.getHeight())
-                        .add(JSON_IMG, image.getFilePath())
-                        .add(JSON_TYPE, image.getShapeType())
-                        .build();
-                arrayBuilder.add(jsonImage);
+                } else if (node instanceof DraggableImage) {
+                    DraggableImage image = (DraggableImage) node;
+                    JsonObject jsonImage = Json.createObjectBuilder()
+                            .add(JSON_X, image.getX())
+                            .add(JSON_Y, image.getY())
+                            .add(JSON_WIDTH, image.getWidth())
+                            .add(JSON_HEIGHT, image.getHeight())
+                            .add(JSON_IMG, image.getFilePath())
+                            .add(JSON_TYPE, image.getShapeType())
+                            .build();
+                    arrayBuilder.add(jsonImage);
+                }
             }
         });
 
@@ -218,6 +220,7 @@ public class mapFiles implements AppFileComponent {
         try (PrintWriter pw = new PrintWriter(filePath)) {
             pw.write(prettyPrinted);
         }
+
     }
 
     @Override
@@ -235,14 +238,7 @@ public class mapFiles implements AppFileComponent {
         JsonArray jsonLinesArray = json.getJsonArray(JSON_LINES);
         JsonArray jsonStatArray = json.getJsonArray(JSON_STAT);
 
-        for (int i = 0; i < jsonLinesArray.size(); i++) {
-            JsonObject jsonItem = jsonLinesArray.getJsonObject(i);
-            Node node = loadNode(jsonItem);
-
-            DraggableLine line = (DraggableLine) node;
-
-            dataManager.addShape(line);
-
+        if (jsonLinesArray.isEmpty()) {
             for (int j = 0; j < jsonStatArray.size(); j++) {
                 JsonObject jsonItem2 = jsonStatArray.getJsonObject(j);
 
@@ -255,23 +251,72 @@ public class mapFiles implements AppFileComponent {
 
                 dataManager.addShape(node2);
 
-                if (line.getStations().contains(node2.getName())) {
-                    line.addStation(node2);
-                }
-
+                //node2.start((int)node2.getCenterX(), (int)node2.getCenterY());
+                //((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node2);
                 ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getStations().getItems().add(node2.getName());
                 ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getFromStat().getItems().add(node2.getName());
                 ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getToStat().getItems().add(node2.getName());
             }
+        } else {
 
+            for (int i = 0; i < jsonLinesArray.size(); i++) {
+                JsonObject jsonItem = jsonLinesArray.getJsonObject(i);
+                Node node = loadNode(jsonItem);
+
+                DraggableLine line = (DraggableLine) node;
+
+                dataManager.addShape(line);
+
+                for (int j = 0; j < jsonStatArray.size(); j++) {
+                    JsonObject jsonItem2 = jsonStatArray.getJsonObject(j);
+
+                    DraggableStation node2 = new DraggableStation(dataManager.getApp(), "");
+                    node2.setName(jsonItem2.getString(JSON_NAME));
+                    node2.setCenterX(jsonItem2.getInt(JSON_X));
+                    node2.setCenterY(jsonItem2.getInt(JSON_Y));
+                    node2.setFill(loadColor(jsonItem2, JSON_COLOR));
+                    node2.setRadius(jsonItem2.getInt(JSON_RADIUS));
+
+                    dataManager.addShape(node2);
+
+                    node2.start((int) node2.getCenterX(), (int) node2.getCenterY());
+
+                    ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node2);
+
+                    if (line.getStations().contains(node2.getName())) {
+                        line.addStation(node2);
+                    }
+
+                    ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getStations().getItems().add(node2.getName());
+                    ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getFromStat().getItems().add(node2.getName());
+                    ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getToStat().getItems().add(node2.getName());
+                }
+
+            }
         }
 
         for (int i = 0; i < jsonItemsArray.size(); i++) {
             JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
             Node node = loadNode(jsonItem);
 
-            if (!((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().contains(node)) {
+            for (Node n : ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren()) {
+                if (n instanceof DraggableText) {
+                    if (node instanceof DraggableText) {
+                        if (((DraggableText) n).getText().equals(((DraggableText) node).getText())) {
+                            continue;
+                        } else {
+                            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
 
+                        }
+                    }
+                }
+
+            }
+
+            if (((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().contains(node)) {
+                continue;
+
+            } else {
                 ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
             }
         }
@@ -356,10 +401,16 @@ public class mapFiles implements AppFileComponent {
             }
             ((DraggableLine) retVal).setStroke(loadColor(jsonObject, JSON_COLOR));
 
-            int x = (int) (30 + Math.random() * 100);
-            int y = (int) (30 + Math.random() * 100);
+            int x = jsonObject.getInt(JSON_START_X);
+            int y = jsonObject.getInt(JSON_START_Y);
 
             ((DraggableLine) retVal).start(x, y);
+
+            ((DraggableLine) retVal).getStartName().setX(x);
+            ((DraggableLine) retVal).getStartName().setY(y);
+
+            ((DraggableLine) retVal).getEndName().setX(jsonObject.getInt(JSON_END_X));
+            ((DraggableLine) retVal).getEndName().setY(jsonObject.getInt(JSON_END_Y));
 
             ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getLines().getItems().add(((DraggableLine) retVal).getName());
 
@@ -377,8 +428,6 @@ public class mapFiles implements AppFileComponent {
 
         mapWorkspace workspace = (mapWorkspace) dataManager.getApp().getWorkspaceComponent();
 
-        
-
         //We only care about metroLines and Stations in the file exporting
         //FOR METRO LINES
         JsonArrayBuilder lineBuilder = Json.createArrayBuilder();
@@ -388,50 +437,51 @@ public class mapFiles implements AppFileComponent {
 
         //Let's get started creating each object
         items.forEach((node) -> {
+            if (node instanceof Draggable) {
+                Node node2 = node;
+                Draggable drag = (Draggable) node;
 
-            Node node2 = node;
-            Draggable drag = (Draggable) node;
+                String type = drag.getShapeType();
+                double x = drag.getX();
+                double y = drag.getY();
+                double width = drag.getWidth();
+                double height = drag.getHeight();
 
-            String type = drag.getShapeType();
-            double x = drag.getX();
-            double y = drag.getY();
-            double width = drag.getWidth();
-            double height = drag.getHeight();
+                if (node instanceof DraggableLine) { //if not instance of Draggable Text
 
-            if (node instanceof DraggableLine) { //if not instance of Draggable Text
+                    DraggableLine dragged = (DraggableLine) node;
+                    JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
 
-                DraggableLine dragged = (DraggableLine) node;
-                JsonObject backgroundColor = getLineBackgroundColor(dragged.getStroke());
+                    //TODO: Implement isCircular
+                    JsonArrayBuilder stationNames = Json.createArrayBuilder();
 
-                //TODO: Implement isCircular
-                JsonArrayBuilder stationNames = Json.createArrayBuilder();
+                    dragged.getStations().forEach((stat) -> {
+                        stationNames.add(stat);
+                    });
 
-                dragged.getStations().forEach((stat) -> {
-                    stationNames.add(stat);
-                });
+                    JsonArray statNames = stationNames.build(); //Add all the station names
 
-                JsonArray statNames = stationNames.build(); //Add all the station names
+                    JsonObject jsonLine = Json.createObjectBuilder()
+                            .add(JSON_NAME, dragged.getName())
+                            .add(JSON_CIRC, dragged.getCircular()) //TODO: Implement Circular Lines
+                            .add(JSON_COLOR, backgroundColor)
+                            .add(JSON_STAT_NAMES, statNames)
+                            .build();
+                    lineBuilder.add(jsonLine);
 
-                JsonObject jsonLine = Json.createObjectBuilder()
-                        .add(JSON_NAME, dragged.getName())
-                        .add(JSON_CIRC, dragged.getCircular()) //TODO: Implement Circular Lines
-                        .add(JSON_COLOR, backgroundColor)
-                        .add(JSON_STAT_NAMES, statNames)
-                        .build();
-                lineBuilder.add(jsonLine);
+                } else if (node instanceof DraggableStation) {
+                    DraggableStation statMan = (DraggableStation) node;
 
-            } else if (node instanceof DraggableStation) {
-                DraggableStation statMan = (DraggableStation) node;
+                    JsonObject color = getLineBackgroundColor(statMan.getFill());
 
-                JsonObject color = getLineBackgroundColor(statMan.getFill());
+                    JsonObject jsonStat = Json.createObjectBuilder()
+                            .add(JSON_NAME, statMan.getName())
+                            .add(JSON_X, statMan.getCenterX())
+                            .add(JSON_Y, statMan.getCenterY())
+                            .build();
+                    statBuilder.add(jsonStat);
 
-                JsonObject jsonStat = Json.createObjectBuilder()
-                        .add(JSON_NAME, statMan.getName())
-                        .add(JSON_X, statMan.getCenterX())
-                        .add(JSON_Y, statMan.getCenterY())
-                        .build();
-                statBuilder.add(jsonStat);
-
+                }
             }
         });
 

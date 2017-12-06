@@ -1,16 +1,17 @@
 package map.gui;
 
 import djf.AppTemplate;
-import javafx.event.ActionEvent;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Rectangle;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 import map.data.Draggable;
 import map.data.DraggableLine;
-import map.data.DraggableStation;
 import map.data.mapData;
 import map.data.mapState;
 import map.transact.ZoomIn;
@@ -127,55 +128,83 @@ public class CanvasController {
     private final double MAX_SCALE = 10.0d;
 
     private final double delta = 1.1; //increase by 10% zoom
-    
+
     jTPS transact;
     jTPS_Transaction t;
 
     void zoomIn() {
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
-        
+
+        DoubleProperty scale = new SimpleDoubleProperty();
+
+        scale.bind((new SimpleDoubleProperty(workspace.getMainGroup().getScaleX())));
+        scale.bind(new SimpleDoubleProperty(workspace.getMainGroup().getScaleY()));
+
         transact = ((mapData) app.getDataComponent()).getTransact();
 
-        double scale1 = workspace.getCanvas().getScaler();
+        double scale1 = scale.get();
         double scale2 = scale1;
-        
-        
 
         scale1 *= delta;
 
-        scale1 = clamp(scale1, MIN_SCALE, MAX_SCALE);
-
         t = new ZoomIn(app, workspace.getCanvas(), scale2, scale1);
         transact.addTransaction(t);
+        workspace.getUndo().setDisable(false);
 
-    }
-
-    private double clamp(double value, double min, double max) {
-
-        if (Double.compare(value, min) < 0) {
-            return min;
-        }
-
-        if (Double.compare(value, max) > 0) {
-            return max;
-        }
-
-        return value;
     }
 
     void zoomOut() {
 
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
-        
+
+        DoubleProperty scale = new SimpleDoubleProperty();
+        scale.bind((new SimpleDoubleProperty(workspace.getMainGroup().getScaleX())));
+        scale.bind(new SimpleDoubleProperty(workspace.getMainGroup().getScaleY()));
+
         transact = ((mapData) app.getDataComponent()).getTransact();
 
-        double scale1 = workspace.getCanvas().getScaler();
+        double scale1 = scale.get();
         double scale2 = scale1;
 
         scale1 /= delta;
 
-        scale1 = clamp(scale1, MIN_SCALE, MAX_SCALE);
         t = new ZoomOut(app, workspace.getCanvas(), scale2, scale1);
+        transact.addTransaction(t);
+        workspace.getUndo().setDisable(false);
+
+    }
+
+    Rectangle r = new Rectangle(1900, 1900);
+
+    void decreaseMapSize() {
+        Pane canvas = ((mapWorkspace) app.getWorkspaceComponent()).getCanvas();
+
+        double xVal = canvas.getWidth() * .10;
+        double yVal = canvas.getHeight() * .10;
+
+        r.setLayoutX(xVal);
+        r.setLayoutY(yVal);
+
+        r.setWidth(r.getWidth() - xVal);
+        r.setHeight(r.getHeight() - yVal);
+        canvas.setClip(r);
+
+    }
+
+    void increaseMapSize() {
+
+        Pane canvas = ((mapWorkspace) app.getWorkspaceComponent()).getCanvas();
+
+        double xVal = canvas.getWidth() * .10;
+        double yVal = canvas.getHeight() * .10;
+
+        r.setLayoutX(-xVal);
+        r.setLayoutY(-yVal);
+
+        r.setWidth(r.getWidth() + xVal);
+        r.setHeight(r.getHeight() + yVal);
+
+        canvas.setClip(r);
 
     }
 

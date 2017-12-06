@@ -12,7 +12,7 @@ import map.transact.DragStuff;
  *
  * @author Ben Michalowicz
  */
-public class DraggableStation extends Circle implements Draggable {
+public class DraggableStation extends Circle implements Draggable, Comparable<DraggableStation> {
 
     double startCenterX;
     double startCenterY;
@@ -62,18 +62,15 @@ public class DraggableStation extends Circle implements Draggable {
         this.setOnMouseDragged(e -> {
             
             transact = ((mapData) app.getDataComponent()).getTransact();
-            setCenterX(e.getX());
-            setCenterY(e.getY());
-            centerXProperty().set(e.getX());
-            centerYProperty().set(e.getY());
+            setX(e.getX());
+            setY(e.getY());
+            
             startCenterX = e.getX();
             startCenterY = e.getY();
 
             this.statName.xProperty().bind(new SimpleDoubleProperty(centerXProperty().get() + radiusProperty().get()));
             this.statName.yProperty().bind(new SimpleDoubleProperty(centerYProperty().get() + radiusProperty().get() - 20));
 
-            lineStat.setX(e.getX());
-            lineStat.setY(e.getY());
             t = new DragStuff(app, this, e.getX(), e.getY(), getX(), getY());
             transact.addTransaction(t);
 
@@ -125,16 +122,14 @@ public class DraggableStation extends Circle implements Draggable {
     @Override
     public void size(int x, int y) {
 
-        setCenterX(x);
-        setCenterY(y);
-        lineStat.setX(x);
-        lineStat.setY(y);
+        setX(x);
+        setY(y);
 
     }
 
     @Override
     public double getX() {
-        return getCenterX() - getRadius();
+        return getCenterX();
     }
 
     public void setX(double value) {
@@ -153,7 +148,7 @@ public class DraggableStation extends Circle implements Draggable {
 
     @Override
     public double getY() {
-        return getCenterY() - getRadius();
+        return getCenterY() ;
     }
 
     @Override
@@ -179,6 +174,27 @@ public class DraggableStation extends Circle implements Draggable {
     @Override
     public String getShapeType() {
         return STATION;
+    }
+
+    @Override
+    public int compareTo(DraggableStation t) {
+        if(this.getX()>t.getX() && this.getY()>t.getY()){
+            return 1;
+        }else if(this.getX()<t.getX() && this.getY()<t.getY()){
+            return-1;
+        }else
+            return 0;
+    }
+    
+    
+    @Override
+    public boolean equals(Object o){
+        if (this==o) return true;
+        if(!(o instanceof DraggableStation)) return false;
+        
+        DraggableStation that = (DraggableStation) o;
+        
+        return this.getName().equals(that.getName()) && this.getX() == that.getX() && this.getY() == that.getY();
     }
 
 }

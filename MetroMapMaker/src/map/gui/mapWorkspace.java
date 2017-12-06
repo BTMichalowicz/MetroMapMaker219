@@ -12,19 +12,13 @@ import static djf.ui.AppGUI.CLASS_BORDERED_PANE;
 import static djf.ui.AppGUI.CLASS_FILE_BUTTON;
 import djf.ui.AppMessageDialogSingleton;
 import djf.ui.AppYesNoCancelDialogSingleton;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -34,12 +28,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
@@ -99,10 +92,10 @@ import map.transact.TextFontColorContent;
  */
 public class mapWorkspace extends AppWorkspaceComponent {
 
-    Group mainSpot;
+    Group mainGroup;
 
-    public Group getMainSpot() {
-        return mainSpot;
+    public Group getMainGroup() {
+        return mainGroup;
     }
     ScrollPane outerCanvas;
 
@@ -245,7 +238,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         this.backgroundColorPicker = backgroundColorPicker;
     }
 
-    public void setCanvas(ZoomPane canvas) {
+    public void setCanvas(Pane canvas) {
         this.canvas = canvas;
     }
 
@@ -344,7 +337,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
     }
 
     //THE MAIN CANVAS FOR THE APPLICATION
-    ZoomPane canvas;
+    Pane canvas;
 
     Text debugText;
 
@@ -728,43 +721,41 @@ public class mapWorkspace extends AppWorkspaceComponent {
         editToolbar.getChildren().addAll(addLinesMain, addStationsMain, fromToDest, decor1,
                 font1, nav1);
 
-        canvas = new ZoomPane();
-
         debugText = new Text();
 
+        outerCanvas = new ScrollPane();
+        mainGroup = new Group();
+
+        workspace = new BorderPane();
+        canvas = new Pane();
         canvas.getChildren().add(debugText);
         debugText.setX(100);
         debugText.setY(100);
 
+        canvas.prefHeight(1900);
+        canvas.prefHeight(1900);
+        canvas.autosize();
+
+        mainGroup.getChildren().add(canvas);
+
+        outerCanvas.setPrefViewportHeight(900);
+        outerCanvas.setPrefViewportWidth(900);
+        outerCanvas.autosize();
+        outerCanvas.setContent(mainGroup);
+        
+         outerCanvas.setHbarPolicy(ScrollBarPolicy.ALWAYS);
+        outerCanvas.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+
+        ((BorderPane) workspace).setLeft(editToolbar);
+        ((BorderPane) workspace).setCenter(outerCanvas);
+
+     
+
+        //outerCanvas.setStyle("-fx-fill: #000000;");
         dataManager = (mapData) app.getDataComponent();
         dataManager.setList(canvas.getChildren());
 
-        workspace = new BorderPane();
-
-        mainSpot = new Group();
-        mainSpot.setOpacity(000);
-        mainSpot.getChildren().add(canvas);
-        outerCanvas = new ScrollPane(mainSpot);
-        
-        mainSpot.prefHeight(outerCanvas.getHeight());
-        mainSpot.prefWidth(outerCanvas.getWidth());
-        
-        mainSpot.autosize();
-
-        outerCanvas.setOpacity(0);
-
-        outerCanvas = new ScrollPane();
-        outerCanvas.setContent(canvas);
-        outerCanvas.setHbarPolicy(ScrollBarPolicy.NEVER);
-        outerCanvas.setVbarPolicy(ScrollBarPolicy.NEVER);
-
-
-        ((BorderPane) workspace).setCenter(canvas);
-
-        editToolbar.setTranslateY(editToolbar.getTranslateY() + 100);
-        outerCanvas.setTranslateY(canvas.getTranslateY() + 100);
-
-        ((BorderPane) workspace).setLeft(editToolbar);
+       
 
     }
 
@@ -860,6 +851,29 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         imgBackground.setOnAction(e -> {
             mapEditController.processAddBackgroundImage();
+
+        });
+
+        outerCanvas.setOnKeyPressed(e -> {
+            Bounds view = outerCanvas.getViewportBounds();
+            switch (e.getCode()) {
+                case W:
+
+                    outerCanvas.setVvalue(outerCanvas.getVvalue() - 0.05);
+                    break;
+                case A:
+
+                    outerCanvas.setHvalue(outerCanvas.getHvalue() - 0.05);
+                    break;
+                case D:
+                    outerCanvas.setHvalue(outerCanvas.getHvalue() + 0.05);
+                    break;
+
+                case S:
+
+                    outerCanvas.setVvalue(outerCanvas.getVvalue() + 0.05);
+                    break;
+            }
 
         });
 
@@ -973,13 +987,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         });
 
-        canvas.setOnMouseClicked(e -> {
+        outerCanvas.setOnMouseClicked(e -> {
 
             canvasController.processCanvasMousPressed((int) e.getX(), (int) e.getY());
 
         });
 
-        canvas.setOnMouseReleased(e -> {
+        outerCanvas.setOnMouseReleased(e -> {
 
             canvasController.processCanvasMouseRelease((int) e.getX(), (int) e.getY());
 
@@ -1058,15 +1072,16 @@ public class mapWorkspace extends AppWorkspaceComponent {
         zoomIn.setOnAction(e -> canvasController.zoomIn());
 
         zoomOut.setOnAction(e -> canvasController.zoomOut());
-//
-//        increaseMapSize.setOnAction(e -> {
-//            canvasController.increaseMapSize();
-//
-//        });
-//
-//        decreaseMapSize.setOnAction(e -> {
-//            canvasController.decreaseMapSize();
-//        });
+
+        increaseMapSize.setOnAction(e -> {
+            canvasController.increaseMapSize();
+
+        });
+
+        decreaseMapSize.setOnAction(e -> {
+            canvasController.decreaseMapSize();
+        });
+
         fontFamilies.setOnAction(e -> {
             Node node = (Node) dataManager.getSelectedShape();
 
@@ -1095,26 +1110,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
         });
 
-        canvas.setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case W:
-
-                    canvas.setLayoutY(canvas.getLayoutY() + 10);
-                    break;
-                case D:
-                    canvas.setLayoutX(canvas.getLayoutX() + 10);
-                    break;
-                case A:
-                    canvas.setLayoutX(canvas.getLayoutX() - 10);
-                    break;
-                case S:
-                    canvas.setLayoutY(canvas.getLayoutY() - 10);
-                    break;
-                default:
-                    break;
-            }
-        });
-
         fontSizes.setOnAction(e -> {
             dataManager = (mapData) app.getDataComponent();
             Node node = (Node) dataManager.getSelectedShape();
@@ -1122,7 +1117,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
             if (node != null & node instanceof DraggableText) {
                 double prevFont = ((DraggableText) node).getFont().getSize();
 
-                int i = fontSizes.getSelectionModel().getSelectedItem();
+                Integer i = fontSizes.getSelectionModel().getSelectedItem();
 
                 Font f = ((DraggableText) node).getFont();
                 Color fill = (Color) ((DraggableText) node).getFill();
@@ -1247,7 +1242,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         this.outerCanvas = outerCanvas;
     }
 
-    public ZoomPane getCanvas() {
+    public Pane getCanvas() {
         return canvas;
     }
 

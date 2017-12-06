@@ -41,16 +41,15 @@ public class addNode implements jTPS_Transaction {
     public void doTransaction() {
         work.getCanvas().getChildren().add(node);
 
-        
         switch (((Draggable) node).getShapeType()) {
             case LINE:
                 DraggableLine l = (DraggableLine) node;
-                
-                if(work.getCanvas().getChildren().contains(l.getStartName())){
-                    
-                }else{
 
-                work.getCanvas().getChildren().addAll(l.getStartName(), l.getEndName());
+                if (work.getCanvas().getChildren().contains(l.getStartName())) {
+
+                } else {
+
+                    work.getCanvas().getChildren().addAll(l.getStartName(), l.getEndName());
                 }
                 break;
 
@@ -61,11 +60,11 @@ public class addNode implements jTPS_Transaction {
 
                 DraggableStation s = (DraggableStation) node;
 
-                if(work.getCanvas().getChildren().contains(s.getStatName())){
-                    
-                }else{
+                if (work.getCanvas().getChildren().contains(s.getStatName())) {
 
-                work.getCanvas().getChildren().addAll(s.getStatName());
+                } else {
+
+                    work.getCanvas().getChildren().addAll(s.getStatName());
                 }
                 break;
 
@@ -73,14 +72,13 @@ public class addNode implements jTPS_Transaction {
 
                 break;
         }
-        
-        
+
     }
 
     @Override
     public void undoTransaction() {
         work.getCanvas().getChildren().remove(node);
-        
+
         switch (((Draggable) node).getShapeType()) {
             case LINE:
                 DraggableLine l = (DraggableLine) node;
@@ -102,7 +100,7 @@ public class addNode implements jTPS_Transaction {
 
                 break;
         }
-        
+
         app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);
     }
 

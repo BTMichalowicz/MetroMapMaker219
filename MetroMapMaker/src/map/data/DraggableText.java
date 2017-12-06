@@ -60,6 +60,25 @@ public class DraggableText extends Text implements Draggable {
         setText("Your text here");
 
         this.app = initApp;
+        
+        this.setOnMouseDragged(e->{
+              transact = ((mapData) app.getDataComponent()).getTransact();
+        double diffX = e.getX() - startX;
+        double diffY = e.getY() - startY;
+        double newX = getX() + diffX;
+        double newY = getY() + diffY;
+
+        setX(e.getX());
+        setY(e.getY());
+        startX = e.getX();
+        startY = e.getY();
+
+        t = new DragStuff(app, this, e.getX(), e.getY(), getX(), getY());
+        transact.addTransaction(t);
+        ((mapWorkspace) app.getWorkspaceComponent()).getUndo().setDisable(false);
+        
+        
+        });
 
     }
 

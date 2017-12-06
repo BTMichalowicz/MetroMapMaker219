@@ -29,7 +29,7 @@ import properties_manager.PropertiesManager;
  * @author Ben Michalowicz
  */
 public class DraggableImage extends Rectangle implements Draggable {
-    
+
     jTPS_Transaction t;
     jTPS transactions;
 
@@ -53,6 +53,25 @@ public class DraggableImage extends Rectangle implements Draggable {
     public DraggableImage(AppTemplate app) {
         this.app = app;
         this.dataManager = (mapData) app.getDataComponent();
+
+        this.setOnMouseDragged(e -> {
+            transactions = ((mapData) app.getDataComponent()).getTransact();
+            double diffX = e.getX() - startX;
+            double diffY = e.getY() - startY;
+            double newX = getX() + diffX;
+            double newY = getY() + diffY;
+
+            setX(e.getX());
+            setY(e.getY());
+
+            startX = e.getX();
+            startY = e.getY();
+
+            t = new DragStuff(app, this, e.getX(), e.getY(), getX(), getY());
+            transactions.addTransaction(t);
+
+            ((mapWorkspace) app.getWorkspaceComponent()).getUndo().setDisable(false);
+        });
 
     }
 
@@ -113,23 +132,7 @@ public class DraggableImage extends Rectangle implements Draggable {
 
     @Override
     public void drag(int x, int y) {
-        
-        transactions = ((mapData)app.getDataComponent()).getTransact();
-        double diffX = x - startX;
-        double diffY = y - startY;
-        double newX = getX() + diffX;
-        double newY = getY() + diffY;
 
-        setX(x);
-        setY(y);
-        
-        startX = x;
-        startY = y;
-        
-        t = new DragStuff(app, this, x, y, getX(), getY());
-        transactions.addTransaction(t);
-        
-        ((mapWorkspace) app.getWorkspaceComponent()).getUndo().setDisable(false);
     }
 
     @Override

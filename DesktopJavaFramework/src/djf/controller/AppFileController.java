@@ -427,9 +427,12 @@ public class AppFileController {
 
                 // RESET THE DATA
                 app.getDataComponent().resetData();
+                
 
                 // LOAD THE FILE INTO THE DATA
                 app.getFileComponent().loadData(app.getDataComponent(), selectedFile.getAbsolutePath());
+                
+          
 
                 // MAKE SURE THE WORKSPACE IS ACTIVATED
                 app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());

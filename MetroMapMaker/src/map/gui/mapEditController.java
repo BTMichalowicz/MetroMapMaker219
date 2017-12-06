@@ -43,6 +43,7 @@ import map.file.mapFiles;
 import map.data.DraggableLine;
 import properties_manager.PropertiesManager;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 import map.transact.RemoveFromLine;
@@ -57,7 +58,7 @@ public class mapEditController {
 
     public AppTemplate app;
     public mapData dataManager;
-    
+
     jTPS transact;
     jTPS_Transaction t;
 
@@ -180,12 +181,11 @@ public class mapEditController {
      * @param selectedLine The selected Draggable Line in question
      */
     public void processRemoveLine(DraggableLine selectedLine) {
-        
+
         dataManager.setSelectedShape(selectedLine);
-        
+
         processRemoveElement();
 
-       
     }
 
     /**
@@ -195,13 +195,11 @@ public class mapEditController {
      * @param draggableStation The draggable station in question.
      */
     public void processRemoveStat(DraggableStation draggableStation) {
-        
-        
+
         dataManager.setSelectedShape(draggableStation);
-        
+
         processRemoveElement();
 
-        
     }
 
     public void processImageOverlay() {
@@ -313,25 +311,22 @@ public class mapEditController {
     public void processRemoveStatFromLine(DraggableStation removedStation) {
         dataManager = (mapData) app.getDataComponent();
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
-        
-        
-        
-        for(Node n: workspace.getCanvas().getChildren()){
-            if(n instanceof DraggableLine){
+
+        for (Node n : workspace.getCanvas().getChildren()) {
+            if (n instanceof DraggableLine) {
                 DraggableLine l = (DraggableLine) n;
-                
-                if(l.getStations().contains(removedStation.getName())){
+
+                if (l.getStations().contains(removedStation.getName())) {
                     int x = (int) removedStation.getX();
-                    int y = (int)removedStation.getY();
-                    
-                    t = new RemoveFromLine(app, l, removedStation,x, y);
+                    int y = (int) removedStation.getY();
+
+                    t = new RemoveFromLine(app, l, removedStation, x, y);
                     transact = dataManager.getTransact();
                     transact.addTransaction(t);
                 }
             }
         }
 
-        
     }
 
     public void processEditLine(AppTemplate app, DraggableLine line) {
@@ -345,8 +340,6 @@ public class mapEditController {
 
     void processLineThickness() {
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
-        
-
 
         dataManager.setCurrentOutlineThickness((int) work.getLineThickness().getValue());
         app.getGUI().updateToolbarControls(false);
@@ -404,17 +397,18 @@ public class mapEditController {
 
     private void showLines(ArrayList<Line> lines) {
 
-        ZoomPane canvas = ((mapWorkspace) app.getWorkspaceComponent()).getCanvas();
+        ScrollPane notMainCanvas = ((mapWorkspace) app.getWorkspaceComponent()).getOuterCanvas();
 
-        for (int x = 0; x < 10000; x += 10) {
-            lines.add(createLine(x, x, 0, canvas.getWidth() * 3));
+        for (int x = 0; x < notMainCanvas.getWidth(); x += 10) {
+            lines.add(createLine(x, x, 0, notMainCanvas.getHeight()));
         }
 
-        for (int x = 0; x < 10000; x += 10) {
-            lines.add((createLine(0, canvas.getHeight() * 3, x, x)));
+        for (int x = 0; x < notMainCanvas.getHeight(); x += 10) {
+            lines.add((createLine(0, notMainCanvas.getWidth(), x, x)));
+
         }
 
-        canvas.getChildren().addAll(lines);
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().addAll(lines);
 
     }
 
@@ -426,29 +420,116 @@ public class mapEditController {
         l.setStartY(y1);
         l.setEndY(y2);
         l.setStroke(Color.BLACK);
-        l.setStrokeWidth(0.1);
-        l.setDisable(true);
+        l.setStrokeWidth(0.2);
+        l.toBack();
 
         return l;
     }
 
     void hideGrid() {
+
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().removeAll(lines);
         lines.forEach((l) -> {
             l.setVisible(false);
-            ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getChildren().remove(l);
         });
         lines.clear();
     }
 
-    void processSnapToGrid() {
-
-    }
+    
 
     void processDirections(DraggableStation toStat1, DraggableStation fromStat1) {
         int station_cost = 3;
         int transfer_cost = 10;
 
         ArrayList<DraggableLine> tripLines = new ArrayList<>();
+    }
+
+    public void processSnapToGrid() {
+        mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+        Node shape = (Node) dataManager.getSelectedShape();
+        double width = workspace.getCanvas().getWidth();
+        double height = workspace.getCanvas().getHeight();
+        double i = 0;
+        double j = 0;
+        if (shape instanceof DraggableText) {
+            DraggableText tempText = (DraggableText) shape;
+            double xCord = tempText.getX(); //xcord of item.
+            double yCord = tempText.getY(); //ycord of item
+            double offset = 0; //offset, which is calculated by xcord - i
+            double snapPointX = 0; //this will find the smallest difference between the lines and xcord
+            double snapPointY = 0; //this willl find the smallest difference between the lines and ycord
+            double newXcord = 0; //this will be the final x cord
+            double newYcord = 0; //this will be the final y cord
+            while (i < width) {
+                if (i % 10 == 0) {
+                    offset = xCord - i;
+                    if (snapPointX == 0) {
+                        snapPointX = offset;
+                    } else {
+                        if (offset < snapPointX && offset > 0) {
+                            snapPointX = offset;
+                            newXcord = i;
+                        }
+                    }
+                }
+                i++;
+            }
+            tempText.setX(newXcord);
+            while (j < height) {
+                if (j % 10 == 0) {
+                    offset = yCord - j;
+                    if (snapPointY == 0) {
+                        snapPointY = offset;
+                    } else {
+                        if (offset < snapPointY && offset > 0) {
+                            snapPointY = offset;
+                            newYcord = j;
+                        }
+                    }
+                }
+                j++;
+            }
+            tempText.setY(newYcord);
+        } else if (shape instanceof DraggableStation) {
+            DraggableStation tempStation = (DraggableStation) shape;
+            double xCord = tempStation.getCenterX();
+            double yCord = tempStation.getCenterY();
+            double offset = 0;
+            double snapPointX = 0;
+            double snapPointY = 0;
+            double newXcord = 0;
+            double newYcord = 0;
+            while (i < width) {
+                if (i % 20 == 0) {
+                    offset = xCord - i;
+                    if (snapPointX == 0) {
+                        snapPointX = offset;
+                    } else {
+                        if (offset < snapPointX && offset > 0) {
+                            snapPointX = offset;
+                            newXcord = i;
+                        }
+                    }
+                }
+                i++;
+            }
+            tempStation.setCenterX(newXcord);
+            while (j < height) {
+                if (j % 20 == 0) {
+                    offset = yCord - j;
+                    if (snapPointY == 0) {
+                        snapPointY = offset;
+                    } else {
+                        if (offset < snapPointY && offset > 0) {
+                            snapPointY = offset;
+                            newYcord = j;
+                        }
+                    }
+                }
+                j++;
+            }
+            tempStation.setCenterY(newYcord);
+        }
     }
 
 }

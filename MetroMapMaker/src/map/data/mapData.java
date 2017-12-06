@@ -7,7 +7,6 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Effect;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
@@ -19,7 +18,6 @@ import djf.ui.AppMessageDialogSingleton;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Optional;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -30,22 +28,19 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.Pane;
 
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.LineTo;
 import javafx.stage.FileChooser;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
 import static map.data.mapState.SELECTING;
-import map.gui.CanvasController;
-import map.gui.ZoomPane;
 import map.gui.mapWorkspace;
 import map.transact.AddToLine;
 import map.transact.BackgroundEdit;
 import map.transact.LineThick;
 import map.transact.addNode;
 import map.transact.removeNode;
-import properties_manager.PropertiesManager;
 
 /**
  * A class that was created for the purpose of manipulating data and handling
@@ -173,7 +168,7 @@ public class mapData implements AppDataComponent {
     public void setBackgroundColor(Color initBackgroundColor) {
 
         mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
-        ZoomPane canvas = work.getCanvas();
+        Pane canvas = work.getCanvas();
         Background prev = canvas.getBackground();
 
         backgroundColor = initBackgroundColor;
@@ -208,11 +203,10 @@ public class mapData implements AppDataComponent {
         currentBorderWidth = initBorderWidth;
         if (selectedNode != null) {
 
-            
             if (selectedNode instanceof Shape) {
-                t = new LineThick(app,((Shape)selectedNode), (int) ((Shape)selectedNode).getStrokeWidth(), initBorderWidth);
+                t = new LineThick(app, ((Shape) selectedNode), (int) ((Shape) selectedNode).getStrokeWidth(), initBorderWidth);
                 transact.addTransaction(t);
-                
+
             }
         }
     }
@@ -461,9 +455,6 @@ public class mapData implements AppDataComponent {
             selectedNode = null; //Terminate the reference
         }
 
-        // USE THE CURRENT SETTINGS FOR THIS NEW SHAPE
-        mapWorkspace work = (mapWorkspace) app.getWorkspaceComponent();
-
         // GO INTO SHAPE SIZING MODE
         state = mapState.SIZING_ITEM;
         state = mapState.SELECTING;
@@ -516,8 +507,12 @@ public class mapData implements AppDataComponent {
         if (selectedNode != null && selectedNode instanceof DraggableText) {
             if (((DraggableText) selectedNode).getRotate() == 90) {
                 ((DraggableText) selectedNode).setRotate(0);
+                setSelectedShape(null);
+                setState(SELECTING);
             } else {
                 ((DraggableText) selectedNode).setRotate(90);
+                setState(SELECTING);
+                setSelectedShape(null);
             }
         }
 
@@ -536,9 +531,13 @@ public class mapData implements AppDataComponent {
             node = (Node) dataManager.getSelectedShape();
             if (node instanceof DraggableStation) {
                 DraggableStation station = (DraggableStation) node;
-                
+
                 t = new AddToLine(app, draggableLine, station, x, y);
                 transact.addTransaction(t);
+
+                if (draggableLine.getElements().size() >=5) {
+                    checkIsCircular(draggableLine);
+                }
 
                 node = null;
 
@@ -554,6 +553,12 @@ public class mapData implements AppDataComponent {
 
         app.getWorkspaceComponent().reloadWorkspace(dataManager);
 
+    }
+
+    private void checkIsCircular(DraggableLine dl) {
+        if (dl.getCircular() == true) {
+            dl.getElements().set(dl.getElements().size() - 2, dl.getElements().get(1));
+        }
     }
 
 }

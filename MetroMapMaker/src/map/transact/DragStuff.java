@@ -53,7 +53,7 @@ public class DragStuff implements jTPS_Transaction {
 
             case STATION:
                 DraggableStation s = (DraggableStation) node;
-                s.setX(this.curY);
+                s.setX(this.curX);
                 s.setY(this.curY);
 
                 break;

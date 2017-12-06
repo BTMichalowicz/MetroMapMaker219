@@ -1,8 +1,10 @@
 package map.transact;
 
 import djf.AppTemplate;
+import javafx.scene.layout.Pane;
+import javafx.scene.transform.Scale;
 import jtps.jTPS_Transaction;
-import map.gui.ZoomPane;
+
 import map.gui.mapWorkspace;
 
 /**
@@ -12,12 +14,12 @@ import map.gui.mapWorkspace;
 public class ZoomOut implements jTPS_Transaction {
 
  AppTemplate app;
-    ZoomPane canvas;
+    Pane canvas;
     
     double prevScale, curScale;
 
 
-    public ZoomOut(AppTemplate app, ZoomPane canvas, double prevScale, double curScale){
+    public ZoomOut(AppTemplate app, Pane canvas, double prevScale, double curScale){
         //TODO: Re-implement this once your algorithm's been figured out for pane usage. 
         this.app = app;
         this.canvas = canvas;
@@ -27,19 +29,24 @@ public class ZoomOut implements jTPS_Transaction {
 
     @Override
     public void doTransaction() {
-        canvas.setScaler(curScale);
-        ((mapWorkspace) app.getWorkspaceComponent()).getMainSpot().setScaleX(curScale);
-        ((mapWorkspace) app.getWorkspaceComponent()).getMainSpot().setScaleY(curScale);
+//        //canvas.setScaler(curScale);
+//        canvas.setScaleX(curScale);
+//        canvas.setScaleY(curScale);
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getTransforms().add(new Scale(curScale, curScale));
+        //((mapWorkspace) app.getWorkspaceComponent()).getMainGroup().getTransforms().add(new Scale(curScale, curScale));
+
     }
 
     @Override
     public void undoTransaction() {
-        canvas.setScaler(prevScale);
+//        //canvas.setScaler(prevScale);
+//]
+//        canvas.setScaleX(prevScale);
+//        canvas.setScaleY(prevScale);
+        ((mapWorkspace) app.getWorkspaceComponent()).getCanvas().getTransforms().add(new Scale(prevScale, prevScale));
+       // ((mapWorkspace) app.getWorkspaceComponent()).getMainGroup().getTransforms().add(new Scale(curScale, curScale));
 
-        ((mapWorkspace) app.getWorkspaceComponent()).getMainSpot().setScaleX(prevScale);
-        ((mapWorkspace) app.getWorkspaceComponent()).getMainSpot().setScaleY(prevScale);
     }
-
 
 
 }
