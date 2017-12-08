@@ -131,11 +131,11 @@ public class AppFileController {
             }
             
             // INIT THE WRITER
-           os = new FileOutputStream(f.getPath() + "\\" + file + ".m3");
+           os = new FileOutputStream(f.getPath() + "\\" + file + ".json");
              jsonFileWriter = Json.createWriter(os);
             jsonFileWriter.writeObject(newFile);
              prettyPrinted = sw.toString();
-            try (PrintWriter pw = new PrintWriter(f.getPath() + "\\" + file + ".m3")) {
+            try (PrintWriter pw = new PrintWriter(f.getPath() + "\\" + file + ".json")) {
                 pw.write(prettyPrinted);
 
             }

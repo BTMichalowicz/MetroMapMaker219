@@ -11,6 +11,7 @@ import static map.data.Draggable.STATION;
 import static map.data.Draggable.TEXT;
 import map.data.DraggableLine;
 import map.data.DraggableStation;
+import map.data.mapData;
 import map.gui.mapWorkspace;
 
 /**
@@ -34,11 +35,12 @@ public class removeNode implements jTPS_Transaction {
 
     @Override
     public void doTransaction() {
-        work.getCanvas().getChildren().remove(node);
 
         switch (((Draggable) node).getShapeType()) {
             case LINE:
+                work.getCanvas().getChildren().remove(node);
                 DraggableLine l = (DraggableLine) node;
+                ((mapData) app.getDataComponent()).getLines().remove(l);
 
                 work.getCanvas().getChildren().remove((l).getStartName());
                 work.getCanvas().getChildren().remove((l).getEndName());
@@ -51,10 +53,12 @@ public class removeNode implements jTPS_Transaction {
                 break;
 
             case IMAGE:
+                work.getCanvas().getChildren().remove(node);
                 break;
 
             case STATION:
 
+                work.getCanvas().getChildren().remove(node);
                 DraggableStation s = (DraggableStation) node;
 
                 work.getCanvas().getChildren().remove((s).getStatName());
@@ -65,11 +69,10 @@ public class removeNode implements jTPS_Transaction {
                     ((DraggableLine) n).removeStation((s));
                 });
 
-                work.getCanvas().getChildren().remove(s.getStatName());
-
                 break;
 
             case TEXT:
+                work.getCanvas().getChildren().remove(node);
 
                 break;
         }
@@ -83,6 +86,7 @@ public class removeNode implements jTPS_Transaction {
         switch (((Draggable) node).getShapeType()) {
             case LINE:
                 DraggableLine l = (DraggableLine) node;
+                ((mapData) app.getDataComponent()).getLines().add(l);
 
                 work.getCanvas().getChildren().addAll(l.getStartName(), l.getEndName());
                 work.getLines().getItems().add((l).getName());

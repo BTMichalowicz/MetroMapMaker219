@@ -25,6 +25,14 @@ public class DraggableLine extends Path implements Draggable {
     DraggableText startName, endName;
     
     boolean isCircular;
+    
+    ArrayList<DraggableStation> stat;
+    
+    public ArrayList<DraggableStation> getStat(){
+        return stat;
+    }
+    
+    
 
     jTPS transactl;
     jTPS_Transaction t;
@@ -45,6 +53,7 @@ public class DraggableLine extends Path implements Draggable {
 
         setOpacity(1.2);
         stations = new ArrayList<>();
+        stat = new ArrayList<>();
 
         this.name = name;
         setStrokeWidth(3);
@@ -64,7 +73,7 @@ public class DraggableLine extends Path implements Draggable {
         return isCircular;
     }
 
-    LineTo line;
+
 
     public ArrayList<String> getStations() {
         return stations;
@@ -84,6 +93,7 @@ public class DraggableLine extends Path implements Draggable {
     public void addStation(DraggableStation s) {
 
         stations.add(s.getName());
+        stat.add(s);
 
 
             getElements().add(getElements().size() - 1, s.getLineStat());
@@ -104,7 +114,7 @@ public class DraggableLine extends Path implements Draggable {
         getElements().remove(s.getLineStat());
 
         stations.remove(s.getName());
-
+        stat.remove(s);
     }
 
     @Override

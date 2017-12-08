@@ -46,6 +46,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
+import map.pathfinder.PathfinderData;
 import map.transact.RemoveFromLine;
 
 /**
@@ -323,6 +324,7 @@ public class mapEditController {
                     t = new RemoveFromLine(app, l, removedStation, x, y);
                     transact = dataManager.getTransact();
                     transact.addTransaction(t);
+                    workspace.getUndo().setDisable(false);
                 }
             }
         }
@@ -330,12 +332,16 @@ public class mapEditController {
     }
 
     public void processEditLine(AppTemplate app, DraggableLine line) {
+        dataManager = (mapData) app.getDataComponent();
 
         EditLineTool editor = new EditLineTool(app, line);
 
         editor.showAndWait();
 
         ((mapWorkspace) app.getWorkspaceComponent()).reloadWorkspace(app.getDataComponent());
+        
+        dataManager.checkIsCircular(line);
+        
     }
 
     void processLineThickness() {
@@ -438,10 +444,10 @@ public class mapEditController {
     
 
     void processDirections(DraggableStation toStat1, DraggableStation fromStat1) {
-        int station_cost = 3;
-        int transfer_cost = 10;
-
-        ArrayList<DraggableLine> tripLines = new ArrayList<>();
+        
+        dataManager = (mapData) app.getDataComponent();
+       PathfinderData data = new PathfinderData(dataManager.getLines(), toStat1, fromStat1);
+        
     }
 
     public void processSnapToGrid() {

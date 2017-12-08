@@ -18,6 +18,7 @@ import djf.ui.AppMessageDialogSingleton;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Optional;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -31,6 +32,8 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
 import javafx.stage.FileChooser;
 import jtps.jTPS;
 import jtps.jTPS_Transaction;
@@ -54,6 +57,12 @@ public class mapData implements AppDataComponent {
     // FIRST THE THINGS THAT HAVE TO BE SAVED TO FILES
     // THESE ARE THE SHAPES TO DRAW
     ObservableList<Node> items;
+    
+    ArrayList<DraggableLine> lines;
+    
+    public ArrayList<DraggableLine> getLines(){
+        return lines;
+    }
 
     public ObservableList<Node> getShapeList() {
         return items;
@@ -137,6 +146,7 @@ public class mapData implements AppDataComponent {
         dropShadowEffect.setBlurType(BlurType.GAUSSIAN);
         dropShadowEffect.setRadius(15);
         highlightedEffect = dropShadowEffect;
+        lines = new ArrayList<>();
 
         transact = new jTPS();
     }
@@ -175,8 +185,15 @@ public class mapData implements AppDataComponent {
 
         BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
         Background background = new Background(fill);
-        t = new BackgroundEdit(app, prev, b, canvas);
+        t = new BackgroundEdit(app, prev, background, canvas);
         transact.addTransaction(t);
+        
+        work.getUndo().setDisable(false);
+        
+        b = background;
+        
+        app.getGUI().getPrimaryScene().setCursor(Cursor.DEFAULT);
+        setState(mapState.SELECTING);
     }
 
     public void setCurrentFillColor(Color initColor) {
@@ -206,6 +223,7 @@ public class mapData implements AppDataComponent {
             if (selectedNode instanceof Shape) {
                 t = new LineThick(app, ((Shape) selectedNode), (int) ((Shape) selectedNode).getStrokeWidth(), initBorderWidth);
                 transact.addTransaction(t);
+                ((mapWorkspace)app.getWorkspaceComponent()).getUndo().setDisable(false);
 
             }
         }
@@ -328,6 +346,7 @@ public class mapData implements AppDataComponent {
             t = new removeNode(app, selectedNode);
 
             transact.addTransaction(t);
+            ((mapWorkspace) app.getWorkspaceComponent()).getUndo().setDisable(false);
 
             selectedNode = null;
         }
@@ -361,6 +380,8 @@ public class mapData implements AppDataComponent {
         if (selectedFile != null) {
             try {
                 setState(mapState.STARTING_BCKGROUND);
+                
+               
 
                 work.getCanvas().setBackground(new Background(new BackgroundImage(loadImg(selectedFile),
                         BackgroundRepeat.ROUND,
@@ -555,9 +576,20 @@ public class mapData implements AppDataComponent {
 
     }
 
-    private void checkIsCircular(DraggableLine dl) {
+    public void checkIsCircular(DraggableLine dl) {
         if (dl.getCircular() == true) {
-            dl.getElements().set(dl.getElements().size() - 2, dl.getElements().get(1));
+            //Set the x and y values of the last station to those of the first station
+            
+            ((LineTo)dl.getElements().get(dl.getElements().size()-2)).setX(((LineTo)dl.getElements().get(1)).getX());
+             ((LineTo)dl.getElements().get(dl.getElements().size()-2)).setY(((LineTo)dl.getElements().get(1)).getY());
+             
+             ((LineTo)dl.getElements().get(dl.getElements().size()-2)).xProperty().bind((((LineTo)dl.getElements().get(1)).xProperty()));
+             ((LineTo)dl.getElements().get(dl.getElements().size()-2)).yProperty().bind((((LineTo)dl.getElements().get(1)).yProperty()));
+
+        }else{
+            ((LineTo)dl.getElements().get(dl.getElements().size()-2)).xProperty().unbind();
+             ((LineTo)dl.getElements().get(dl.getElements().size()-2)).yProperty().unbind();
+            
         }
     }
 

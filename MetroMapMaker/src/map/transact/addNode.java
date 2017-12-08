@@ -1,9 +1,6 @@
 package map.transact;
 
 import djf.AppTemplate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import jtps.jTPS_Transaction;
@@ -14,7 +11,7 @@ import static map.data.Draggable.STATION;
 import static map.data.Draggable.TEXT;
 import map.data.DraggableLine;
 import map.data.DraggableStation;
-import map.data.DraggableText;
+import map.data.mapData;
 import map.gui.mapWorkspace;
 
 /**
@@ -45,7 +42,9 @@ public class addNode implements jTPS_Transaction {
             case LINE:
                 DraggableLine l = (DraggableLine) node;
 
-                if (work.getCanvas().getChildren().contains(l.getStartName())) {
+                ((mapData) app.getDataComponent()).getLines().add(l);
+
+                if (work.getCanvas().getChildren().contains(l.getStartName()) || work.getCanvas().getChildren().contains(l.getEndName())) {
 
                 } else {
 
@@ -82,6 +81,7 @@ public class addNode implements jTPS_Transaction {
         switch (((Draggable) node).getShapeType()) {
             case LINE:
                 DraggableLine l = (DraggableLine) node;
+                ((mapData) app.getDataComponent()).getLines().remove(l);
 
                 work.getCanvas().getChildren().removeAll(l.getStartName(), l.getEndName());
                 break;
@@ -94,6 +94,9 @@ public class addNode implements jTPS_Transaction {
                 DraggableStation s = (DraggableStation) node;
 
                 work.getCanvas().getChildren().remove(s.getStatName());
+               // work.getStations().getItems().remove(s.getStatName());
+                work.getFromStat().getItems().remove(s.getStatName());
+                work.getToStat().getItems().remove(s.getStatName());
                 break;
 
             case TEXT:

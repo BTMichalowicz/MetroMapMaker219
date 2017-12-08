@@ -1,6 +1,7 @@
 package map.data;
 
 import djf.AppTemplate;
+import java.util.Objects;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.shape.Circle;
 import jtps.jTPS;
@@ -12,7 +13,7 @@ import map.transact.DragStuff;
  *
  * @author Ben Michalowicz
  */
-public class DraggableStation extends Circle implements Draggable, Comparable<DraggableStation> {
+public class DraggableStation extends Circle implements Draggable{
 
     double startCenterX;
     double startCenterY;
@@ -73,6 +74,7 @@ public class DraggableStation extends Circle implements Draggable, Comparable<Dr
 
             t = new DragStuff(app, this, e.getX(), e.getY(), getX(), getY());
             transact.addTransaction(t);
+            ((mapWorkspace)app.getWorkspaceComponent()).getUndo().setDisable(false);
 
         });
     }
@@ -176,25 +178,29 @@ public class DraggableStation extends Circle implements Draggable, Comparable<Dr
         return STATION;
     }
 
-    @Override
-    public int compareTo(DraggableStation t) {
-        if(this.getX()>t.getX() && this.getY()>t.getY()){
-            return 1;
-        }else if(this.getX()<t.getX() && this.getY()<t.getY()){
-            return-1;
-        }else
-            return 0;
-    }
+   
     
     
+    
+
     @Override
-    public boolean equals(Object o){
-        if (this==o) return true;
-        if(!(o instanceof DraggableStation)) return false;
-        
-        DraggableStation that = (DraggableStation) o;
-        
-        return this.getName().equals(that.getName()) && this.getX() == that.getX() && this.getY() == that.getY();
+    public int hashCode() {
+        int hash = 3;
+        hash = 83 * hash + (int) (Double.doubleToLongBits(this.startCenterX) ^ (Double.doubleToLongBits(this.startCenterX) >>> 32));
+        hash = 83 * hash + (int) (Double.doubleToLongBits(this.startCenterY) ^ (Double.doubleToLongBits(this.startCenterY) >>> 32));
+        hash = 83 * hash + Objects.hashCode(this.app);
+        hash = 83 * hash + Objects.hashCode(this.name);
+        hash = 83 * hash + Objects.hashCode(this.statName);
+        hash = 83 * hash + Objects.hashCode(this.lineStat);
+        hash = 83 * hash + (int) (Double.doubleToLongBits(this.prevX) ^ (Double.doubleToLongBits(this.prevX) >>> 32));
+        hash = 83 * hash + (int) (Double.doubleToLongBits(this.prevY) ^ (Double.doubleToLongBits(this.prevY) >>> 32));
+        hash = 83 * hash + (int) (Double.doubleToLongBits(this.curX) ^ (Double.doubleToLongBits(this.curX) >>> 32));
+        hash = 83 * hash + (int) (Double.doubleToLongBits(this.curY) ^ (Double.doubleToLongBits(this.curY) >>> 32));
+        hash = 83 * hash + Objects.hashCode(this.transact);
+        hash = 83 * hash + Objects.hashCode(this.t);
+        return hash;
     }
+
+    
 
 }

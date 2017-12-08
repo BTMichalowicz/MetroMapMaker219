@@ -17,7 +17,6 @@ import java.util.Map;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
@@ -94,9 +93,6 @@ public class mapFiles implements AppFileComponent {
         dataManager = (mapData) data;
 
         mapWorkspace workspace = (mapWorkspace) dataManager.getApp().getWorkspaceComponent();
-
-        Background bg = dataManager.getB();
-        //Set the background up regardless of image or color or other
 
         //FOR GENERAL OBJECTS
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
@@ -233,7 +229,6 @@ public class mapFiles implements AppFileComponent {
 
         dataManager.getApp().setLineName(json.getString(JSON_NAME));
 
-        //dataManager.setBackgroundColor(Color.LIGHTGREY);
         JsonArray jsonItemsArray = json.getJsonArray("everything_else");
         JsonArray jsonLinesArray = json.getJsonArray(JSON_LINES);
         JsonArray jsonStatArray = json.getJsonArray(JSON_STAT);
@@ -249,7 +244,7 @@ public class mapFiles implements AppFileComponent {
                 node2.setFill(loadColor(jsonItem2, JSON_COLOR));
                 node2.setRadius(jsonItem2.getInt(JSON_RADIUS));
 
-                dataManager.addShape(node2);
+                ((mapWorkspace)dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node2);
 
                 //node2.start((int)node2.getCenterX(), (int)node2.getCenterY());
                 //((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node2);
@@ -266,8 +261,14 @@ public class mapFiles implements AppFileComponent {
                 DraggableLine line = (DraggableLine) node;
 
                 dataManager.addShape(line);
+                dataManager.getLines().add(line);
 
-                for (int j = 0; j < jsonStatArray.size(); j++) {
+                
+
+            }
+            
+            for (int j = 0; j < jsonStatArray.size(); j++) {
+                
                     JsonObject jsonItem2 = jsonStatArray.getJsonObject(j);
 
                     DraggableStation node2 = new DraggableStation(dataManager.getApp(), "");
@@ -277,45 +278,45 @@ public class mapFiles implements AppFileComponent {
                     node2.setFill(loadColor(jsonItem2, JSON_COLOR));
                     node2.setRadius(jsonItem2.getInt(JSON_RADIUS));
 
-                    dataManager.addShape(node2);
-
-                    node2.start((int) node2.getCenterX(), (int) node2.getCenterY());
-
-                    ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node2);
-
+//                    ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node2);
+                for (DraggableLine line : dataManager.getLines()) {
                     if (line.getStations().contains(node2.getName())) {
+                        
                         line.addStation(node2);
-                    }
+
+                    } else {
+                                            }
+                }
+                ((mapWorkspace)dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node2);
+
 
                     ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getStations().getItems().add(node2.getName());
                     ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getFromStat().getItems().add(node2.getName());
                     ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getToStat().getItems().add(node2.getName());
                 }
-
-            }
+            
+            
+            
         }
 
         for (int i = 0; i < jsonItemsArray.size(); i++) {
             JsonObject jsonItem = jsonItemsArray.getJsonObject(i);
             Node node = loadNode(jsonItem);
 
-            for (Node n : ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren()) {
-                if (n instanceof DraggableText) {
-                    if (node instanceof DraggableText) {
-                        if (((DraggableText) n).getText().equals(((DraggableText) node).getText())) {
-                            continue;
-                        } else {
-                            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
-
-                        }
-                    }
-                }
-
-            }
-
+//            for (Node n : ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren()) {
+//                if (n instanceof DraggableText) {
+//                    if (node instanceof DraggableText) {
+//                        if (((DraggableText) n).getText().equals(((DraggableText) node).getText())) {
+//                            continue;
+//                        } else {
+//                            ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
+//
+//                        }
+//                    }
+//                }
+//
+//            }
             if (((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().contains(node)) {
-                continue;
-
             } else {
                 ((mapWorkspace) dataManager.getApp().getWorkspaceComponent()).getCanvas().getChildren().add(node);
             }

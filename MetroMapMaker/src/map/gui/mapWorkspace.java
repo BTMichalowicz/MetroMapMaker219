@@ -733,7 +733,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         debugText.setY(100);
 
         canvas.prefHeight(1900);
-        canvas.prefHeight(1900);
+        canvas.prefWidth(1900);
         canvas.autosize();
 
         mainGroup.getChildren().add(canvas);
@@ -742,20 +742,16 @@ public class mapWorkspace extends AppWorkspaceComponent {
         outerCanvas.setPrefViewportWidth(900);
         outerCanvas.autosize();
         outerCanvas.setContent(mainGroup);
-        
-         outerCanvas.setHbarPolicy(ScrollBarPolicy.ALWAYS);
+
+        outerCanvas.setHbarPolicy(ScrollBarPolicy.ALWAYS);
         outerCanvas.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
         ((BorderPane) workspace).setLeft(editToolbar);
         ((BorderPane) workspace).setCenter(outerCanvas);
 
-     
-
         //outerCanvas.setStyle("-fx-fill: #000000;");
         dataManager = (mapData) app.getDataComponent();
         dataManager.setList(canvas.getChildren());
-
-       
 
     }
 
@@ -1024,37 +1020,37 @@ public class mapWorkspace extends AppWorkspaceComponent {
             mapEditController.rotateText();
         });
 
-//        fromToPop.setOnAction(e -> {
-//            if (fromStat.getSelectionModel().getSelectedItem() != null && toStat.getSelectionModel().getSelectedItem() != null) {
-//
-//                DraggableStation toStat1 = null, fromStat1 = null;
-//
-//                for (Node n : canvas.getChildren()) {
-//                    if (n instanceof DraggableStation) {
-//                        DraggableStation drag = (DraggableStation) n;
-//
-//                        if (drag.getName().equals(fromStat.getSelectionModel().getSelectedItem())) {
-//                            toStat1 = drag;
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//                for (Node n : canvas.getChildren()) {
-//                    if (n instanceof DraggableStation) {
-//                        DraggableStation drag = (DraggableStation) n;
-//
-//                        if (drag.getName().equals(toStat.getSelectionModel().getSelectedItem())) {
-//                            fromStat1 = drag;
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//                mapEditController.processDirections(toStat1, fromStat1);
-//            }
-//
-//        });
+        fromToPop.setOnAction(e -> {
+            if (fromStat.getSelectionModel().getSelectedItem() != null && toStat.getSelectionModel().getSelectedItem() != null) {
+
+                DraggableStation toStat1 = null, fromStat1 = null;
+
+                for (Node n : canvas.getChildren()) {
+                    if (n instanceof DraggableStation) {
+                        DraggableStation drag = (DraggableStation) n;
+
+                        if (drag.getName().equals(fromStat.getSelectionModel().getSelectedItem())) {
+                            toStat1 = drag;
+                            break;
+                        }
+                    }
+                }
+
+                for (Node n : canvas.getChildren()) {
+                    if (n instanceof DraggableStation) {
+                        DraggableStation drag = (DraggableStation) n;
+
+                        if (drag.getName().equals(toStat.getSelectionModel().getSelectedItem())) {
+                            fromStat1 = drag;
+                            break;
+                        }
+                    }
+                }
+
+                mapEditController.processDirections(toStat1, fromStat1);
+            }
+
+        });
         snapToGrid.setOnAction(e -> {
             mapEditController.processSnapToGrid();
 
@@ -1103,6 +1099,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
                     transaction = new TextFontColorContent(app, ((DraggableText) node), fill, fill2, f, f2);
                     dataManager.getTransact().addTransaction(transaction);
+                    undo.setDisable(false);
 
                 }
 
